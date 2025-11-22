@@ -16,5 +16,8 @@
   },
   "volta": {
     "node": "22.14.0"
+  },
+  "dependencies": {
+    "change-case": "^5.4.4"
   }
 }

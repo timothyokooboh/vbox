@@ -102,3 +102,10 @@ export type VBoxProps = PseudoProps &
   };
 
 export type VBoxStyleProps = Omit<VBoxProps, "is">;
+
+export type Breakpoints = {
+  sm: string;
+  md: string;
+  lg: string;
+  xl: string;
+};

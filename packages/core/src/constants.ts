@@ -39,3 +39,41 @@ export const DefaultAliases: AliasMap = {
   radius: "borderRadius",
   shadow: "boxShadow",
 };
+
+export const TokensMap = {
+  color: "colors",
+  "font-size": "font-size",
+  "font-weight": "font-weight",
+  "font-family": "font-family",
+  spacing: "spacing",
+};
+
+export const SpacingProperties = [
+  "margin",
+  "margin-top",
+  "margin-block-start",
+  "margin-bottom",
+  "margin-block-end",
+  "margin-block",
+  "margin-right",
+  "margin-inline-end",
+  "margin-left",
+  "margin-inline-start",
+  "margin-inline",
+  "padding",
+  "padding-top",
+  "padding-block-start",
+  "padding-bottom",
+  "padding-block-end",
+  "padding-block",
+  "padding-right",
+  "padding-inline-end",
+  "padding-left",
+  "padding-inline-start",
+  "padding-inline",
+  "gap",
+  "column-gap",
+  "row-gap",
+  "line-height",
+  "letter-spacing",
+] as const;
