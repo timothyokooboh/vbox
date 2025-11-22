@@ -81,7 +81,7 @@ const extractStylesFromValue = (value: unknown) => {
   return { rootStyleRecord, nestedStyleRecord };
 };
 
-export const processMediaQueries = (styleObj: VBoxProps["mq"]) => {
+const processMediaQueries = (styleObj: VBoxProps["mq"]) => {
   if (!styleObj) return;
   const customMediaQueries: Record<string, Record<string, string>> = {};
   const selectorBlocks: Record<string, Record<string, string>> = {};

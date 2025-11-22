@@ -14,14 +14,14 @@
 
     /* Bundler mode */
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
+    // "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
-    "noEmit": true,
+    "noEmit": false,
     "declaration": true,
     "sourceMap": true,
     "declarationMap": true,
-    "emitDeclarationOnly": false,
+    // "emitDeclarationOnly": false,
 
     /* Linting */
     "strict": true,

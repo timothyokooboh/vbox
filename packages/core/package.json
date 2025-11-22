@@ -3,16 +3,22 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "main": "dist/index.umd.js",
+  "module": "dist/index.es.js",
+  "types": "dist/types/types.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "preview": "vite preview"
   },
   "devDependencies": {
     "@types/node": "^24.10.0",
     "csstype": "^3.2.3",
     "typescript": "~5.9.3",
-    "vite": "^7.1.7"
+    "vite": "^7.1.7",
+    "vite-plugin-dts": "^4.5.4"
   },
   "volta": {
     "node": "22.14.0"
