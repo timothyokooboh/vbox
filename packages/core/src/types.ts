@@ -1,24 +1,26 @@
 import type { StandardProperties, Pseudos } from "csstype";
 
+export type StandardCSSProperties = StandardProperties;
+
 /**
  * Maps shorthand keys to full CSS property names.
  * Used internally to expand alias props at runtime.
  * Example: `{ d: 'display', p: 'padding' }`
  */
-export type AliasMap = Record<string, keyof StandardProperties>;
+export type AliasMap = Record<string, keyof StandardCSSProperties>;
 
 /**
  * CSS selector blocks keyed by selector strings.
  * Keys may include `&` for parent reference.
  * Example: `{ '&:first-child': { color: 'red' } }`
  */
-export type Selectors = Record<string, StandardProperties>;
+export type Selectors = Record<string, StandardCSSProperties>;
 
 /**
  * A union type representing either plain CSS properties
  * or nested selector rules.
  */
-export type PropertiesAndSelectors = StandardProperties | Selectors;
+export type PropertiesAndSelectors = StandardCSSProperties | Selectors;
 
 /**
  * Shorthand props for common pseudo-classes such as :hover and :focus.
@@ -59,7 +61,7 @@ export interface BreakpointProps {
  * Example: `d="flex"` → `display: flex`.
  */
 export type AliasProps = {
-  [K in keyof AliasMap]?: StandardProperties[AliasMap[K]];
+  [K in keyof AliasMap]?: StandardCSSProperties[AliasMap[K]];
 };
 
 /**
@@ -68,7 +70,7 @@ export type AliasProps = {
  * Allows v-box to accept CSS properties and aliases as props.
  */
 export type CSSStyleProps = {
-  [K in keyof StandardProperties]?: StandardProperties[K];
+  [K in keyof StandardCSSProperties]?: StandardCSSProperties[K];
 } & AliasProps;
 
 export type VBoxProps = PseudoProps &

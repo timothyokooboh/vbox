@@ -1,12 +1,12 @@
 {
-  "private": true,
-  "name": "vbox",
+  "private": false,
+  "name": "@vbox/vue",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "author": "Timothy Okooboh",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "vite build"
   },
   "keywords": [],
   "license": "MIT",
