@@ -1,4 +1,5 @@
 import { fileURLToPath, URL } from "node:url";
+import path from "node:path";
 
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
@@ -23,11 +24,16 @@ export default defineConfig({
   build: {
     lib: {
       entry: path.resolve(__dirname, "src/index.ts"),
-      name: "VBoxCore",
+      name: "VBoxVue",
       fileName: (format) => `index.${format}.js`,
     },
     rollupOptions: {
-      external: [],
+      external: ["vue"],
+      output: {
+        globals: {
+          vue: "Vue",
+        },
+      },
     },
   },
 });

@@ -4,10 +4,10 @@ import { isValidCssDeclaration } from "./isValidCssDeclaration";
 import { isObjectLiteral } from "./isObjectLiteral";
 import { isValidCssSelector } from "./isValidCssSelector";
 import type {
-  StandardProperties,
+  // StandardProperties,
   StandardPropertiesHyphenFallback,
 } from "csstype";
-import type { Breakpoints, VBoxProps } from "../types";
+import type { AliasMap, Breakpoints, VBoxProps } from "../types";
 
 const normalizeCache = new Map<string, string>();
 
@@ -20,10 +20,7 @@ const normalizeCache = new Map<string, string>();
  *
  * Results are cached to avoid repeated normalization work.
  */
-const normalizeKey = (
-  key: string,
-  aliases: Record<string, keyof StandardProperties>,
-): string => {
+const normalizeKey = (key: string, aliases: AliasMap): string => {
   const cached = normalizeCache.get(key);
   if (cached) return cached;
 
@@ -140,7 +137,7 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
   breakpoints,
 }: {
   obj: T;
-  aliases: Record<string, keyof StandardProperties>;
+  aliases: AliasMap; //Record<string, keyof StandardProperties>;
   className: string;
   breakpoints: Breakpoints;
 }) => {

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { VBoxProps, Breakpoints, StandardCSSProperties } from "@vbox/core";
+import type { VBoxProps, Breakpoints, AliasMap } from "@vbox/core";
 import { DefaultAliases, parseStyleObject, buildCssString } from "@vbox/core";
 
 import {
@@ -16,10 +16,7 @@ import { useDeriveChildNode } from "@/composables/useDeriveChildNode";
 const props = defineProps<VBoxProps>();
 
 const breakpoints = inject("vbox-breakpoints") as Breakpoints;
-const aliases = inject<Record<string, keyof StandardCSSProperties>>(
-  "vbox-aliases",
-  DefaultAliases,
-);
+const aliases = inject<AliasMap>("vbox-aliases", DefaultAliases);
 const classNamePrefix = inject("class-name-prefix", "");
 
 const className = `${classNamePrefix}-css-${useId()}`;
@@ -60,11 +57,11 @@ watchEffect(() => {
     className,
   });
 
-  // inject/update style element
   if (!styleEl.value && typeof document !== "undefined") {
     styleEl.value = document.createElement("style");
     document.head.appendChild(styleEl.value);
   }
+
   if (styleEl.value) {
     styleEl.value.textContent = cssString;
   }

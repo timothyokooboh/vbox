@@ -1,6 +1,6 @@
 {
   "files": [],
-  "references": [{ "path": "./packages/core" }],
+  "references": [{ "path": "./packages/core" }, { "path": "./packages/vue" }],
   "compilerOptions": {
     "target": "ESNext",
     "useDefineForClassFields": true,

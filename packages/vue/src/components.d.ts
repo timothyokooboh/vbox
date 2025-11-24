@@ -1,4 +1,4 @@
-import type VBox from "@/VBox.vue";
+import type VBox from "@/components/VBox.vue";
 
 declare module "vue" {
   export interface GlobalComponents {

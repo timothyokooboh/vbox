@@ -15,5 +15,5 @@ export type {
   AliasProps,
   CSSStyleProps,
   BreakpointProps,
-  StandardCSSProperties,
+  StandardCssProperties,
 } from "./types";

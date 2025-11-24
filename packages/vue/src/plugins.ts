@@ -9,7 +9,7 @@ export type Breakpoints = {
   xl: string;
 };
 
-type AliasStrategy = "merge" | "replace";
+export type AliasStrategy = "merge" | "replace";
 
 export interface VBoxPluginOptions {
   breakpoints?: Breakpoints;
@@ -20,7 +20,7 @@ export interface VBoxPluginOptions {
   };
 }
 
-export default {
+export const VBoxPlugin = {
   install(app: App<Element>, options?: VBoxPluginOptions) {
     const userAlias = options?.alias?.values ?? {};
     const strategy = options?.alias?.strategy ?? "merge";
