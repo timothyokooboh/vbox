@@ -1,5 +1,5 @@
 import type { StandardPropertiesHyphenFallback } from "csstype";
-import { SpacingProperties, TokensMap } from "../constants";
+import { ColorProperties, SpacingProperties, TokensMap } from "../constants";
 
 const deriveToken = (tokenIdentifier: string, value: string) => {
   return `--${tokenIdentifier}-${value}`;
@@ -24,11 +24,13 @@ export const useDesignTokens = <
   const trimmedValue = value.trim();
 
   switch (true) {
-    case cssProp === "color" &&
-      hasToken(deriveToken(TokensMap.color, trimmedValue)):
+    case ColorProperties.includes(
+      cssProp as (typeof ColorProperties)[number],
+    ) && hasToken(deriveToken(TokensMap.color, trimmedValue)):
+      console.log(cssProp);
       return {
         ...newStyles,
-        color: `var(${deriveToken(TokensMap.color, trimmedValue)})`,
+        [cssProp]: `var(${deriveToken(TokensMap.color, trimmedValue)})`,
       };
     case cssProp === "font-size" &&
       hasToken(deriveToken(TokensMap["font-size"], trimmedValue)):
@@ -37,7 +39,7 @@ export const useDesignTokens = <
         "font-size": `var(${deriveToken(TokensMap["font-size"], trimmedValue)})`,
       };
     case cssProp === "font-weight" &&
-      hasToken(deriveToken(TokensMap.color, trimmedValue)):
+      hasToken(deriveToken(TokensMap["font-weight"], trimmedValue)):
       return {
         ...newStyles,
         "font-weight": `var(${deriveToken(TokensMap["font-weight"], trimmedValue)})`,

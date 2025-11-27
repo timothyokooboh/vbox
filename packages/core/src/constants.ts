@@ -1,6 +1,4 @@
-import type { AliasMap } from "./types";
-
-export const DefaultAliases: AliasMap = {
+export const DefaultAliases = {
   w: "width",
   maxW: "maxWidth",
   minW: "minWidth",
@@ -13,17 +11,17 @@ export const DefaultAliases: AliasMap = {
   lh: "lineHeight",
   ls: "letterSpacing",
   m: "margin",
-  mt: "marginTop",
-  mb: "marginBottom",
-  ml: "marginLeft",
-  mr: "marginRight",
+  mt: "marginBlockStart",
+  mb: "marginBlockEnd",
+  ml: "marginInlineStart",
+  mr: "marginInlineEnd",
   mx: "marginInline",
   my: "marginBlock",
   p: "padding",
-  pt: "paddingTop",
-  pb: "paddingBottom",
-  pl: "paddingLeft",
-  pr: "paddingRight",
+  pt: "paddingBlockStart",
+  pb: "paddingBlockEnd",
+  pl: "paddingInlineStart",
+  pr: "paddingInlineEnd",
   px: "paddingInline",
   py: "paddingBlock",
   bg: "background",
@@ -35,10 +33,9 @@ export const DefaultAliases: AliasMap = {
   bgRepeat: "backgroundRepeat",
   bgAttachment: "backgroundAttachment",
   bgOrigin: "backgroundOrigin",
-  d: "display",
   radius: "borderRadius",
   shadow: "boxShadow",
-};
+} as const;
 
 export const TokensMap = {
   color: "colors",
@@ -47,6 +44,18 @@ export const TokensMap = {
   "font-family": "font-family",
   spacing: "spacing",
 };
+
+export const ColorProperties = [
+  "color",
+  "background",
+  "background-color",
+  "border-color",
+  "outline-color",
+  "caret-color",
+  "text-decoration-color",
+  "fill",
+  "stroke",
+] as const;
 
 export const SpacingProperties = [
   "margin",
@@ -76,4 +85,7 @@ export const SpacingProperties = [
   "row-gap",
   "line-height",
   "letter-spacing",
+  "border-spacing",
+  "word-spacing",
+  "text-indent",
 ] as const;

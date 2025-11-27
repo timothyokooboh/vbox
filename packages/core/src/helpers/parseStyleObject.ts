@@ -25,7 +25,7 @@ const normalizeKey = (key: string, aliases: AliasMap): string => {
   if (cached) return cached;
 
   const camelCaseKey = camelCase(key);
-  const resolved = aliases[camelCaseKey];
+  const resolved = aliases[camelCaseKey as keyof typeof aliases];
   const resolvedKey = (resolved ?? camelCaseKey) as string;
   normalizeCache.set(key, resolvedKey);
   return resolvedKey;
