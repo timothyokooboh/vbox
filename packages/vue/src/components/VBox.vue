@@ -12,12 +12,17 @@ import {
   onBeforeUnmount,
 } from "vue";
 import { useDeriveChildNode } from "@/composables/useDeriveChildNode";
+import {
+  classNamePrefixKey,
+  aliasKey,
+  breakpointsKey,
+} from "@/injectionSymbols";
 
 const props = defineProps<VBoxProps>();
 
-const breakpoints = inject("vbox-breakpoints") as Breakpoints;
-const aliases = inject<AliasMap>("vbox-aliases", DefaultAliases);
-const classNamePrefix = inject("class-name-prefix", "");
+const breakpoints = inject(breakpointsKey) as Breakpoints;
+const aliases = inject<AliasMap>(aliasKey, DefaultAliases);
+const classNamePrefix = inject(classNamePrefixKey, "");
 
 const className = `${classNamePrefix}-css-${useId()}`;
 const attrs = useAttrs();
