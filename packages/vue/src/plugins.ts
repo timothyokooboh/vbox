@@ -150,7 +150,6 @@ function injectThemeCSS(css: string) {
 export const VBoxPlugin = {
   install(app: App<Element>, options?: VBoxPluginOptions) {
     if (options?.theme) {
-      console.log("THEME", options.theme);
       const normalized = normalizeTheme(options.theme);
       const css = buildCSSVariables(normalized);
       injectThemeCSS(css);
@@ -163,19 +162,9 @@ export const VBoxPlugin = {
         ? Object.assign({}, userDefinedAlias)
         : Object.assign({}, DefaultAliases, userDefinedAlias);
 
-    app.provide(
-      breakpointsKey,
-      options?.breakpoints ?? {
-        sm: "640px",
-        md: "768px",
-        lg: "1024px",
-        xl: "1280px",
-      },
-    );
-
+    app.provide(breakpointsKey, options?.breakpoints);
     app.provide(aliasKey, finalAlias);
-    app.provide(classNamePrefixKey, options?.classNamePrefix ?? "");
-
+    app.provide(classNamePrefixKey, options?.classNamePrefix);
     app.component("VBox", VBox);
   },
 };

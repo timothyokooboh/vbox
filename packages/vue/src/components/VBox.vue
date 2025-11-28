@@ -20,11 +20,19 @@ import {
 
 const props = defineProps<VBoxProps>();
 
-const breakpoints = inject(breakpointsKey) as Breakpoints;
+const breakpoints = inject(breakpointsKey, {
+  sm: "640px",
+  md: "768px",
+  lg: "1024px",
+  xl: "1280px",
+}) as Breakpoints;
 const aliases = inject<AliasMap>(aliasKey, DefaultAliases);
 const classNamePrefix = inject(classNamePrefixKey, "");
 
-const className = `${classNamePrefix}-css-${useId()}`;
+const baseClassname = `css-${useId()}`;
+const className = classNamePrefix
+  ? `${classNamePrefix}-${baseClassname}`
+  : baseClassname;
 const attrs = useAttrs();
 const styleEl = ref<HTMLStyleElement | null>(null);
 
