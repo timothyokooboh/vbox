@@ -34,6 +34,7 @@ export interface CommonPseudoProps {
   focus?: PropertiesAndSelectors;
   focusVisible?: PropertiesAndSelectors;
   focusWithin?: PropertiesAndSelectors;
+  active?: PropertiesAndSelectors;
   _disabled?: PropertiesAndSelectors;
 }
 
