@@ -1,4 +1,3 @@
-import { camelCase, kebabCase } from "change-case";
 import { useDesignTokens } from "./useDesignTokens";
 import { isValidCssDeclaration } from "./isValidCssDeclaration";
 import { isObjectLiteral } from "./isObjectLiteral";
@@ -8,6 +7,8 @@ import type {
   StandardPropertiesHyphenFallback,
 } from "csstype";
 import type { AliasMap, Breakpoints, VBoxProps } from "../types";
+import { toKebabCase } from "./toKebabCase";
+import { kebabToCamelCase } from "./kebabToCamelCase";
 
 const normalizeCache = new Map<string, string>();
 
@@ -24,7 +25,7 @@ const normalizeKey = (key: string, aliases: AliasMap): string => {
   const cached = normalizeCache.get(key);
   if (cached) return cached;
 
-  const camelCaseKey = camelCase(key);
+  const camelCaseKey = kebabToCamelCase(key);
   const resolved = aliases[camelCaseKey as keyof typeof aliases];
   const resolvedKey = (resolved ?? camelCaseKey) as string;
   normalizeCache.set(key, resolvedKey);
@@ -48,7 +49,9 @@ const extractStylesFromValue = (value: unknown) => {
 
       let nestedValid: Record<string, string> = {};
       for (const [prop, val] of Object.entries(subVal)) {
-        const propK = kebabCase(prop) as keyof StandardPropertiesHyphenFallback;
+        const propK = toKebabCase(
+          prop,
+        ) as keyof StandardPropertiesHyphenFallback;
         let propVal = String(val);
         if (propK === "content" && !/^['"]/.test(propVal)) {
           propVal = `"${propVal}"`;
@@ -63,7 +66,9 @@ const extractStylesFromValue = (value: unknown) => {
 
       nestedStyleRecord[subKey] = nestedValid;
     } else {
-      const propK = kebabCase(subKey) as keyof StandardPropertiesHyphenFallback;
+      const propK = toKebabCase(
+        subKey,
+      ) as keyof StandardPropertiesHyphenFallback;
       let propVal = String(subVal);
       if (propK === "content" && !/^['"]/.test(propVal))
         propVal = `"${propVal}"`;
@@ -155,7 +160,7 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
     const resolvedKey = normalizeKey(key, aliases);
 
     // 1) handle direct CSS properties (including alias resolution)
-    const cssProp = kebabCase(
+    const cssProp = toKebabCase(
       resolvedKey,
     ) as keyof StandardPropertiesHyphenFallback;
     const stringValue = String(rawValue);
@@ -216,11 +221,16 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
       continue;
     }
 
-    // 3) pseudo props (e.g. _hover, _focus)
+    // 3) pseudo props (e.g. hover, focus)
     if (
-      ["hover", "focus", "focusVisible", "focusWithin", "_disabled"].includes(
-        resolvedKey,
-      )
+      [
+        "hover",
+        "focus",
+        "focusVisible",
+        "focusWithin",
+        "active",
+        "_disabled",
+      ].includes(resolvedKey)
     ) {
       const pseudo =
         resolvedKey === "_disabled" ? resolvedKey.slice(1) : resolvedKey;

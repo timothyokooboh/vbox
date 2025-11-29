@@ -1,5 +1,5 @@
-import { kebabCase } from "change-case";
 import { buildRules } from "./buildRules";
+import { toKebabCase } from "./toKebabCase";
 
 export const buildCssString = ({
   rootStyles,
@@ -29,7 +29,7 @@ export const buildCssString = ({
   // pseudo blocks
   for (const [pseudo, styles] of Object.entries(pseudoStyles)) {
     const prefix = pseudo.startsWith(":") ? "" : ":";
-    cssString += `\n.${className}${prefix}${kebabCase(pseudo)} { ${buildRules(styles)} }`;
+    cssString += `\n.${className}${prefix}${toKebabCase(pseudo)} { ${buildRules(styles)} }`;
 
     // nested selectors that belong to this pseudo
     for (const [sel, nested] of Object.entries(selectorBlocks)) {
@@ -57,7 +57,7 @@ export const buildCssString = ({
   for (const [selector, styles] of Object.entries(selectorBlocks)) {
     const rules = Object.entries(styles)
       .map(([k, v]) => {
-        const prop = kebabCase(k);
+        const prop = toKebabCase(k);
         let val = String(v);
         if (prop === "content" && !/^['"]/.test(val)) val = `"${val}"`;
         return `${prop}: ${val};`;
