@@ -298,8 +298,8 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
       continue;
     }
 
-    // 7) explicit breakpoints (sm, md, lg, xl)
-    if (["sm", "md", "lg", "xl"].includes(resolvedKey)) {
+    // 7) explicit breakpoints (sm, md, lg, xl, "2xl")
+    if (["sm", "md", "lg", "xl", "2xl"].includes(resolvedKey)) {
       const bpKey = resolvedKey as keyof typeof breakpoints;
       if (typeof rawValue === "object") {
         const { rootStyleRecord, nestedStyleRecord } =
