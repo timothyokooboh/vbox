@@ -1,6 +1,11 @@
 <script lang="ts" setup>
 import type { VBoxProps, Breakpoints, AliasMap } from "@vbox/core";
-import { DefaultAliases, parseStyleObject, buildCssString } from "@vbox/core";
+import {
+  DefaultAliases,
+  DefaultBreakpoints,
+  parseStyleObject,
+  buildCssString,
+} from "@vbox/core";
 
 import {
   ref,
@@ -20,19 +25,14 @@ import {
 
 const props = defineProps<VBoxProps>();
 
-const breakpoints = inject(breakpointsKey, {
-  sm: "640px",
-  md: "768px",
-  lg: "1024px",
-  xl: "1280px",
-}) as Breakpoints;
+const breakpoints = inject(breakpointsKey, DefaultBreakpoints) as Breakpoints;
 const aliases = inject<AliasMap>(aliasKey, DefaultAliases);
 const classNamePrefix = inject(classNamePrefixKey, "");
 
-const baseClassname = `css-${useId()}`;
+const baseClassName = `css-${useId()}`;
 const className = classNamePrefix
-  ? `${classNamePrefix}-${baseClassname}`
-  : baseClassname;
+  ? `${classNamePrefix}-${baseClassName}`
+  : baseClassName;
 const attrs = useAttrs();
 const styleEl = ref<HTMLStyleElement | null>(null);
 
