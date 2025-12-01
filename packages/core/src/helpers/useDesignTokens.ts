@@ -27,7 +27,6 @@ export const useDesignTokens = <
     case ColorProperties.includes(
       cssProp as (typeof ColorProperties)[number],
     ) && hasToken(deriveToken(TokensMap.color, trimmedValue)):
-      console.log(cssProp);
       return {
         ...newStyles,
         [cssProp]: `var(${deriveToken(TokensMap.color, trimmedValue)})`,
