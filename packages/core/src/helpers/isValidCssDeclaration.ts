@@ -7,7 +7,7 @@ export const isValidCssDeclaration = (cssProp: string, value: string) => {
 
   if (cssSupportCache.has(key)) return cssSupportCache.get(key)!;
 
-  const isValid = CSS.supports(trimmedProperty, trimmedValue);
+  const isValid = CSS.supports(`${trimmedProperty}: ${trimmedValue}`);
   cssSupportCache.set(key, isValid);
 
   return isValid;
