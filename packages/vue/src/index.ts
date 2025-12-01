@@ -5,7 +5,7 @@ export { default as VBox } from "./components/VBox.vue";
 export { VBoxPlugin } from "./plugins";
 export type { VBoxPluginOptions, AliasStrategy } from "./plugins";
 
-export function defineVBoxConfig(config: VBoxPluginOptions) {
+export function defineConfig(config: VBoxPluginOptions) {
   return config;
 }
 
