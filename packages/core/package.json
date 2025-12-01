@@ -9,9 +9,17 @@
   "files": [
     "dist"
   ],
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.umd.js"
+    },
+    "./styles/resets.css": "./dist/styles/resets.css"
+  },
   "scripts": {
     "build": "vite build && pnpm copy:assets",
-    "copy:assets": "cpx src/resets.css dist/"
+    "copy:assets": "cpx src/styles/resets.css dist/styles/"
   },
   "devDependencies": {
     "@types/node": "^24.10.0",
