@@ -2,7 +2,7 @@ export { isValidCssDeclaration } from "./helpers/isValidCssDeclaration";
 export { isValidCssSelector } from "./helpers/isValidCssSelector";
 export { parseStyleObject } from "./helpers/parseStyleObject";
 export { buildCssString } from "./helpers/buildCssString";
-export { DefaultAliases } from "./constants";
+export { DefaultAliases, DefaultBreakpoints } from "./constants";
 export type {
   VBoxProps,
   VBoxStyleProps,
