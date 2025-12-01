@@ -1,5 +1,6 @@
 import type { App } from "vue";
-import { DefaultAliases } from "@vbox/core";
+import { DefaultAliases, DefaultBreakpoints } from "@vbox/core";
+import cssResets from "@vbox/core/styles/resets.css?inline";
 import VBox from "@/components/VBox.vue";
 import {
   classNamePrefixKey,
@@ -11,13 +12,14 @@ export type AliasStrategy = "merge" | "replace";
 
 export interface VBoxPluginOptions {
   classNamePrefix?: string;
+  cssResets?: boolean;
   breakpoints?: {
     sm: string;
     md: string;
     lg: string;
     xl: string;
   };
-  alias?: {
+  aliases?: {
     strategy?: AliasStrategy;
     values: Record<string, keyof CSSStyleDeclaration>;
   };
@@ -44,11 +46,11 @@ type Theme = Required<VBoxPluginOptions>["theme"];
 const isReference = (value: string) => value.startsWith("$");
 
 // resolve "$colors.red-200" → theme.colors["red-200"] (recursively)
-function resolveToken(
+const resolveToken = (
   theme: Theme,
   reference: string,
   stack: string[] = [],
-): string {
+): string => {
   const path = reference.replace(/^\$/, "").split(".");
   const [category, key] = path as [ThemeCategory, string];
 
@@ -74,10 +76,10 @@ function resolveToken(
   }
 
   return target;
-}
+};
 
 // Flatten theme and resolve semantics
-function normalizeTheme(theme: Theme) {
+const normalizeTheme = (theme: Theme) => {
   const resolved: Record<string, Record<string, string>> = {};
 
   const categories: ThemeCategory[] = [
@@ -105,10 +107,12 @@ function normalizeTheme(theme: Theme) {
   }
 
   return resolved;
-}
+};
 
 // Convert normalized tokens into CSS variable strings
-function buildCSSVariables(normalized: Record<string, Record<string, string>>) {
+const buildCSSVariables = (
+  normalized: Record<string, Record<string, string>>,
+) => {
   let css = ":root{";
 
   for (const [category, group] of Object.entries(normalized)) {
@@ -125,10 +129,10 @@ function buildCSSVariables(normalized: Record<string, Record<string, string>>) {
 
   css += "}";
   return css;
-}
+};
 
 // Inject <style> into document head
-function injectThemeCSS(css: string) {
+function injectCSS(css: string) {
   if (typeof window === "undefined") return; // SSR safety
 
   const id = "vbox-theme-tokens";
@@ -136,14 +140,14 @@ function injectThemeCSS(css: string) {
 
   // Replace if exists
   if (styleEl) {
-    styleEl.textContent = css;
+    styleEl.textContent += css;
     return;
   }
 
   // Create new
   styleEl = document.createElement("style");
   styleEl.id = id;
-  styleEl.textContent = css;
+  styleEl.textContent += css;
   document.head.appendChild(styleEl);
 }
 
@@ -152,17 +156,21 @@ export const VBoxPlugin = {
     if (options?.theme) {
       const normalized = normalizeTheme(options.theme);
       const css = buildCSSVariables(normalized);
-      injectThemeCSS(css);
+      injectCSS(css);
     }
 
-    const userDefinedAlias = options?.alias?.values ?? {};
-    const strategy = options?.alias?.strategy ?? "merge";
+    if (options?.cssResets) {
+      injectCSS(cssResets);
+    }
+
+    const userDefinedAlias = options?.aliases?.values ?? {};
+    const strategy = options?.aliases?.strategy ?? "merge";
     const finalAlias =
       strategy === "replace"
         ? Object.assign({}, userDefinedAlias)
         : Object.assign({}, DefaultAliases, userDefinedAlias);
 
-    app.provide(breakpointsKey, options?.breakpoints);
+    app.provide(breakpointsKey, options?.breakpoints ?? DefaultBreakpoints);
     app.provide(aliasKey, finalAlias);
     app.provide(classNamePrefixKey, options?.classNamePrefix);
     app.component("VBox", VBox);
