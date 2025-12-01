@@ -49,7 +49,7 @@ export type PseudoProps = {
 };
 
 /**
- * Responsive styles for predefined breakpoints: sm, md, lg, xl.
+ * Responsive styles for predefined breakpoints: sm, md, lg, xl and 2xl
  * Each field accepts CSS properties or selectors.
  */
 
@@ -58,7 +58,12 @@ export interface BreakpointProps {
   md?: PropertiesAndSelectors;
   lg?: PropertiesAndSelectors;
   xl?: PropertiesAndSelectors;
+  // "2xl"?: PropertiesAndSelectors;
 }
+
+export type Breakpoints = Required<{
+  [K in keyof BreakpointProps]: string;
+}>;
 
 /**
  * Alias-based CSS props derived from `AliasMap`.
@@ -218,10 +223,3 @@ export type VBoxProps = PseudoProps &
   };
 
 export type VBoxStyleProps = Omit<VBoxProps, "is">;
-
-export type Breakpoints = {
-  sm: string;
-  md: string;
-  lg: string;
-  xl: string;
-};
