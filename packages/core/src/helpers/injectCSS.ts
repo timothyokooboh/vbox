@@ -1,7 +1,7 @@
 export const injectCSS = (css: string) => {
   if (typeof window === "undefined") return;
 
-  const id = "vbox-theme-tokens";
+  const id = "@vbox-style-sheet";
   let styleEl = document.getElementById(id) as HTMLStyleElement | null;
 
   if (styleEl) {
