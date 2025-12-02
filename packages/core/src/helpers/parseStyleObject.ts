@@ -1,5 +1,3 @@
-import { useDesignTokens } from "./useDesignTokens";
-import { isValidCssDeclaration } from "./isValidCssDeclaration";
 import { isObjectLiteral } from "./isObjectLiteral";
 import { isValidCssSelector } from "./isValidCssSelector";
 import type {
@@ -37,13 +35,13 @@ const extractStylesFromValue = (value: unknown) => {
   let rootStyleRecord: Record<string, string> = {};
   const nestedStyleRecord: Record<string, Record<string, string>> = {};
 
-  if (!value || typeof value !== "object")
+  if (!value || !isObjectLiteral(value)) {
     return { rootStyleRecord, nestedStyleRecord };
+  }
 
   for (const [subKey, subVal] of Object.entries(value)) {
     if (isObjectLiteral(subVal)) {
       if (!isValidCssSelector(subKey)) {
-        console.warn(`[VBox] Invalid nested selector "${subKey}"`);
         continue;
       }
 
@@ -57,11 +55,7 @@ const extractStylesFromValue = (value: unknown) => {
           propVal = `"${propVal}"`;
         }
 
-        if (isValidCssDeclaration(propK, propVal)) {
-          nestedValid[propK] = propVal;
-        } else {
-          nestedValid = useDesignTokens(propK, propVal, nestedValid);
-        }
+        nestedValid[propK] = propVal;
       }
 
       nestedStyleRecord[subKey] = nestedValid;
@@ -70,36 +64,40 @@ const extractStylesFromValue = (value: unknown) => {
         subKey,
       ) as keyof StandardPropertiesHyphenFallback;
       let propVal = String(subVal);
-      if (propK === "content" && !/^['"]/.test(propVal))
+      if (propK === "content" && !/^['"]/.test(propVal)) {
         propVal = `"${propVal}"`;
-      if (isValidCssDeclaration(propK, propVal)) {
-        rootStyleRecord[propK] = propVal;
-      } else {
-        rootStyleRecord = useDesignTokens(propK, propVal, rootStyleRecord);
       }
+
+      rootStyleRecord[propK] = propVal;
     }
   }
 
   return { rootStyleRecord, nestedStyleRecord };
 };
 
-const processMediaQueries = (styleObj: VBoxProps["mq"]) => {
+const processMediaQueries = (
+  styleObj: VBoxProps["mq"],
+  originalProp?: string,
+) => {
   if (!styleObj) return;
+
   const customMediaQueries: Record<string, Record<string, string>> = {};
   const selectorBlocks: Record<string, Record<string, string>> = {};
 
   for (const [query, styles] of Object.entries(styleObj)) {
     if (!query.startsWith("@media ")) {
-      console.warn(
-        `[VBox] Invalid mq key "${query}". It must start with "@media".`,
-      );
+      if (originalProp === "mq") {
+        console.warn(
+          `[VBox] Invalid mq key "${query}". It must start with "@media".`,
+        );
+      }
       continue;
     }
     const { rootStyleRecord, nestedStyleRecord } =
       extractStylesFromValue(styles);
     customMediaQueries[query] = rootStyleRecord;
-    for (const [sel, s] of Object.entries(nestedStyleRecord)) {
-      selectorBlocks[`mbp::${query}::${sel}`] = s;
+    for (const [selector, value] of Object.entries(nestedStyleRecord)) {
+      selectorBlocks[`mbp::${query}::${selector}`] = value;
     }
   }
 
@@ -109,7 +107,10 @@ const processMediaQueries = (styleObj: VBoxProps["mq"]) => {
   };
 };
 
-const processContainerQueries = (styleObj: VBoxProps["cq"]) => {
+const processContainerQueries = (
+  styleObj: VBoxProps["cq"],
+  originalProp?: string,
+) => {
   if (!styleObj) return;
 
   const containerQueries: Record<string, Record<string, string>> = {};
@@ -117,16 +118,18 @@ const processContainerQueries = (styleObj: VBoxProps["cq"]) => {
 
   for (const [query, styles] of Object.entries(styleObj)) {
     if (!query.startsWith("@container ")) {
-      console.warn(
-        `[VBox] Invalid cq key "${query}". It must start with "@container".`,
-      );
+      if (originalProp === "cq") {
+        console.warn(
+          `[VBox] Invalid cq key "${query}". It must start with "@container".`,
+        );
+      }
       continue;
     }
     const { rootStyleRecord, nestedStyleRecord } =
       extractStylesFromValue(styles);
     containerQueries[query] = rootStyleRecord;
-    for (const [sel, s] of Object.entries(nestedStyleRecord))
-      selectorBlocks[`cbp::${query}::${sel}`] = s;
+    for (const [selector, value] of Object.entries(nestedStyleRecord))
+      selectorBlocks[`cbp::${query}::${selector}`] = value;
   }
 
   return {
@@ -149,7 +152,7 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
   let rootStyles: Record<string, string> = {};
   const rootDarkStyles: Record<string, string> = {};
   const pseudoStyles: Record<string, Record<string, string>> = {};
-  const mediaStyles: Record<string, Record<string, string>> = {};
+  const breakpointStyles: Record<string, Record<string, string>> = {};
   let customMediaQueries: Record<string, Record<string, string>> = {};
   let containerQueries: Record<string, Record<string, string>> = {};
   let selectorBlocks: Record<string, Record<string, string>> = {};
@@ -164,11 +167,8 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
       resolvedKey,
     ) as keyof StandardPropertiesHyphenFallback;
     const stringValue = String(rawValue);
-    if (isValidCssDeclaration(cssProp, stringValue)) {
-      rootStyles[cssProp] = stringValue;
-    } else {
-      rootStyles = useDesignTokens(cssProp, stringValue, rootStyles);
-    }
+
+    rootStyles[cssProp] = stringValue;
 
     // 2) unified `css` escape hatch
     if (resolvedKey === "css") {
@@ -215,8 +215,8 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
       const { rootStyleRecord, nestedStyleRecord } =
         extractStylesFromValue(rawValue);
       Object.assign(rootDarkStyles, rootStyleRecord);
-      for (const [sel, styles] of Object.entries(nestedStyleRecord)) {
-        selectorBlocks[`dark::${sel}`] = styles;
+      for (const [selector, value] of Object.entries(nestedStyleRecord)) {
+        selectorBlocks[`dark::${selector}`] = value;
       }
       continue;
     }
@@ -238,11 +238,11 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
         const { rootStyleRecord, nestedStyleRecord } =
           extractStylesFromValue(rawValue);
         pseudoStyles[pseudo] = rootStyleRecord;
-        for (const [sel, styles] of Object.entries(nestedStyleRecord)) {
+        for (const [selector, styles] of Object.entries(nestedStyleRecord)) {
           const prefix = ":";
-          const resolvedSel = sel.includes("&")
-            ? sel.replace(/&/g, `.${className}${prefix}${pseudo}`)
-            : `.${className}${prefix}${pseudo} ${sel}`;
+          const resolvedSel = selector.includes("&")
+            ? selector.replace(/&/g, `.${className}${prefix}${pseudo}`)
+            : `.${className}${prefix}${pseudo} ${selector}`;
           selectorBlocks[resolvedSel] = styles;
         }
       }
@@ -261,11 +261,11 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
         const { rootStyleRecord, nestedStyleRecord } =
           extractStylesFromValue(styles);
         pseudoStyles[pseudoSelector] = rootStyleRecord;
-        for (const [sel, s] of Object.entries(nestedStyleRecord)) {
-          const resolvedSel = sel.includes("&")
-            ? sel.replace(/&/g, `.${className}${pseudoSelector}`)
-            : `.${className}${pseudoSelector} ${sel}`;
-          selectorBlocks[resolvedSel] = s;
+        for (const [selector, styles] of Object.entries(nestedStyleRecord)) {
+          const resolvedSel = selector.includes("&")
+            ? selector.replace(/&/g, `.${className}${pseudoSelector}`)
+            : `.${className}${pseudoSelector} ${selector}`;
+          selectorBlocks[resolvedSel] = styles;
         }
       }
       continue;
@@ -304,9 +304,9 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
       if (typeof rawValue === "object") {
         const { rootStyleRecord, nestedStyleRecord } =
           extractStylesFromValue(rawValue);
-        mediaStyles[breakpoints[bpKey]] = rootStyleRecord;
-        for (const [sel, s] of Object.entries(nestedStyleRecord))
-          selectorBlocks[`bp::${breakpoints[bpKey]}::${sel}`] = s;
+        breakpointStyles[breakpoints[bpKey]] = rootStyleRecord;
+        for (const [selector, styles] of Object.entries(nestedStyleRecord))
+          selectorBlocks[`bp::${breakpoints[bpKey]}::${selector}`] = styles;
       }
       continue;
     }
@@ -316,7 +316,7 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
     rootStyles,
     rootDarkStyles,
     pseudoStyles,
-    mediaStyles,
+    breakpointStyles,
     customMediaQueries,
     containerQueries,
     selectorBlocks,
