@@ -40,59 +40,6 @@ export const DefaultAliases = {
   d: "display",
 } as const;
 
-export const TokensMap = {
-  color: "colors",
-  "font-size": "font-size",
-  "font-weight": "font-weight",
-  "font-family": "font-family",
-  spacing: "spacing",
-};
-
-export const ColorProperties = [
-  "color",
-  "background",
-  "background-color",
-  "border-color",
-  "outline-color",
-  "caret-color",
-  "text-decoration-color",
-  "fill",
-  "stroke",
-] as const;
-
-export const SpacingProperties = [
-  "margin",
-  "margin-top",
-  "margin-block-start",
-  "margin-bottom",
-  "margin-block-end",
-  "margin-block",
-  "margin-right",
-  "margin-inline-end",
-  "margin-left",
-  "margin-inline-start",
-  "margin-inline",
-  "padding",
-  "padding-top",
-  "padding-block-start",
-  "padding-bottom",
-  "padding-block-end",
-  "padding-block",
-  "padding-right",
-  "padding-inline-end",
-  "padding-left",
-  "padding-inline-start",
-  "padding-inline",
-  "gap",
-  "column-gap",
-  "row-gap",
-  "line-height",
-  "letter-spacing",
-  "border-spacing",
-  "word-spacing",
-  "text-indent",
-] as const;
-
 export const DefaultBreakpoints: Breakpoints = {
   sm: "40rem", // ~640px
   md: "48rem", // ~768px
