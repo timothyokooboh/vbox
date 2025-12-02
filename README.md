@@ -4,11 +4,6 @@ A polymorphic Vue.js component with a lightweight runtime styling engine
 
 # Installation
 
-To install VBox in your Vue.js project, use any of the following package
-managers:
-
-::: code-group
-
 ```bash [npm]
 npm install @vbox/core @vbox/vue
 ```
@@ -20,8 +15,6 @@ pnpm add @vbox/core @vbox/vue
 ```bash [yarn]
 yarn add @vbox/core @vbox/vue
 ```
-
-:::
 
 Then, import and register the plugin globally.
 
