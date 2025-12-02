@@ -1,0 +1,16 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+
+  "tasks": {
+    "lint": {},
+    "format": {},
+    "test": {
+      "inputs": ["src/**/*.vue", "src/**/*.ts"]
+    },
+    "dev": {},
+    "build": {},
+    "deploy": {
+      "dependsOn": ["build", "test", "lint", "format:check"]
+    }
+  }
+}

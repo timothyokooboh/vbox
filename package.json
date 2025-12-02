@@ -6,13 +6,19 @@
   "main": "index.js",
   "author": "Timothy Okooboh",
   "scripts": {
-    "build": "vite build"
+    "build": "pnpm turbo run build",
+    "test": "pnpm turbo run test",
+    "format": "pnpm turbo run format"
   },
   "keywords": [],
   "license": "MIT",
   "packageManager": "pnpm@10.14.0",
   "devDependencies": {
     "prettier": "^3.6.2",
+    "turbo": "^2.6.1",
     "typescript": "^5.9.3"
+  },
+  "volta": {
+    "node": "22.14.0"
   }
 }
