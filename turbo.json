@@ -8,7 +8,9 @@
       "inputs": ["src/**/*.vue", "src/**/*.ts"]
     },
     "dev": {},
-    "build": {},
+    "build": {
+      "dependsOn": ["^build"]
+    },
     "deploy": {
       "dependsOn": ["build", "test", "lint", "format:check"]
     }
