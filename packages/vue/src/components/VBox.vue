@@ -5,17 +5,10 @@ import {
   DefaultBreakpoints,
   parseStyleObject,
   buildCssString,
+  injectCSS,
 } from "@vbox/core";
 
-import {
-  ref,
-  computed,
-  watchEffect,
-  useAttrs,
-  useId,
-  inject,
-  onBeforeUnmount,
-} from "vue";
+import { computed, watchEffect, useAttrs, useId, inject } from "vue";
 import { useDeriveChildNode } from "@/composables/useDeriveChildNode";
 import {
   classNamePrefixKey,
@@ -34,7 +27,6 @@ const className = classNamePrefix
   ? `${classNamePrefix}-${baseClassName}`
   : baseClassName;
 const attrs = useAttrs();
-const styleEl = ref<HTMLStyleElement | null>(null);
 
 const { childNode } = useDeriveChildNode(
   className,
@@ -49,7 +41,7 @@ watchEffect(() => {
     rootDarkStyles,
     pseudoStyles,
     selectorBlocks,
-    mediaStyles,
+    breakpointStyles,
     containerQueries,
     customMediaQueries,
   } = parseStyleObject({
@@ -64,26 +56,13 @@ watchEffect(() => {
     rootDarkStyles,
     pseudoStyles,
     selectorBlocks,
-    mediaStyles,
+    breakpointStyles,
     containerQueries,
     customMediaQueries,
     className,
   });
 
-  if (!styleEl.value && typeof document !== "undefined") {
-    styleEl.value = document.createElement("style");
-    document.head.appendChild(styleEl.value);
-  }
-
-  if (styleEl.value) {
-    styleEl.value.textContent = cssString;
-  }
-});
-
-onBeforeUnmount(() => {
-  if (styleEl.value?.parentNode) {
-    styleEl.value.parentNode.removeChild(styleEl.value);
-  }
+  injectCSS(cssString);
 });
 </script>
 
