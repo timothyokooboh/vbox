@@ -1,5 +1,5 @@
 import type { InjectionKey } from "vue";
-import type { VBoxPluginOptions } from "./plugins";
+import type { VBoxPluginOptions } from "@vbox/core";
 
 export const aliasKey = Symbol("aliases") as InjectionKey<
   Record<string, keyof CSSStyleDeclaration>
