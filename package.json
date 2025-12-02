@@ -8,7 +8,8 @@
   "scripts": {
     "build": "pnpm turbo run build",
     "test": "pnpm turbo run test",
-    "format": "pnpm turbo run format"
+    "format": "pnpm turbo run format",
+    "deploy": "pnpm turbo run deploy"
   },
   "keywords": [],
   "license": "MIT",
