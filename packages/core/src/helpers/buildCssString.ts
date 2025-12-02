@@ -1,4 +1,5 @@
 import { buildRules } from "./buildRules";
+import { isObjectLiteral } from "./isObjectLiteral";
 import { toKebabCase } from "./toKebabCase";
 
 export const buildCssString = ({
@@ -6,7 +7,7 @@ export const buildCssString = ({
   rootDarkStyles,
   pseudoStyles,
   selectorBlocks,
-  mediaStyles,
+  breakpointStyles,
   customMediaQueries,
   containerQueries,
   className,
@@ -15,7 +16,7 @@ export const buildCssString = ({
   rootDarkStyles: Record<string, string>;
   pseudoStyles: Record<string, Record<string, string>>;
   selectorBlocks: Record<string, Record<string, string>>;
-  mediaStyles: Record<string, Record<string, string>>;
+  breakpointStyles: Record<string, Record<string, string>>;
   customMediaQueries: Record<string, Record<string, string>>;
   containerQueries: Record<string, Record<string, string>>;
   className: string;
@@ -24,7 +25,13 @@ export const buildCssString = ({
   let cssString = `.${className} { ${buildRules(rootStyles)} }`;
 
   // append css string for dark theme styles
-  cssString += `\nhtml.dark { .${className} { ${buildRules(rootDarkStyles)} } }`;
+
+  if (
+    isObjectLiteral(rootDarkStyles) &&
+    Object.keys(rootDarkStyles).length > 0
+  ) {
+    cssString += `\nhtml.dark { .${className} { ${buildRules(rootDarkStyles)} } }`;
+  }
 
   // pseudo blocks
   for (const [pseudo, styles] of Object.entries(pseudoStyles)) {
@@ -39,7 +46,7 @@ export const buildCssString = ({
   }
 
   // media queries
-  for (const [bp, styles] of Object.entries(mediaStyles)) {
+  for (const [bp, styles] of Object.entries(breakpointStyles)) {
     cssString += `\n@media (min-width: ${bp}) { .${className} { ${buildRules(styles)} } }`;
   }
 
