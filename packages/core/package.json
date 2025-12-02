@@ -25,7 +25,8 @@
     "build:cli": "tsc src/cli/generate-types.ts --outDir dist",
     "rename-to-cjs": "node src/scripts/rename-to-cjs.js",
     "copy:assets": "cpx src/styles/resets.css dist/styles/",
-    "test": "vitest"
+    "test": "vitest",
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
@@ -35,6 +36,7 @@
     "fs-extra": "^11.3.2",
     "jiti": "^2.6.1",
     "jsdom": "^27.2.0",
+    "prettier": "^3.7.3",
     "typescript": "~5.9.3",
     "vite": "^7.1.7",
     "vite-plugin-dts": "^4.5.4",
