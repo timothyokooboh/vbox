@@ -1,6 +1,5 @@
 import { describe, test, expect } from "vitest";
 import { parseStyleObject } from "../src/helpers/parseStyleObject";
-import { toKebabCase } from "../src/helpers/toKebabCase";
 import type { AliasMap } from "../src/types";
 
 describe("parseStyleObject", () => {
