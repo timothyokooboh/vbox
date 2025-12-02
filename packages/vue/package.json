@@ -9,15 +9,9 @@
   "files": [
     "dist"
   ],
-  "bin": {
-    "vbox-type-gen": "./dist/generate-types.cjs"
-  },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "build:cli": "tsc src/cli/generate-types.ts --outDir dist",
-    "rename-to-cjs": "node src/scripts/rename-to-cjs.js",
-    "build:all": "pnpm build && pnpm build:cli && pnpm rename-to-cjs"
+    "build": "vite build"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
@@ -34,5 +28,8 @@
   "dependencies": {
     "@vbox/core": "workspace:*",
     "vue": "^3.5.24"
+  },
+  "volta": {
+    "node": "22.14.0"
   }
 }
