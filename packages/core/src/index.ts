@@ -9,7 +9,7 @@ export {
   normalizeTheme,
   resolveToken,
   buildCSSVariables,
-} from "./helpers/useThemeConfig";
+} from "./helpers/themeConfigParser";
 export { DefaultAliases, DefaultBreakpoints } from "./constants";
 export type {
   VBoxProps,
