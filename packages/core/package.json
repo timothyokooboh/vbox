@@ -1,5 +1,7 @@
 {
   "name": "@vbox/core",
+  "version": "0.0.0",
+  "description": "The core package of VBox - a polymorphic Vue.js component with a runtime styling engine.",
   "private": false,
   "license": "MIT",
   "author": {
@@ -10,7 +12,6 @@
     "type": "git",
     "url": "git+https://github.com/timothyokooboh/vbox.git"
   },
-  "version": "0.0.0",
   "type": "module",
   "main": "dist/index.umd.js",
   "module": "dist/index.es.js",
