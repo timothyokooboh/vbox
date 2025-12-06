@@ -1,4 +1,4 @@
-import type { App } from "vue";
+import type { App } from 'vue';
 import {
   DefaultAliases,
   DefaultBreakpoints,
@@ -7,17 +7,17 @@ import {
   normalizeTheme,
   buildCSSVariables,
   deepMerge,
-} from "@vbox/core";
-import type { VBoxPluginOptions } from "@vbox/core";
-import cssResets from "@vbox/core/styles/resets.css?inline";
-import VBox from "@/components/VBox.vue";
+} from '@veebox/core';
+import type { VBoxPluginOptions } from '@veebox/core';
+import cssResets from '@veebox/core/styles/resets.css?inline';
+import VBox from '@/components/VBox.vue';
 import {
   classNamePrefixKey,
   aliasKey,
   breakpointsKey,
-} from "./injectionSymbols";
+} from './injectionSymbols';
 
-export type AliasStrategy = "merge" | "replace";
+export type AliasStrategy = 'merge' | 'replace';
 
 export const VBoxPlugin = {
   install(app: App<Element>, options: VBoxPluginOptions) {
@@ -36,15 +36,15 @@ export const VBoxPlugin = {
     }
 
     const userDefinedAlias = options?.aliases?.values ?? {};
-    const strategy = options?.aliases?.strategy ?? "merge";
+    const strategy = options?.aliases?.strategy ?? 'merge';
     const finalAlias =
-      strategy === "replace"
+      strategy === 'replace'
         ? Object.assign({}, userDefinedAlias)
         : Object.assign({}, DefaultAliases, userDefinedAlias);
 
     app.provide(breakpointsKey, options?.breakpoints ?? DefaultBreakpoints);
     app.provide(aliasKey, finalAlias);
     app.provide(classNamePrefixKey, options?.classNamePrefix);
-    app.component("VBox", VBox);
+    app.component('VBox', VBox);
   },
 };
