@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "dist/cli",
+    "declaration": true,
+    "rootDir": "src"
+  },
+  "include": [
+    "src/constants.ts",
+    "src/cli/generate-types.ts",
+    "src/helpers/mergeTheme.ts",
+    "src/helpers/isObjectLiteral.ts",
+    "src/types.ts"
+  ]
+}
