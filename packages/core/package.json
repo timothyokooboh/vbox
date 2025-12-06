@@ -28,12 +28,12 @@
     "./styles/resets.css": "./dist/styles/resets.css"
   },
   "bin": {
-    "vbox-type-gen": "./dist/generate-types.cjs"
+    "vbox-type-gen": "./dist/cli/cli/generate-types.js"
   },
   "scripts": {
-    "build": "vite build && pnpm build:cli && pnpm rename-to-cjs && pnpm copy:assets",
-    "build:cli": "tsc src/cli/generate-types.ts --outDir dist",
-    "rename-to-cjs": "node src/scripts/rename-to-cjs.js",
+    "build": "vite build && pnpm copy:assets",
+    "build:cli": "tsc -p tsconfig.cli.json",
+    "build:all": "pnpm build && pnpm build:cli",
     "copy:assets": "cpx src/styles/resets.css dist/styles/",
     "test": "vitest",
     "format": "prettier --write ."
