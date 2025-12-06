@@ -5,12 +5,18 @@ export { isValidCssSelector } from "./helpers/isValidCssSelector";
 export { parseStyleObject } from "./helpers/parseStyleObject";
 export { buildCssString } from "./helpers/buildCssString";
 export { injectCSS } from "./helpers/injectCSS";
+export { deepMerge } from "./helpers/mergeTheme";
 export {
   normalizeTheme,
   resolveToken,
   buildCSSVariables,
 } from "./helpers/themeConfigParser";
-export { DefaultAliases, DefaultBreakpoints } from "./constants";
+export { keyframes } from "./helpers/keyframes";
+export {
+  DefaultAliases,
+  DefaultBreakpoints,
+  DefaultDesignSystem,
+} from "./constants";
 export type {
   VBoxProps,
   VBoxStyleProps,
@@ -26,9 +32,13 @@ export type {
   ColorTokensInterface,
   FontSizeTokensInterface,
   FontWeightTokensInterface,
+  LineHeightTokensInterface,
+  LetterSpacingTokensInterface,
   FontFamilyTokensInterface,
   SpacingTokensInterface,
-  CSSStyleProps,
+  BorderRadiusTokensInterface,
+  ZIndexTokensInterface,
+  // CSSStyleProps,
   BreakpointProps,
   StandardCssProperties,
 } from "./types";
