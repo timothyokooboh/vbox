@@ -2,9 +2,11 @@ import type { App } from "vue";
 import {
   DefaultAliases,
   DefaultBreakpoints,
+  DefaultDesignSystem,
   injectCSS,
   normalizeTheme,
   buildCSSVariables,
+  deepMerge,
 } from "@vbox/core";
 import type { VBoxPluginOptions } from "@vbox/core";
 import cssResets from "@vbox/core/styles/resets.css?inline";
@@ -18,9 +20,13 @@ import {
 export type AliasStrategy = "merge" | "replace";
 
 export const VBoxPlugin = {
-  install(app: App<Element>, options?: VBoxPluginOptions) {
-    if (options?.theme) {
-      const { normalized, colorDarkMap } = normalizeTheme(options.theme);
+  install(app: App<Element>, options: VBoxPluginOptions) {
+    const enableDefaults = options?.defaultDesignSystem !== false;
+    const base = enableDefaults ? DefaultDesignSystem : {};
+    const mergedTheme = deepMerge(base as any, options?.theme ?? {});
+
+    if (Object.keys(mergedTheme).length > 0) {
+      const { normalized, colorDarkMap } = normalizeTheme(mergedTheme);
       const css = buildCSSVariables({ normalized, colorDarkMap });
       injectCSS(css);
     }
