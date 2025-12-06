@@ -1,4 +1,5 @@
 import { buildRules } from "./buildRules";
+import { __DEV__ } from "./isDevelopment";
 import { isObjectLiteral } from "./isObjectLiteral";
 import { toKebabCase } from "./toKebabCase";
 
@@ -76,7 +77,9 @@ export const buildCssString = ({
       : `.${className} ${selector}`;
 
     if (!/^[\s\S]*\S[\s\S]*$/.test(resolvedSelector)) {
-      console.warn(`[VBox] Skipping invalid selector: "${selector}"`);
+      if (__DEV__) {
+        console.warn(`[VBox] Skipping invalid selector: "${selector}"`);
+      }
       continue;
     }
 
