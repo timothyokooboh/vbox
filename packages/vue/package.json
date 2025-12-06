@@ -1,8 +1,20 @@
 {
-  "name": "@vbox/vue",
+  "name": "@veebox/vue",
   "private": false,
   "version": "0.0.0",
   "type": "module",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": {
+    "name": "Timothy Okooboh",
+    "email": "okoobohtimothy@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/timothyokooboh/vbox.git"
+  },
   "main": "dist/index.umd.js",
   "module": "dist/index.es.js",
   "types": "dist/types/index.d.ts",
@@ -28,7 +40,7 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "dependencies": {
-    "@vbox/core": "workspace:*",
+    "@veebox/core": "workspace:*",
     "vue": "^3.5.24"
   },
   "volta": {
