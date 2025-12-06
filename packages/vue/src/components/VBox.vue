@@ -1,26 +1,26 @@
 <script lang="ts" setup>
-import type { VBoxProps, Breakpoints, AliasMap } from "@vbox/core";
+import type { VBoxProps, Breakpoints, AliasMap } from '@veebox/core';
 import {
   DefaultAliases,
   DefaultBreakpoints,
   parseStyleObject,
   buildCssString,
   injectCSS,
-} from "@vbox/core";
+} from '@veebox/core';
 
-import { computed, watchEffect, useAttrs, useId, inject } from "vue";
-import { useDeriveChildNode } from "@/composables/useDeriveChildNode";
+import { computed, watchEffect, useAttrs, useId, inject } from 'vue';
+import { useDeriveChildNode } from '@/composables/useDeriveChildNode';
 import {
   classNamePrefixKey,
   aliasKey,
   breakpointsKey,
-} from "@/injectionSymbols";
+} from '@/injectionSymbols';
 
 const props = defineProps<VBoxProps>();
 
 const breakpoints = inject(breakpointsKey, DefaultBreakpoints) as Breakpoints;
 const aliases = inject<AliasMap>(aliasKey, DefaultAliases);
-const classNamePrefix = inject(classNamePrefixKey, "");
+const classNamePrefix = inject(classNamePrefixKey, '');
 
 const baseClassName = `css-${useId()}`;
 const className = classNamePrefix
