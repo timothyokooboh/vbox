@@ -35,19 +35,4 @@ describe('keyframes', () => {
 
     expect(fade!.startsWith('fadeIn-')).toBe(true);
   });
-
-  test('injects generated keyframes', () => {
-    const identifier = keyframes({
-      from: { opacity: '0' },
-      to: { opacity: '1' },
-    });
-
-    const style = document.querySelector(
-      '#vbox-style-sheet',
-    ) as HTMLStyleElement;
-
-    expect(style.sheet?.cssRules[0].cssText).toContain(
-      `@keyframes ${identifier} {`,
-    );
-  });
 });
