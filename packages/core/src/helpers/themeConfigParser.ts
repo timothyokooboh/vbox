@@ -1,11 +1,16 @@
 import type { VBoxPluginOptions } from "../types";
+import { __DEV__ } from "./isDevelopment";
 
 const themeCategories = [
   "color",
   "fontSize",
   "fontWeight",
   "fontFamily",
+  "lineHeight",
+  "letterSpacing",
   "spacing",
+  "borderRadius",
+  "zIndex",
 ] as const;
 
 type ThemeCategory = (typeof themeCategories)[number];
@@ -32,15 +37,19 @@ export const resolveToken = (
   const target = theme?.[category]?.[key];
 
   if (target === undefined) {
-    console.warn(`[VBox] Unknown token reference: ${reference}`);
+    if (__DEV__) {
+      console.warn(`[VBox] Unknown token reference: ${reference}`);
+    }
     return reference;
   }
 
   const id = `${category}.${key}`;
   if (stack.includes(id)) {
-    console.warn(
-      `[VBox] Circular token reference detected: ${[...stack, id].join(" → ")}`,
-    );
+    if (__DEV__) {
+      console.warn(
+        `[VBox] Circular token reference detected: ${[...stack, id].join(" → ")}`,
+      );
+    }
     return reference;
   }
 
@@ -102,7 +111,9 @@ export const normalizeTheme = (theme: Theme) => {
           if (defaultVal && typeof defaultVal === "string") {
             normalized.color![key] = defaultVal;
           } else {
-            console.warn(`[VBox] Invalid default value for color.${key}`);
+            if (__DEV__) {
+              console.warn(`[VBox] Invalid default value for color.${key}`);
+            }
             continue;
           }
 
@@ -115,7 +126,9 @@ export const normalizeTheme = (theme: Theme) => {
         }
 
         // Unknown color shape
-        console.warn(`[VBox] Unsupported color value for ${key}:`, value);
+        if (__DEV__) {
+          console.warn(`[VBox] Unsupported color value for ${key}:`, value);
+        }
         continue;
       } else {
         // ----------------------------
