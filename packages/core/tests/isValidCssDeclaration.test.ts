@@ -1,5 +1,5 @@
-import { vi, expect, test, beforeEach } from "vitest";
-import { isValidCssDeclaration } from "../src";
+import { vi, expect, test, beforeEach } from 'vitest';
+import { isValidCssDeclaration } from '../src';
 
 beforeEach(() => {
   // ensure global CSS object exists
@@ -10,21 +10,21 @@ beforeEach(() => {
   }
 });
 
-test("caches CSS.supports results", () => {
-  const spy = vi.spyOn(globalThis.CSS, "supports").mockReturnValue(true);
+test('caches CSS.supports results', () => {
+  const spy = vi.spyOn(globalThis.CSS, 'supports').mockReturnValue(true);
 
-  expect(isValidCssDeclaration("color", "red")).toBe(true);
-  expect(isValidCssDeclaration("color", "red")).toBe(true);
-  expect(isValidCssDeclaration("color", "red")).toBe(true);
+  expect(isValidCssDeclaration('color', 'red')).toBe(true);
+  expect(isValidCssDeclaration('color', 'red')).toBe(true);
+  expect(isValidCssDeclaration('color', 'red')).toBe(true);
 
   // second and third call uses cache
   expect(spy).toHaveBeenCalledTimes(1);
   spy.mockRestore();
 });
 
-test("calls CSS.supports with correct args", () => {
-  const spy = vi.spyOn(globalThis.CSS, "supports").mockReturnValue(true);
-  isValidCssDeclaration("display", "flex !important");
-  expect(spy).toHaveBeenCalledWith("display: flex !important");
+test('calls CSS.supports with correct args', () => {
+  const spy = vi.spyOn(globalThis.CSS, 'supports').mockReturnValue(true);
+  isValidCssDeclaration('display', 'flex !important');
+  expect(spy).toHaveBeenCalledWith('display: flex !important');
   spy.mockRestore();
 });

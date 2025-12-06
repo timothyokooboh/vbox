@@ -1,5 +1,4 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
-import type { VBoxPluginOptions } from "../src/types";
 import {
   buildCSSVariables,
   normalizeTheme,
@@ -21,10 +20,21 @@ describe("theme config parser", () => {
     test("resolves a simple non-color token reference", () => {
       const theme = {
         fontSize: { xl: "2rem" },
-      }; // as Required<VBoxPluginOptions>["theme"];
+        fontWeight: { thin: "300" },
+        fontFamily: { sora: "sora" },
+        lineHeight: { base: "40px" },
+        letterSpacing: { base: "25px" },
+        zIndex: { modal: "999" },
+        borderRadius: { md: "7px" },
+      };
 
-      const output = resolveToken(theme as any, "$fontSize.xl");
-      expect(output).toBe("2rem");
+      expect(resolveToken(theme, "$fontSize.xl")).toBe("2rem");
+      expect(resolveToken(theme, "$fontWeight.thin")).toBe("300");
+      expect(resolveToken(theme, "$fontFamily.sora")).toBe("sora");
+      expect(resolveToken(theme, "$lineHeight.base")).toBe("40px");
+      expect(resolveToken(theme, "$letterSpacing.base")).toBe("25px");
+      expect(resolveToken(theme, "$zIndex.modal")).toBe("999");
+      expect(resolveToken(theme, "$borderRadius.md")).toBe("7px");
     });
 
     test("resolves chained non-color references", () => {

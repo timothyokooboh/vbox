@@ -1,6 +1,17 @@
-import { describe, test, expect } from "vitest";
+import { describe, beforeEach, vi, test, expect } from "vitest";
 import { parseStyleObject } from "../src/helpers/parseStyleObject";
 import type { AliasMap } from "../src/types";
+
+beforeEach(() => {
+  // ensure global CSS object exists
+  if (!globalThis.CSS) {
+    globalThis.CSS = {
+      supports: vi.fn(),
+    } as any;
+  }
+
+  vi.spyOn(globalThis.CSS, "supports").mockReturnValue(true);
+});
 
 describe("parseStyleObject", () => {
   const aliases = {
