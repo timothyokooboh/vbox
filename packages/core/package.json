@@ -1,6 +1,6 @@
 {
   "name": "@veebox/core",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "The core package of VBox - a polymorphic Vue.js component with a runtime styling engine.",
   "publishConfig": {
     "access": "public"
@@ -33,9 +33,7 @@
     "vbox-type-gen": "dist/cli/cli/generate-types.js"
   },
   "scripts": {
-    "build": "vite build && pnpm copy:assets",
-    "build:cli": "tsc -p tsconfig.cli.json",
-    "build:all": "pnpm build && pnpm build:cli",
+    "build": "vite build && pnpm copy:assets && tsc -p tsconfig.cli.json",
     "copy:assets": "cpx src/styles/resets.css dist/styles/",
     "test": "vitest",
     "format": "prettier --write ."
