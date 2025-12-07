@@ -188,7 +188,6 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
     const stringValue = String(rawValue);
 
     const parsedValue = parseTokens(stringValue);
-    console.log(stringValue, parsedValue);
     const parsedKey = normalizeKey(cssProp, aliases);
     const parsedKebabKey = toKebabCase(parsedKey);
     if (isValidCssDeclaration(parsedKebabKey, parsedValue)) {
