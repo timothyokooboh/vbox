@@ -1,8 +1,8 @@
-import type { StandardProperties, Pseudos } from "csstype";
-import { type DefaultAliases } from "./constants";
+import type { Properties, PropertiesHyphen, Pseudos } from 'csstype';
+import { type DefaultAliases } from './constants';
 
 export type CSSCustomProperties = { [index: `--${string}`]: unknown };
-export type StandardCssProperties = StandardProperties & CSSCustomProperties;
+export type CssProperties = Properties & PropertiesHyphen & CSSCustomProperties;
 
 // filled by cli through npx vbox-type-gen
 export interface ColorTokensInterface {}
@@ -64,7 +64,7 @@ export type DesignTokens =
 
 // Augment CSS properties to also use design tokens as values
 export type AugmentedCSSProperties = {
-  [K in keyof StandardCssProperties]?: StandardCssProperties[K] | DesignTokens;
+  [K in keyof CssProperties]?: CssProperties[K] | DesignTokens;
 };
 
 /**
@@ -79,7 +79,7 @@ export type Selectors = Record<string, AugmentedCSSProperties>;
  * Example: `d="flex"` → `display: flex`.
  */
 export type AliasProps = {
-  [K in keyof AliasMap]?: StandardCssProperties[AliasMap[K]] | DesignTokens;
+  [K in keyof AliasMap]?: CssProperties[AliasMap[K]] | DesignTokens;
 };
 
 /**
@@ -165,7 +165,7 @@ export type VBoxProps = PseudoProps &
      * Escape hatch for complex styles not covered by other props.
      * Supports CSS properties, selectors, media queries, and container queries.
      */
-    css?: PropertiesAndSelectors & VBoxProps["mq"] & VBoxProps["cq"];
+    css?: PropertiesAndSelectors & VBoxProps['mq'] & VBoxProps['cq'];
     /**
      * Styles applied when the `.dark` class is present on the root element.
      * Mirrors Tailwind-style dark-mode behavior.
@@ -178,9 +178,9 @@ export type VBoxProps = PseudoProps &
     asChild?: boolean;
   };
 
-export type VBoxStyleProps = Omit<VBoxProps, "is">;
+export type VBoxStyleProps = Omit<VBoxProps, 'is'>;
 
-export type AliasStrategy = "merge" | "replace";
+export type AliasStrategy = 'merge' | 'replace';
 export interface VBoxPluginOptions {
   classNamePrefix?: string;
   defaultDesignSystem?: boolean;

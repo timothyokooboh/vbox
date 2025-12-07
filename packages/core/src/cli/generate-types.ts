@@ -3,22 +3,22 @@
   Generates vbox.d.ts with type augmentations for alias and design tokens
 */
 
-import path from "node:path";
-import fs from "fs-extra";
-import { fileURLToPath } from "node:url";
-import { createJiti } from "jiti";
-import { DefaultDesignSystem } from "../constants.js";
-import { deepMerge } from "../helpers/mergeTheme.js";
+import path from 'node:path';
+import fs from 'fs-extra';
+import { fileURLToPath } from 'node:url';
+import { createJiti } from 'jiti';
+import { DefaultDesignSystem } from '../constants.js';
+import { deepMerge } from '../helpers/mergeTheme.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const jiti = createJiti(__filename, { debug: true });
 
 const root = process.cwd();
 const configs = [
-  path.resolve(root, "vbox.config.ts"),
-  path.resolve(root, "vbox.config.js"),
-  path.resolve(root, "vbox.config.cjs"),
-  path.resolve(root, "vbox.config.mjs"),
+  path.resolve(root, 'vbox.config.ts'),
+  path.resolve(root, 'vbox.config.js'),
+  path.resolve(root, 'vbox.config.cjs'),
+  path.resolve(root, 'vbox.config.mjs'),
 ];
 
 const loadConfig = async () => {
@@ -28,7 +28,7 @@ const loadConfig = async () => {
         const mod = jiti(config);
         return mod?.default ?? mod;
       } catch (err) {
-        console.error("Failed to load config:", config, err);
+        console.error('Failed to load config:', config, err);
       }
     }
   }
@@ -51,27 +51,27 @@ type ThemeShape = {
 };
 
 const isReference = (v: unknown): v is string =>
-  typeof v === "string" && v.startsWith("$");
+  typeof v === 'string' && v.startsWith('$');
 
 function getBucket(theme: ThemeShape, category: string) {
   // strict map of valid categories
   const VALID_KEYS = {
-    color: "color",
-    fontSize: "fontSize",
-    fontWeight: "fontWeight",
-    fontFamily: "fontFamily",
-    spacing: "spacing",
-    lineHeight: "lineHeight",
-    letterSpacing: "letterSpacing",
-    borderRdaius: "borderRadius",
-    zIndex: "zIndex",
+    color: 'color',
+    fontSize: 'fontSize',
+    fontWeight: 'fontWeight',
+    fontFamily: 'fontFamily',
+    spacing: 'spacing',
+    lineHeight: 'lineHeight',
+    letterSpacing: 'letterSpacing',
+    borderRdaius: 'borderRadius',
+    zIndex: 'zIndex',
   } as const;
 
   const key = VALID_KEYS[category as keyof typeof VALID_KEYS];
   if (!key) return undefined;
 
   const bucket = (theme as any)[key];
-  return typeof bucket === "object" && bucket ? bucket : undefined;
+  return typeof bucket === 'object' && bucket ? bucket : undefined;
 }
 
 // Resolve token for non-color categories -> returns a string (primitive) or raw ref fallback
@@ -90,7 +90,7 @@ function resolvePrimitiveToken(
   const id = `${category}.${key}`;
   if (stack.includes(id)) {
     console.warn(
-      `[vbox-type-gen] Circular reference detected: ${[...stack, id].join(" -> ")}`,
+      `[vbox-type-gen] Circular reference detected: ${[...stack, id].join(' -> ')}`,
     );
     return `$${category}.${key}`;
   }
@@ -103,19 +103,19 @@ function resolvePrimitiveToken(
     return `$${category}.${key}`;
   }
 
-  if (typeof val === "string" && isReference(val)) {
-    const cleaned = val.replace(/^\$/, "");
-    const [nextCat, ...rest] = cleaned.split(".");
-    const nextKey = rest.join(".");
+  if (typeof val === 'string' && isReference(val)) {
+    const cleaned = val.replace(/^\$/, '');
+    const [nextCat, ...rest] = cleaned.split('.');
+    const nextKey = rest.join('.');
     return resolvePrimitiveToken(theme, nextCat, nextKey, [...stack, id]);
   }
 
-  if (typeof val === "string") return val;
+  if (typeof val === 'string') return val;
 
   // fallback for unexpected object
-  if (typeof val === "object" && val !== null) {
-    if (typeof (val as any).default === "string") return (val as any).default;
-    const first = Object.values(val).find((v) => typeof v === "string");
+  if (typeof val === 'object' && val !== null) {
+    if (typeof (val as any).default === 'string') return (val as any).default;
+    const first = Object.values(val).find((v) => typeof v === 'string');
     return (first as string) ?? `$${category}.${key}`;
   }
 
@@ -133,7 +133,7 @@ function resolveColorTokenValues(
 
   if (stack.includes(id)) {
     console.warn(
-      `[vbox-type-gen] Circular color reference: ${[...stack, id].join(" -> ")}`,
+      `[vbox-type-gen] Circular color reference: ${[...stack, id].join(' -> ')}`,
     );
     return [`$color.${key}`];
   }
@@ -144,17 +144,17 @@ function resolveColorTokenValues(
     return [`$color.${key}`];
   }
 
-  if (typeof val === "string" && !isReference(val)) {
+  if (typeof val === 'string' && !isReference(val)) {
     return [val];
   }
 
-  if (typeof val === "string" && isReference(val)) {
-    const cleaned = val.replace(/^\$/, "");
-    const [catRaw, ...rest] = cleaned.split(".");
+  if (typeof val === 'string' && isReference(val)) {
+    const cleaned = val.replace(/^\$/, '');
+    const [catRaw, ...rest] = cleaned.split('.');
     const cat = catRaw; // must match exactly 'color'
-    const refKey = rest.join(".");
+    const refKey = rest.join('.');
 
-    if (cat !== "color") {
+    if (cat !== 'color') {
       console.warn(
         `[vbox-type-gen] Invalid reference category '${cat}' in color token '${key}'.`,
       );
@@ -164,8 +164,8 @@ function resolveColorTokenValues(
     return resolveColorTokenValues(theme, refKey, [...stack, id]);
   }
 
-  if (typeof val === "object" && val !== null) {
-    return Object.values(val).filter((v) => typeof v === "string") as string[];
+  if (typeof val === 'object' && val !== null) {
+    return Object.values(val).filter((v) => typeof v === 'string') as string[];
   }
 
   return [`$color.${key}`];
@@ -181,41 +181,41 @@ function buildThemeInterfaceBlock(
 
   for (const [k, rawVal] of Object.entries(values)) {
     // Colors -> possibly union of mode values
-    if (typeName === "ColorTokensInterface") {
+    if (typeName === 'ColorTokensInterface') {
       // resolve possibly referenced values to an array of string values
       const resolved = resolveColorTokenValues(theme ?? {}, k);
       // create JSDoc listing modes and values; if original rawVal is object with keys, include mode names
-      let jsdoc = "";
-      if (typeof rawVal === "object" && rawVal !== null) {
+      let jsdoc = '';
+      if (typeof rawVal === 'object' && rawVal !== null) {
         const modeLines = Object.entries(rawVal)
-          .filter(([, v]) => typeof v === "string")
+          .filter(([, v]) => typeof v === 'string')
           .map(([mode, v]) => `${mode}: ${v}`)
-          .join("\n * ");
+          .join('\n * ');
         jsdoc = `/**\n * ${modeLines}\n */\n`;
-      } else if (typeof rawVal === "string" && isReference(rawVal)) {
-        const resolvedLines = resolved.join(" | ");
+      } else if (typeof rawVal === 'string' && isReference(rawVal)) {
+        const resolvedLines = resolved.join(' | ');
         jsdoc = `/**\n * ${resolvedLines}\n */\n`;
-      } else if (typeof rawVal === "string") {
+      } else if (typeof rawVal === 'string') {
         jsdoc = `/**\n * ${rawVal}\n */\n`;
       }
 
       const uniq = Array.from(new Set(resolved));
-      const union = uniq.map((s) => JSON.stringify(s)).join(" | ") || "string";
+      const union = uniq.map((s) => JSON.stringify(s)).join(' | ') || 'string';
       lines.push(`${jsdoc}  ${JSON.stringify(k)}: ${union};`);
     } else {
       // Non-color categories: resolve references to single primitive string
       let finalValue: string;
-      if (typeof rawVal === "string" && isReference(rawVal)) {
-        const cleaned = rawVal.replace(/^\$/, "");
-        const [catRaw, ...rest] = cleaned.split(".");
+      if (typeof rawVal === 'string' && isReference(rawVal)) {
+        const cleaned = rawVal.replace(/^\$/, '');
+        const [catRaw, ...rest] = cleaned.split('.');
         const refCat = catRaw;
-        const refKey = rest.join(".");
+        const refKey = rest.join('.');
         finalValue = resolvePrimitiveToken(theme ?? {}, refCat, refKey);
-      } else if (typeof rawVal === "object" && rawVal !== null) {
+      } else if (typeof rawVal === 'object' && rawVal !== null) {
         // it's unexpected for non-color, but try to pick default or first string
         finalValue =
           (rawVal as any).default ??
-          Object.values(rawVal).find((v: any) => typeof v === "string") ??
+          Object.values(rawVal).find((v: any) => typeof v === 'string') ??
           String(rawVal);
       } else {
         finalValue = String(rawVal);
@@ -228,16 +228,16 @@ function buildThemeInterfaceBlock(
     }
   }
 
-  return `interface ${typeName} {\n${lines.join("\n")}\n}\n`;
+  return `interface ${typeName} {\n${lines.join('\n')}\n}\n`;
 }
 
 const buildAliasDts = (aliases = {}) => {
   const entries = Object.entries(aliases)
     .map(([k, v]) => `    ${k}: "${v}";`)
-    .join("\n");
+    .join('\n');
   return `
 interface AliasMap {
-${entries || "    // no user aliases"}
+${entries || '    // no user aliases'}
 }
 `;
 };
@@ -247,7 +247,7 @@ const main = async () => {
 
   if (!config) {
     console.log(
-      "Could not find either vbox.config.ts or vbox.config.js file at the root of the project",
+      'Could not find either vbox.config.ts or vbox.config.js file at the root of the project',
     );
     // return;
   }
@@ -267,52 +267,52 @@ const main = async () => {
   const borderRadius = mergedTheme?.borderRadius ?? {};
   const zIndex = mergedTheme?.zIndex ?? {};
 
-  const outFile = path.resolve(root, "vbox.d.ts");
+  const outFile = path.resolve(root, 'vbox.d.ts');
 
   const aliasDts = buildAliasDts(aliases);
   const colorBlock = buildThemeInterfaceBlock(
     color,
-    "ColorTokensInterface",
+    'ColorTokensInterface',
     mergedTheme,
   );
   const fontSizeBlock = buildThemeInterfaceBlock(
     fontSizes,
-    "FontSizeTokensInterface",
+    'FontSizeTokensInterface',
     mergedTheme,
   );
   const fontWeightBlock = buildThemeInterfaceBlock(
     fontWeights,
-    "FontWeightTokensInterface",
+    'FontWeightTokensInterface',
     mergedTheme,
   );
   const fontFamilyBlock = buildThemeInterfaceBlock(
     fontFamilies,
-    "FontFamilyTokensInterface",
+    'FontFamilyTokensInterface',
     mergedTheme,
   );
   const lineHeightBlock = buildThemeInterfaceBlock(
     lineHeights,
-    "LineHeightTokensInterface",
+    'LineHeightTokensInterface',
     mergedTheme,
   );
   const letterSpacingBlock = buildThemeInterfaceBlock(
     letterSpacings,
-    "LetterSpacingTokensInterface",
+    'LetterSpacingTokensInterface',
     mergedTheme,
   );
   const spacingBlock = buildThemeInterfaceBlock(
     spacings,
-    "SpacingTokensInterface",
+    'SpacingTokensInterface',
     mergedTheme,
   );
   const borderRadiusBlock = buildThemeInterfaceBlock(
     borderRadius,
-    "BorderRadiusTokensInterface",
+    'BorderRadiusTokensInterface',
     mergedTheme,
   );
   const zIndexBlock = buildThemeInterfaceBlock(
     zIndex,
-    "ZIndexTokensInterface",
+    'ZIndexTokensInterface',
     mergedTheme,
   );
 
@@ -320,9 +320,9 @@ const main = async () => {
 // AUTO-GENERATED by vbox-type-gen
 // Do not edit by hand. Regenerate with npx vbox-type-gen'
 
-import type { AliasMap, ColorTokensInterface, FontSizeTokensInterface, FontWeightTokensInterface, FontFamilyTokensInterface, LetterSpacingTokensInterface, LineHeightTokensInterface, SpacingTokensInterface, BorderRadiusTokensInterface, ZIndexTokensInterface } from "@vbox/core";
+import type { AliasMap, ColorTokensInterface, FontSizeTokensInterface, FontWeightTokensInterface, FontFamilyTokensInterface, LetterSpacingTokensInterface, LineHeightTokensInterface, SpacingTokensInterface, BorderRadiusTokensInterface, ZIndexTokensInterface } from "@veebox/core";
 
-declare module "@vbox/core" {
+declare module "@veebox/core" {
   ${aliasDts}
   ${colorBlock}
   ${fontSizeBlock}
@@ -336,8 +336,8 @@ declare module "@vbox/core" {
 }
   `;
 
-  await fs.writeFile(outFile, content, "utf8");
-  console.log("wrote", outFile);
+  await fs.writeFile(outFile, content, 'utf8');
+  console.log('wrote', outFile);
 };
 
 main().catch((err) => {
