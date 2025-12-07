@@ -1,7 +1,7 @@
-import { buildRules } from "./buildRules";
-import { __DEV__ } from "./isDevelopment";
-import { isObjectLiteral } from "./isObjectLiteral";
-import { toKebabCase } from "./toKebabCase";
+import { buildRules } from './buildRules';
+import { __DEV__ } from './isDevelopment';
+import { isObjectLiteral } from './isObjectLiteral';
+import { toKebabCase } from './toKebabCase';
 
 export const buildCssString = ({
   rootStyles,
@@ -36,7 +36,7 @@ export const buildCssString = ({
 
   // pseudo blocks
   for (const [pseudo, styles] of Object.entries(pseudoStyles)) {
-    const prefix = pseudo.startsWith(":") ? "" : ":";
+    const prefix = pseudo.startsWith(':') ? '' : ':';
     cssString += `\n.${className}${prefix}${toKebabCase(pseudo)} { ${buildRules(styles)} }`;
 
     // nested selectors that belong to this pseudo
@@ -67,12 +67,12 @@ export const buildCssString = ({
       .map(([k, v]) => {
         const prop = toKebabCase(k);
         let val = String(v);
-        if (prop === "content" && !/^['"]/.test(val)) val = `"${val}"`;
+        if (prop === 'content' && !/^['"]/.test(val)) val = `"${val}"`;
         return `${prop}: ${val};`;
       })
-      .join(" ");
+      .join(' ');
 
-    const resolvedSelector = selector.includes("&")
+    const resolvedSelector = selector.includes('&')
       ? selector.replace(/&/g, `.${className}`)
       : `.${className} ${selector}`;
 
@@ -83,17 +83,17 @@ export const buildCssString = ({
       continue;
     }
 
-    if (resolvedSelector.startsWith("bp::")) {
-      const [, breakPoint, selectors] = resolvedSelector.split("::");
+    if (resolvedSelector.startsWith('bp::')) {
+      const [, breakPoint, selectors] = resolvedSelector.split('::');
       cssString += `\n@media (min-width: ${breakPoint}) { ${selectors} { ${rules} } }`;
-    } else if (resolvedSelector.startsWith("mbp::")) {
-      const [, mediaQuery, selectors] = resolvedSelector.split("::");
+    } else if (resolvedSelector.startsWith('mbp::')) {
+      const [, mediaQuery, selectors] = resolvedSelector.split('::');
       cssString += `\n${mediaQuery} { ${selectors} { ${rules} } }`;
-    } else if (resolvedSelector.startsWith("cbp::")) {
-      const [, containerQuery, selectors] = resolvedSelector.split("::");
+    } else if (resolvedSelector.startsWith('cbp::')) {
+      const [, containerQuery, selectors] = resolvedSelector.split('::');
       cssString += `\n${containerQuery} { ${selectors} { ${rules} } }`;
-    } else if (resolvedSelector.startsWith("dark::")) {
-      const [, selectors] = resolvedSelector.split("::");
+    } else if (resolvedSelector.startsWith('dark::')) {
+      const [, selectors] = resolvedSelector.split('::');
       cssString += `\nhtml.dark { ${selectors} { ${rules} } }`;
     } else {
       cssString += `\n${resolvedSelector} { ${rules} }`;

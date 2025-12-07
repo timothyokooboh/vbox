@@ -1,7 +1,7 @@
-import { describe, expect, test } from "vitest";
-import { buildCssString } from "../src/helpers/buildCssString";
+import { describe, expect, test } from 'vitest';
+import { buildCssString } from '../src/helpers/buildCssString';
 
-describe("buildCssString", () => {
+describe('buildCssString', () => {
   const baseArgs = {
     rootStyles: {},
     rootDarkStyles: {},
@@ -10,19 +10,19 @@ describe("buildCssString", () => {
     breakpointStyles: {},
     customMediaQueries: {},
     containerQueries: {},
-    className: "box",
+    className: 'box',
   };
 
-  test("builds base styles", () => {
+  test('builds base styles', () => {
     const css = buildCssString({
       ...baseArgs,
-      rootStyles: { color: "red", "font-size": "1rem" },
+      rootStyles: { color: 'red', 'font-size': '1rem' },
     });
 
     expect(css).toBe(`.box { color: red; font-size: 1rem; }`);
   });
 
-  test("builds empty base styles", () => {
+  test('builds empty base styles', () => {
     const css = buildCssString({
       ...baseArgs,
     });
@@ -30,65 +30,65 @@ describe("buildCssString", () => {
     expect(css).toBe(`.box {  }`);
   });
 
-  test("builds dark theme styles when provided", () => {
+  test('builds dark theme styles when provided', () => {
     const css = buildCssString({
       ...baseArgs,
-      rootDarkStyles: { color: "white" },
+      rootDarkStyles: { color: 'white' },
     });
 
     expect(css).toContain(`html.dark { .box { color: white; } }`);
   });
 
-  test("does not render dark theme section when empty", () => {
+  test('does not render dark theme section when empty', () => {
     const css = buildCssString({
       ...baseArgs,
       rootDarkStyles: {},
     });
 
-    expect(css).not.toContain("html.dark");
+    expect(css).not.toContain('html.dark');
   });
 
-  test("builds pseudo styles with auto-prefixed colon", () => {
+  test('builds pseudo styles with auto-prefixed colon', () => {
     const css = buildCssString({
       ...baseArgs,
       pseudoStyles: {
-        hover: { color: "red" },
+        hover: { color: 'red' },
       },
     });
 
     expect(css).toContain(`.box:hover { color: red; }`);
   });
 
-  test("builds pseudo styles when colon already exists", () => {
+  test('builds pseudo styles when colon already exists', () => {
     const css = buildCssString({
       ...baseArgs,
       pseudoStyles: {
-        ":focus-visible": { outline: "none" },
+        ':focus-visible': { outline: 'none' },
       },
     });
 
     expect(css).toContain(`.box:focus-visible { outline: none; }`);
   });
 
-  test("builds nested selectors under matching pseudo", () => {
+  test('builds nested selectors under matching pseudo', () => {
     const css = buildCssString({
       ...baseArgs,
       pseudoStyles: {
-        hover: { color: "red" },
+        hover: { color: 'red' },
       },
       selectorBlocks: {
-        ".box:hover .child": { color: "blue" },
+        '.box:hover .child': { color: 'blue' },
       },
     });
 
     expect(css).toContain(`.box:hover .child { color: blue; }`);
   });
 
-  test("builds breakpoint styles as media queries", () => {
+  test('builds breakpoint styles as media queries', () => {
     const css = buildCssString({
       ...baseArgs,
       breakpointStyles: {
-        "600px": { display: "flex" },
+        '600px': { display: 'flex' },
       },
     });
 
@@ -97,11 +97,11 @@ describe("buildCssString", () => {
     );
   });
 
-  test("builds custom media queries", () => {
+  test('builds custom media queries', () => {
     const css = buildCssString({
       ...baseArgs,
       customMediaQueries: {
-        "@media (orientation: landscape)": { color: "red" },
+        '@media (orientation: landscape)': { color: 'red' },
       },
     });
 
@@ -110,11 +110,11 @@ describe("buildCssString", () => {
     );
   });
 
-  test("builds container queries", () => {
+  test('builds container queries', () => {
     const css = buildCssString({
       ...baseArgs,
       containerQueries: {
-        "@container card (min-width: 400px)": { padding: "1rem" },
+        '@container card (min-width: 400px)': { padding: '1rem' },
       },
     });
 
@@ -123,35 +123,35 @@ describe("buildCssString", () => {
     );
   });
 
-  test("builds selector styles", () => {
+  test('builds selector styles', () => {
     const css = buildCssString({
       ...baseArgs,
       selectorBlocks: {
-        ".title": { color: "red" },
+        '.title': { color: 'red' },
       },
     });
 
     expect(css).toContain(`.box .title { color: red; }`);
   });
 
-  test("replaces & with className", () => {
+  test('replaces & with className', () => {
     const css = buildCssString({
       ...baseArgs,
       selectorBlocks: {
-        "&:hover": { color: "blue" },
+        '&:hover': { color: 'blue' },
       },
     });
 
     expect(css).toContain(`.box:hover { color: blue; }`);
   });
 
-  test("skips invalid selectors", () => {
+  test('skips invalid selectors', () => {
     // const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
 
     const css = buildCssString({
       ...baseArgs,
       selectorBlocks: {
-        "   ": { color: "red" }, // invalid selector
+        '   ': { color: 'red' }, // invalid selector
       },
     });
 
@@ -161,11 +161,11 @@ describe("buildCssString", () => {
     // warn.mockRestore();
   });
 
-  test("builds css string for selectors inside breakpoints", () => {
+  test('builds css string for selectors inside breakpoints', () => {
     const css = buildCssString({
       ...baseArgs,
       selectorBlocks: {
-        "bp::40rem::& :has(a)": { width: "250px" },
+        'bp::40rem::& :has(a)': { width: '250px' },
       },
     });
 
@@ -174,12 +174,12 @@ describe("buildCssString", () => {
     );
   });
 
-  test("builds css string for selectors inside media queries", () => {
+  test('builds css string for selectors inside media queries', () => {
     const css = buildCssString({
       ...baseArgs,
       selectorBlocks: {
-        "mbp::@media (min-width: 500px)::& :has(a)": {
-          width: "250px",
+        'mbp::@media (min-width: 500px)::& :has(a)': {
+          width: '250px',
         },
       },
     });
@@ -189,12 +189,12 @@ describe("buildCssString", () => {
     );
   });
 
-  test("builds css string for selectors inside container queries", () => {
+  test('builds css string for selectors inside container queries', () => {
     const css = buildCssString({
       ...baseArgs,
       selectorBlocks: {
-        "cbp::@container (min-width: 500px)::& :has(a)": {
-          padding: "2rem",
+        'cbp::@container (min-width: 500px)::& :has(a)': {
+          padding: '2rem',
         },
       },
     });
@@ -204,12 +204,12 @@ describe("buildCssString", () => {
     );
   });
 
-  test("renders dark:: selector blocks", () => {
+  test('renders dark:: selector blocks', () => {
     const css = buildCssString({
       ...baseArgs,
       selectorBlocks: {
-        "dark::& p": { color: "white" },
-        "dark::& img": { height: "100px" },
+        'dark::& p': { color: 'white' },
+        'dark::& img': { height: '100px' },
       },
     });
 
@@ -217,22 +217,22 @@ describe("buildCssString", () => {
     expect(css).toContain(`html.dark { .box img { height: 100px; } }`);
   });
 
-  test("auto-quotes content values when missing", () => {
+  test('auto-quotes content values when missing', () => {
     const css = buildCssString({
       ...baseArgs,
       selectorBlocks: {
-        ".title::after": { content: "hello" },
+        '.title::after': { content: 'hello' },
       },
     });
 
     expect(css).toContain(`content: "hello";`);
   });
 
-  test("does not double-quote content when already quoted", () => {
+  test('does not double-quote content when already quoted', () => {
     const css = buildCssString({
       ...baseArgs,
       selectorBlocks: {
-        ".title::after": { content: "'hello'" },
+        '.title::after': { content: "'hello'" },
       },
     });
 

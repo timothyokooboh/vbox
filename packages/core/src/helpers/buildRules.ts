@@ -8,5 +8,5 @@
 export const buildRules = (styles: Record<string, string>) => {
   return Object.entries(styles)
     .map(([k, v]) => `${k}: ${v};`)
-    .join(" ");
+    .join(' ');
 };

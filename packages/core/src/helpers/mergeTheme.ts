@@ -1,4 +1,4 @@
-import { isObjectLiteral } from "./isObjectLiteral.js";
+import { isObjectLiteral } from './isObjectLiteral.js';
 
 /**
  * Deep merges `base` and `override`.
