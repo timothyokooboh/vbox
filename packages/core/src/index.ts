@@ -12,6 +12,7 @@ export {
   buildCSSVariables,
 } from './helpers/themeConfigParser';
 export { keyframes } from './helpers/keyframes';
+export { __DEV__ } from './helpers/isDevelopment';
 export {
   DefaultAliases,
   DefaultBreakpoints,
