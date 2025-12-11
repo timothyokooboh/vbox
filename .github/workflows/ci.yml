@@ -27,7 +27,7 @@ jobs:
           registry-url: https://registry.npmjs.org # 🔥 REQUIRED
 
       - name: install dependencies
-        run: pnpm install
+        run: rm -rf node_modules pnpm-lock.yaml && pnpm install
 
       - name: test
         run: pnpm test
