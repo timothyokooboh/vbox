@@ -24,7 +24,7 @@ jobs:
         with:
           node-version: 22.14.0
           cache: pnpm
-          registry-url: https://registry.npmjs.org # 🔥 REQUIRED
+          registry-url: https://registry.npmjs.org
 
       - name: install dependencies
         run: rm -rf node_modules pnpm-lock.yaml && pnpm install
@@ -32,16 +32,70 @@ jobs:
       - name: test
         run: pnpm test
 
+      # -----------------------------------------------------
+      # Check if CORE version was bumped (version-based publish)
+      # -----------------------------------------------------
+      - name: Check core version bump
+        id: core_version
+        run: |
+          # Get previous version from last commit, if exists
+          if git show HEAD^:packages/core/package.json > /tmp/old_core.json 2>/dev/null; then
+            old=$(jq -r .version /tmp/old_core.json)
+          else
+            old="none"
+          fi
+
+          # Get new version
+          new=$(jq -r .version packages/core/package.json)
+
+          echo "Old version: $old"
+          echo "New version: $new"
+
+          if [ "$old" = "$new" ]; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Publish core
-        if: github.ref == 'refs/heads/main'
+        if:
+          github.ref == 'refs/heads/main' && steps.core_version.outputs.changed
+          == 'true'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           cd packages/core
           npm publish --access public --no-git-checks
 
+      # -----------------------------------------------------
+      # Check if VUE version was bumped
+      # -----------------------------------------------------
+      - name: Check vue version bump
+        id: vue_version
+        run: |
+          # Get previous version from last commit, if exists
+          if git show HEAD^:packages/vue/package.json > /tmp/old_vue.json 2>/dev/null; then
+            old=$(jq -r .version /tmp/old_vue.json)
+          else
+            old="none"
+          fi
+
+          # Get new version
+          new=$(jq -r .version packages/vue/package.json)
+
+          echo "Old version: $old"
+          echo "New version: $new"
+
+          if [ "$old" = "$new" ]; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Publish vue
-        if: github.ref == 'refs/heads/main'
+        if:
+          github.ref == 'refs/heads/main' && steps.vue_version.outputs.changed
+          == 'true'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
