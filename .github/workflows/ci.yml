@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 jobs:
-  actions:
+  publish:
     runs-on: ubuntu-latest
 
     steps:
@@ -41,11 +41,11 @@ jobs:
         run: |
           cd packages/core
           pnpm build
-          pnpm publish
+          npm publish
 
       - name: Publish vue
         if: github.ref == 'refs/heads/main'
         run: |
           cd packages/vue
           pnpm build
-          pnpm publish
+          npm publish
