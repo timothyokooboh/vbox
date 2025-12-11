@@ -40,6 +40,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           cd packages/core
+          npm ci
           pnpm build
           npm publish
 
@@ -47,5 +48,6 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           cd packages/vue
+          npm ci
           pnpm build
           npm publish
