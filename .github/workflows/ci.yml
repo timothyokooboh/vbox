@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-
   pull_request:
     branches:
       - main
@@ -25,6 +24,7 @@ jobs:
         with:
           node-version: 22.14.0
           cache: pnpm
+          registry-url: https://registry.npmjs.org # 🔥 REQUIRED
 
       - name: install dependencies
         run: pnpm install
@@ -38,7 +38,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           cd packages/core
-          npm publish
+          npm publish --access public --no-git-checks
 
       - name: Publish vue
         if: github.ref == 'refs/heads/main'
@@ -46,4 +46,4 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           cd packages/vue
-          npm publish
+          npm publish --access public --no-git-checks
