@@ -31,7 +31,7 @@ describe('parseTokens', () => {
   });
 
   test('parses border-radius', () => {
-    expect(parseTokens('rd-md')).toBe('var(--border-radius-md)');
+    expect(parseTokens('br-md')).toBe('var(--border-radius-md)');
   });
 
   test('parses z-index', () => {

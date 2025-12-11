@@ -11,10 +11,9 @@ import { stableStringify } from './stableStringify';
 
 export type KeyframeStep = 'from' | 'to' | `${number}%`;
 
-export type KeyframeDefinition = Record<
-  KeyframeStep,
-  AugmentedCSSProperties | AliasProps
->;
+export type KeyframeDefinition = {
+  [K in KeyframeStep]?: AugmentedCSSProperties | AliasProps;
+};
 
 export const keyframes = (
   identifierOrRules: string | KeyframeDefinition,

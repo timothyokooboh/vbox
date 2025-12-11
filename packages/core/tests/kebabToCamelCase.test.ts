@@ -9,4 +9,5 @@ test('converts kebab case to camel case', () => {
 test('preserves special characters during conversion', () => {
   expect(kebabToCamelCase(':focus-visible')).toBe(':focusVisible');
   expect(kebabToCamelCase(':focus-within')).toBe(':focusWithin');
+  expect(kebabToCamelCase('--border-input')).toBe('--borderInput');
 });

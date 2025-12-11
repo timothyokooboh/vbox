@@ -47,7 +47,7 @@ export const DefaultBreakpoints: Breakpoints = {
   //"2xl": "96rem", // ~1536px
 };
 
-export const DefaultDesignSystem: VBoxPluginOptions['theme'] = {
+export const DefaultTheme: VBoxPluginOptions['theme'] = {
   color: {
     'red-50': 'oklch(0.971 0.013 17.38)',
     'red-100': 'oklch(0.936 0.032 17.717)',
@@ -302,7 +302,6 @@ export const DefaultDesignSystem: VBoxPluginOptions['theme'] = {
     '3xl': '1.875rem', // 30px
     '4xl': '2.25rem', // 36px
   },
-
   fontWeight: {
     hairline: '100',
     thin: '200',
@@ -314,7 +313,6 @@ export const DefaultDesignSystem: VBoxPluginOptions['theme'] = {
     extrabold: '800',
     black: '900',
   },
-
   fontFamily: {
     sans: "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
     serif: "Georgia, 'Times New Roman', Times, serif",
@@ -322,7 +320,7 @@ export const DefaultDesignSystem: VBoxPluginOptions['theme'] = {
   },
 
   lineHeight: {
-    none: '1', // equals the elements font-size
+    none: '1', // equals the element's font-size
     tight: '1.15',
     snug: '1.25',
     normal: '1.5',

@@ -6,11 +6,12 @@ const TOKEN_PREFIX_MAP = {
   lh: 'line-height',
   ls: 'letter-spacing',
   sp: 'spacing',
-  rd: 'border-radius',
+  br: 'border-radius',
+  bs: 'box-shadow',
   z: 'z-index',
 } as const;
 
-const TOKEN_REGEX = /\b(cl|fs|fw|ff|lh|ls|sp|rd|z)-([a-zA-Z0-9-_]+)\b/g;
+const TOKEN_REGEX = /\b(cl|fs|fw|ff|lh|ls|sp|br|bs|z)-([a-zA-Z0-9-_]+)\b/g;
 
 /**
  * Replaces prefixed tokens like `cl-red-300` with `var(--color-red-300)`.
@@ -33,7 +34,6 @@ export const parseTokens = (value: string): string => {
       if (varStart !== -1) {
         const varEnd = fullStr.indexOf(')', varStart);
         if (varEnd !== -1 && varEnd >= offset + _match.length - 1) {
-          // this match is inside var(...), leave it as-is
           return _match;
         }
       }

@@ -195,45 +195,17 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
     }
 
     // 2) unified `css` escape hatch
-    if (resolvedKey === 'css') {
-      for (const k in rawValue) {
-        const v = rawValue[k as keyof typeof rawValue];
+    if (resolvedKey === 'declarations') {
+      const { rootStyleRecord, nestedStyleRecord } = extractStylesFromValue(
+        rawValue,
+        aliases,
+      );
 
-        if (k.startsWith('@media ') && isObjectLiteral(v)) {
-          customMediaQueries = {
-            ...customMediaQueries,
-            ...processMediaQueries(rawValue as VBoxProps['mq'], aliases)
-              ?.customMediaQueries,
-          };
-
-          selectorBlocks = {
-            ...selectorBlocks,
-            ...processMediaQueries(rawValue as VBoxProps['mq'], aliases)
-              ?.selectorBlocks,
-          };
-        } else if (k.startsWith('@container ') && isObjectLiteral(v)) {
-          containerQueries = {
-            ...containerQueries,
-            ...processContainerQueries(rawValue as VBoxProps['cq'], aliases)
-              ?.containerQueries,
-          };
-
-          selectorBlocks = {
-            ...selectorBlocks,
-            ...processContainerQueries(rawValue as VBoxProps['cq'], aliases)
-              ?.selectorBlocks,
-          };
-        } else {
-          const { rootStyleRecord, nestedStyleRecord } = extractStylesFromValue(
-            rawValue,
-            aliases,
-          );
-          Object.assign(rootStyles, rootStyleRecord);
-          for (const [sel, styles] of Object.entries(nestedStyleRecord)) {
-            selectorBlocks[sel] = styles;
-          }
-        }
+      Object.assign(rootStyles, rootStyleRecord);
+      for (const [sel, styles] of Object.entries(nestedStyleRecord)) {
+        selectorBlocks[sel] = styles;
       }
+
       continue;
     }
 

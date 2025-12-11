@@ -194,23 +194,4 @@ describe('parseStyleObject', () => {
       result.selectorBlocks['cbp::@container (min-width: 500px)::& :has(a)'],
     ).toStrictEqual({ width: '250px' });
   });
-
-  test("handles style object in 'css' prop", () => {
-    const result = parseStyleObject({
-      obj: {
-        css: {
-          '@media (max-width: 600px)': { color: 'green' },
-          '&:hover': { color: 'blue' },
-        },
-      },
-      aliases,
-      className: 'shr',
-      breakpoints,
-    });
-
-    expect(result.customMediaQueries).toEqual({
-      '@media (max-width: 600px)': { color: 'green' },
-    });
-    expect(result.selectorBlocks).toHaveProperty('&:hover');
-  });
 });

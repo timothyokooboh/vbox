@@ -13,11 +13,7 @@ export {
 } from './helpers/themeConfigParser';
 export { keyframes } from './helpers/keyframes';
 export { __DEV__ } from './helpers/isDevelopment';
-export {
-  DefaultAliases,
-  DefaultBreakpoints,
-  DefaultDesignSystem,
-} from './constants';
+export { DefaultAliases, DefaultBreakpoints, DefaultTheme } from './constants';
 export type {
   VBoxProps,
   VBoxStyleProps,
@@ -38,6 +34,7 @@ export type {
   FontFamilyTokensInterface,
   SpacingTokensInterface,
   BorderRadiusTokensInterface,
+  BoxShadowTokensInterface,
   ZIndexTokensInterface,
   BreakpointProps,
   CssProperties,

@@ -1,7 +1,10 @@
 import type { VBoxPluginOptions } from '../types';
 import { __DEV__ } from './isDevelopment';
 
-const themeCategories = [
+type Theme = Required<VBoxPluginOptions>['theme'];
+type ThemeKeys = keyof Theme;
+
+const themeCategories: readonly ThemeKeys[] = [
   'color',
   'fontSize',
   'fontWeight',
@@ -10,12 +13,9 @@ const themeCategories = [
   'letterSpacing',
   'spacing',
   'borderRadius',
+  'boxShadow',
   'zIndex',
-] as const;
-
-type ThemeCategory = (typeof themeCategories)[number];
-
-type Theme = Required<VBoxPluginOptions>['theme'];
+];
 
 // ---------- helper: isReference ----------
 const isReference = (value: unknown): value is string =>
@@ -32,7 +32,7 @@ export const resolveToken = (
   stack: string[] = [],
 ): string => {
   const path = parseReferencePath(reference);
-  const [category, key] = path as [ThemeCategory, string];
+  const [category, key] = path as [ThemeKeys, string];
 
   const target = theme?.[category]?.[key];
 
@@ -92,7 +92,7 @@ export const normalizeTheme = (theme: Theme) => {
         // handle primitive reference strings e.g. "$color.red-200"
         if (typeof value === 'string' && isReference(value)) {
           const path = parseReferencePath(value);
-          const [, pathValue] = path as [ThemeCategory, string];
+          const [, pathValue] = path as [ThemeKeys, string];
 
           // produce a CSS custom property
           // example: normalized.color['danger'] = 'var(--color-red-200)'

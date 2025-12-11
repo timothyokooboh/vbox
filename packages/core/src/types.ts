@@ -13,6 +13,7 @@ export interface SpacingTokensInterface {}
 export interface LineHeightTokensInterface {}
 export interface LetterSpacingTokensInterface {}
 export interface BorderRadiusTokensInterface {}
+export interface BoxShadowTokensInterface {}
 export interface ZIndexTokensInterface {}
 
 export type ColorTokens =
@@ -44,8 +45,12 @@ export type LineHeightTokens =
   | `var(--line-height-${keyof LineHeightTokensInterface})`;
 
 export type BorderRadiusTokens =
-  | `rd-${keyof BorderRadiusTokensInterface}`
+  | `br-${keyof BorderRadiusTokensInterface}`
   | `var(--border-radius-${keyof BorderRadiusTokensInterface})`;
+
+export type BoxShadowTokens =
+  | `bs-${keyof BoxShadowTokensInterface}`
+  | `var(--box-shadow-${keyof BoxShadowTokensInterface})`;
 
 export type ZIndexTokens =
   | `z-${keyof ZIndexTokensInterface}`
@@ -60,7 +65,8 @@ export type DesignTokens =
   | LineHeightTokens
   | LetterSpacingTokens
   | BorderRadiusTokens
-  | ZIndexTokens;
+  | ZIndexTokens
+  | BoxShadowTokens;
 
 // Augment CSS properties to also use design tokens as values
 export type AugmentedCSSProperties = {
@@ -162,10 +168,9 @@ export type VBoxProps = PseudoProps &
     cq?: Record<`@container ${string}`, PropertiesAndSelectors>;
 
     /**
-     * Escape hatch for complex styles not covered by other props.
-     * Supports CSS properties, selectors, media queries, and container queries.
+     * Supports CSS properties and selectors,
      */
-    css?: PropertiesAndSelectors & VBoxProps['mq'] & VBoxProps['cq'];
+    declarations?: PropertiesAndSelectors;
     /**
      * Styles applied when the `.dark` class is present on the root element.
      * Mirrors Tailwind-style dark-mode behavior.
@@ -183,7 +188,7 @@ export type VBoxStyleProps = Omit<VBoxProps, 'is'>;
 export type AliasStrategy = 'merge' | 'replace';
 export interface VBoxPluginOptions {
   classNamePrefix?: string;
-  defaultDesignSystem?: boolean;
+  enableDefaultTheme?: boolean;
   cssResets?: boolean;
   breakpoints?: {
     sm: string;
@@ -204,6 +209,7 @@ export interface VBoxPluginOptions {
     letterSpacing?: Record<string, string>;
     spacing?: Record<string, string>;
     borderRadius?: Record<string, string>;
+    boxShadow?: Record<string, string>;
     zIndex?: Record<string, string>;
   };
 }
