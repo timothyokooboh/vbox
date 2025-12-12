@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@veebox/core": "^0.0.13",
-    "@veebox/vue": "^0.0.7",
+    "@veebox/vue": "^0.0.9",
     "vue": "^3.5.25"
   },
   "devDependencies": {
