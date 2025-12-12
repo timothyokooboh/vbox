@@ -24,8 +24,8 @@ importers:
         specifier: ^0.0.13
         version: 0.0.13
       '@veebox/vue':
-        specifier: ^0.0.9
-        version: 0.0.9(vue@3.5.25(typescript@5.9.3))
+        specifier: ^0.0.10
+        version: 0.0.10(vue@3.5.25(typescript@5.9.3))
       vue:
         specifier: ^3.5.25
         version: 3.5.25(typescript@5.9.3)
@@ -1199,6 +1199,11 @@ packages:
   '@veebox/core@0.0.13':
     resolution: {integrity: sha512-JjXez4ZY/ZEU0GoDOLw0dPUIq6bEcYSAcSxrwvgKdt0eFy1yBx6Qcb77myLt4QwLHnzEAdVSozSh9m7n3k/gkA==}
     hasBin: true
+
+  '@veebox/vue@0.0.10':
+    resolution: {integrity: sha512-CnxdAdfz/e7gLfMQHw5mzLwvYMd4F+UpEsqyg//BL70igoLeydH6am2zkNdHD+ZdyHaGoZ/axXYvsHm3aJPwow==}
+    peerDependencies:
+      vue: ^3.5.0
 
   '@veebox/vue@0.0.9':
     resolution: {integrity: sha512-HHSVit3/P9LDXbzOKWyaF32vLaSxueQPvrsx63zZ2H9BQVmYEiBJuYY0PNx9aI8kgEknOwiDvXsvmnCXYmIK5A==}
@@ -4264,6 +4269,11 @@ snapshots:
   '@veebox/core@0.0.13':
     dependencies:
       stylis: 4.3.6
+
+  '@veebox/vue@0.0.10(vue@3.5.25(typescript@5.9.3))':
+    dependencies:
+      '@veebox/core': 0.0.13
+      vue: 3.5.25(typescript@5.9.3)
 
   '@veebox/vue@0.0.9(vue@3.5.25(typescript@5.9.3))':
     dependencies:
