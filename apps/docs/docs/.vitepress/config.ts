@@ -2,6 +2,11 @@ import { defineConfig } from 'vitepress';
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  vite: {
+    ssr: {
+      noExternal: ['@veebox/core', '@veebox/vue'],
+    },
+  },
   title: 'VBox',
   description:
     'A polymorphic Vue component with a lightweight runtime styling engine.',

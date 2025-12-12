@@ -20,7 +20,7 @@ import {
   withCtx
 } from "./chunk-WVT526FA.js";
 
-// ../../node_modules/.pnpm/@veebox+vue@0.0.10_vue@3.5.25_typescript@5.9.3_/node_modules/@veebox/vue/dist/index.es.js
+// ../../node_modules/.pnpm/@veebox+vue@0.0.11_vue@3.5.25_typescript@5.9.3_/node_modules/@veebox/vue/dist/index.es.js
 var n0 = /* @__PURE__ */ new Map();
 var a0 = (e, o) => {
   const t = `${e}::${o}`;
