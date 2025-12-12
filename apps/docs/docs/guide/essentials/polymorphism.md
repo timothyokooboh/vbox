@@ -16,7 +16,7 @@ The `is` prop is compatible with
 [eslint-plugin-vuejs-accessibility](https://vue-a11y.github.io/eslint-plugin-vuejs-accessibility/)
 for stactic analysis of accessible elements.
 
-<img src="/images/a11y-analysis.png" alt="A11y Analysis Screenshot" />
+<img src="/a11y-analysis.png" alt="A11y Analysis Screenshot" />
 
 ## asChild prop
 

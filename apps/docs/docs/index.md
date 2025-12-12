@@ -9,7 +9,7 @@ hero:
   alt:
     'VBox - A polymorphic Vue component with a lightweight runtime styling
     engine'
-  image: /images/logo.png
+  image: /logo.png
   actions:
     - theme: brand
       text: Get Started

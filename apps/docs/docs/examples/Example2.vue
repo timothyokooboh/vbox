@@ -1,7 +1,7 @@
 <template>
   <v-box
     is="img"
-    src="/images/victor-osimhen.jpg"
+    src="/victor-osimhen.jpg"
     alt="Victor Osimhen"
     title="Victor Osimhen"
     height="80px"
