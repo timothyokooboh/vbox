@@ -2,7 +2,7 @@
   <v-box display="flex" align-items="start" gap="1rem">
     <v-box
       is="img"
-      src="/images/victor-osimhen.jpg"
+      src="/victor-osimhen.jpg"
       alt="Victor Osihmen"
       height="50px"
       width="50px"
