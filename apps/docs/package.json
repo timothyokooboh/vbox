@@ -15,7 +15,7 @@
     "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
-    "@veebox/core": "^0.0.13",
+    "@veebox/core": "^0.0.14",
     "@veebox/vue": "^0.0.9",
     "vue": "^3.5.25"
   },

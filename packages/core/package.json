@@ -1,6 +1,6 @@
 {
   "name": "@veebox/core",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "The core package of VBox - a polymorphic Vue.js component with a runtime styling engine.",
   "publishConfig": {
     "access": "public"
