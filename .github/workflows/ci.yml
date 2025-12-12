@@ -30,7 +30,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           cd packages/core
-          pnpm install --ignore-workspace-root-check --no-frozen-lockfile
+          pnpm install --ignore-workspace --no-frozen-lockfile
           pnpm build
           pnpm test
           npm publish
@@ -41,12 +41,12 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           cd packages/vue
-          pnpm install --ignore-workspace-root-check --no-frozen-lockfile
+          pnpm install --ignore-workspace --no-frozen-lockfile
           pnpm build
           npm publish
 
       - name: Build Docs
         run: |
           cd apps/docs
-          pnpm install --ignore-workspace-root-check --no-frozen-lockfile
+          pnpm install --ignore-workspace --no-frozen-lockfile
           pnpm build
