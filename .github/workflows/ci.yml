@@ -41,12 +41,15 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           cd packages/vue
+          pnpm add @veebox/core@latest --no-frozen-lockfile
           pnpm install --no-frozen-lockfile
           pnpm build
           npm publish
 
-      - name: Build Docs
+      - name: Build docs
         run: |
           cd apps/docs
+          pnpm add @veebox/core@latest --no-frozen-lockfile
+          pnpm add @veebox/vue@latest --no-frozen-lockfile
           pnpm install --no-frozen-lockfile
           pnpm build
