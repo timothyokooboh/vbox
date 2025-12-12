@@ -19,7 +19,7 @@ import {
 
 export type AliasStrategy = 'merge' | 'replace';
 
-export const VBoxPlugin = {
+export default {
   install(app: App<Element>, options?: VBoxPluginOptions) {
     const enableDefaults = options?.enableDefaultTheme !== false;
     const baseTheme = enableDefaults ? DefaultTheme : {};
