@@ -1,6 +1,6 @@
 {
   "name": "@veebox/vue",
-  "version": "0.0.9",
+  "version": "0.0.8",
   "description": "A polymorphic Vue.js component with a runtime styling engine.",
   "type": "module",
   "license": "MIT",
@@ -41,7 +41,7 @@
     "vue": "^3.5.24"
   },
   "dependencies": {
-    "@veebox/core": "^0.0.14"
+    "@veebox/core": "^0.0.13"
   },
   "peerDependencies": {
     "vue": "^3.5.0"
