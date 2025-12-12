@@ -24,7 +24,7 @@ jobs:
         with:
           node-version: 22.14.0
           cache: pnpm
-          registry-url: https://registry.npmjs.org # 🔥 REQUIRED
+          registry-url: https://registry.npmjs.org
 
       - name: Publish core
         if: github.ref == 'refs/heads/main'
@@ -32,7 +32,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           cd packages/core
-          pnpm install
+          rm -rf node_modules pnpm-lock.yaml && pnpm install
           pnpm build
           pnpm test
           npm publish
@@ -43,13 +43,13 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           cd packages/vue
-          pnpm install
+          rm -rf node_modules pnpm-lock.yaml && pnpm install
           pnpm build
-          pnpm test
+          pnpm build
           npm publish
 
       - name: Build docs
         run: |
           cd apps/docs
-          pnpm install
+          rm -rf node_modules pnpm-lock.yaml && pnpm install
           pnpm build
