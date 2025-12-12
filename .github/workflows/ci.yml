@@ -22,9 +22,21 @@ jobs:
         with:
           node-version: 22.14.0
           cache: pnpm
+          registry-url: https://registry.npmjs.org
 
-      - name: Build docs
+      - name: install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm build
+
+      - name: test
+        run: pnpm test
+
+      - name: Publish @veebox/vue
+        if: github.ref == 'refs/heads/main'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          cd apps/docs
-          pnpm install
-          pnpm build
+          cd packages/vue
+          npm publish
