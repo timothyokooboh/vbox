@@ -12,7 +12,10 @@ and contribute smoothly.
 
 ## Install & build
 
-`pnpm install` `pnpm build`
+```bash
+pnpm install
+pnpm build
+```
 
 ## Start the documentation
 
