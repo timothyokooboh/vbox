@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  publish:
+  action:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,11 +32,3 @@ jobs:
 
       - name: test
         run: pnpm test
-
-      - name: Publish @veebox/vue
-        if: github.ref == 'refs/heads/main'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          cd packages/vue
-          npm publish
