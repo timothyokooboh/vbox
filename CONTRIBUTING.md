@@ -21,7 +21,7 @@ pnpm build
 
 ```bash
     cd apps/docs
-    pnpm docs:dev
+    pnpm dev
 ```
 
 ## Code of Conduct
