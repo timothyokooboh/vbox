@@ -1,27 +1,11 @@
-import type { VBoxPluginOptions } from '../types';
-import { __DEV__ } from './isDevelopment';
+import { ThemeCategories } from '../constants.js';
+import type { Theme, ThemeKeys } from '../types';
+import { __DEV__ } from './isDevelopment.js';
 
-type Theme = Required<VBoxPluginOptions>['theme'];
-type ThemeKeys = keyof Theme;
-
-const themeCategories: readonly ThemeKeys[] = [
-  'color',
-  'fontSize',
-  'fontWeight',
-  'fontFamily',
-  'lineHeight',
-  'letterSpacing',
-  'spacing',
-  'borderRadius',
-  'boxShadow',
-  'zIndex',
-];
-
-// ---------- helper: isReference ----------
 const isReference = (value: unknown): value is string =>
   typeof value === 'string' && value.startsWith('$');
 
-const parseReferencePath = (reference: string) => {
+export const parseReferencePath = (reference: string) => {
   if (!reference) return [];
   return reference.replace(/^\$/, '').split('.');
 };
@@ -63,7 +47,6 @@ export const resolveToken = (
   return typeof target === 'string' ? target : (target as any);
 };
 
-// ---------- normalizeTheme (now supports mode-aware color tokens) ----------
 /**
  * Returns:
  * {
@@ -75,7 +58,7 @@ export const normalizeTheme = (theme: Theme) => {
   const normalized: Record<string, Record<string, string>> = {};
   const colorDarkMap: Record<string, string> = {};
 
-  for (const category of themeCategories) {
+  for (const category of ThemeCategories) {
     const group = theme[category];
     if (!group) continue;
 
@@ -131,9 +114,6 @@ export const normalizeTheme = (theme: Theme) => {
         }
         continue;
       } else {
-        // ----------------------------
-        // Non-color categories (unchanged behavior)
-        // ----------------------------
         if (value && typeof value === 'string' && isReference(value)) {
           // Resolve references for non-color categories to primitive values
           const primitiveValue = resolveToken(theme, value);
@@ -148,7 +128,6 @@ export const normalizeTheme = (theme: Theme) => {
   return { normalized, colorDarkMap };
 };
 
-// ---------- buildCSSVariables (produces :root + html.dark overrides) ----------
 export const buildCSSVariables = (payload: {
   normalized: Record<string, Record<string, string>>;
   colorDarkMap: Record<string, string>;

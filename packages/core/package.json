@@ -1,6 +1,6 @@
 {
   "name": "@veebox/core",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "The core package of VBox - a polymorphic Vue.js component with a runtime styling engine.",
   "publishConfig": {
     "access": "public"
@@ -44,8 +44,6 @@
     "@types/stylis": "^4.2.7",
     "cpx": "^1.5.0",
     "csstype": "^3.2.3",
-    "fs-extra": "^11.3.2",
-    "jiti": "^2.6.1",
     "jsdom": "^27.2.0",
     "prettier": "^3.7.3",
     "typescript": "~5.9.3",
@@ -57,6 +55,8 @@
     "node": "22.14.0"
   },
   "dependencies": {
-    "stylis": "^4.3.6"
+    "stylis": "^4.3.6",
+    "fs-extra": "^11.3.2",
+    "jiti": "^2.6.1"
   }
 }

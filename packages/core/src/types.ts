@@ -213,3 +213,6 @@ export interface VBoxPluginOptions {
     zIndex?: Record<string, string>;
   };
 }
+
+export type Theme = Required<VBoxPluginOptions>['theme'];
+export type ThemeKeys = keyof Theme;

@@ -1,4 +1,17 @@
-import type { Breakpoints, VBoxPluginOptions } from './types';
+import type { Breakpoints, ThemeKeys, VBoxPluginOptions } from './types';
+
+export const ThemeCategories: readonly ThemeKeys[] = [
+  'color',
+  'fontSize',
+  'fontWeight',
+  'fontFamily',
+  'lineHeight',
+  'letterSpacing',
+  'spacing',
+  'borderRadius',
+  'boxShadow',
+  'zIndex',
+];
 
 export const DefaultAliases = {
   w: 'width',

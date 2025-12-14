@@ -5,15 +5,13 @@
 
 import path from 'node:path';
 import fs from 'fs-extra';
-import { fileURLToPath } from 'node:url';
 import { createJiti } from 'jiti';
-import { DefaultTheme } from '../constants.js';
+import { DefaultTheme, ThemeCategories } from '../constants.js';
 import { deepMerge } from '../helpers/mergeTheme.js';
-import type { VBoxPluginOptions } from '../types.js';
+import type { VBoxPluginOptions, Theme, ThemeKeys } from '../types.js';
+import { parseReferencePath } from '../helpers/themeConfigParser.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const jiti = createJiti(__filename, { debug: true });
-
+const jiti = createJiti(import.meta.url, { debug: true });
 const root = process.cwd();
 const configs = [
   path.resolve(root, 'vbox.config.ts'),
@@ -26,8 +24,10 @@ const loadConfig = async () => {
   for (const config of configs) {
     if (await fs.pathExists(config)) {
       try {
-        const mod = jiti(config);
-        return mod?.default ?? mod;
+        const modDefault = (await jiti.import(config, {
+          default: true,
+        })) as VBoxPluginOptions;
+        return modDefault;
       } catch (err) {
         console.error('Failed to load config:', config, err);
       }
@@ -36,39 +36,22 @@ const loadConfig = async () => {
   return null;
 };
 
-// Helpers
-
-type ThemeShape = VBoxPluginOptions['theme'];
+// type ThemeShape = VBoxPluginOptions['theme'];
 
 const isReference = (v: unknown): v is string =>
   typeof v === 'string' && v.startsWith('$');
 
-function getBucket(theme: ThemeShape, category: string) {
-  // strict map of valid categories
-  const VALID_KEYS = {
-    color: 'color',
-    fontSize: 'fontSize',
-    fontWeight: 'fontWeight',
-    fontFamily: 'fontFamily',
-    spacing: 'spacing',
-    lineHeight: 'lineHeight',
-    letterSpacing: 'letterSpacing',
-    borderRdaius: 'borderRadius',
-    boxShadow: 'boxShadow',
-    zIndex: 'zIndex',
-  } as const;
+function getBucket(theme: Theme, category: ThemeKeys) {
+  if (!ThemeCategories.includes(category)) return undefined;
 
-  const key = VALID_KEYS[category as keyof typeof VALID_KEYS];
-  if (!key) return undefined;
-
-  const bucket = (theme as any)[key];
+  const bucket = (theme as any)[category];
   return typeof bucket === 'object' && bucket ? bucket : undefined;
 }
 
 // Resolve token for non-color categories -> returns a string (primitive) or raw ref fallback
 function resolvePrimitiveToken(
-  theme: ThemeShape,
-  category: string,
+  theme: Theme,
+  category: ThemeKeys,
   key: string,
   stack: string[] = [],
 ): string {
@@ -95,10 +78,10 @@ function resolvePrimitiveToken(
   }
 
   if (typeof val === 'string' && isReference(val)) {
-    const cleaned = val.replace(/^\$/, '');
-    const [nextCat, ...rest] = cleaned.split('.');
-    const nextKey = rest.join('.');
-    return resolvePrimitiveToken(theme, nextCat, nextKey, [...stack, id]);
+    const path = parseReferencePath(val);
+    const [category, key] = path as [ThemeKeys, string];
+
+    return resolvePrimitiveToken(theme, category, key, [...stack, id]);
   }
 
   if (typeof val === 'string') return val;
@@ -115,7 +98,7 @@ function resolvePrimitiveToken(
 
 // Resolve color token -> returns array of string values (modes) or resolved strings
 function resolveColorTokenValues(
-  theme: ThemeShape,
+  theme: Theme,
   key: string,
   stack: string[] = [],
 ): string[] {
@@ -166,7 +149,7 @@ function resolveColorTokenValues(
 function buildThemeInterfaceBlock(
   values: Record<string, any>,
   typeName: string,
-  theme?: ThemeShape,
+  theme?: Theme,
 ) {
   const lines: string[] = [];
 
@@ -197,11 +180,9 @@ function buildThemeInterfaceBlock(
       // Non-color categories: resolve references to single primitive string
       let finalValue: string;
       if (typeof rawVal === 'string' && isReference(rawVal)) {
-        const cleaned = rawVal.replace(/^\$/, '');
-        const [catRaw, ...rest] = cleaned.split('.');
-        const refCat = catRaw;
-        const refKey = rest.join('.');
-        finalValue = resolvePrimitiveToken(theme ?? {}, refCat, refKey);
+        const path = parseReferencePath(rawVal);
+        const [category, key] = path as [ThemeKeys, string];
+        finalValue = resolvePrimitiveToken(theme ?? {}, category, key);
       } else if (typeof rawVal === 'object' && rawVal !== null) {
         // it's unexpected for non-color, but try to pick default or first string
         finalValue =
@@ -240,14 +221,13 @@ const main = async () => {
     console.log(
       'Could not find either vbox.config.ts or vbox.config.js file at the root of the project',
     );
-    // return;
   }
 
   const enableDefaultTheme = config?.enableDefaultTheme !== false;
   const base = enableDefaultTheme ? DefaultTheme : {};
   const mergedTheme = deepMerge(base as any, config?.theme ?? {});
 
-  const aliases = config?.aliases?.values ?? config?.alias?.values ?? {};
+  const aliases = config?.aliases?.values ?? config?.aliases?.values ?? {};
   const color = mergedTheme?.color ?? {};
   const fontSizes = mergedTheme?.fontSize ?? {};
   const fontWeights = mergedTheme?.fontWeight ?? {};
