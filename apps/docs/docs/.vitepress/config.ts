@@ -8,6 +8,7 @@ export default defineConfig({
     },
   },
   title: 'VBox',
+  head: [['link', { rel: 'icon', href: '/logo.ico' }]],
   description:
     'A polymorphic Vue component with a lightweight runtime styling engine.',
   themeConfig: {
