@@ -6,6 +6,7 @@
   "main": "index.js",
   "author": "Timothy Okooboh",
   "scripts": {
+    "dev": "pnpm turbo dev",
     "build": "pnpm turbo run build",
     "test": "pnpm turbo run test",
     "format": "pnpm turbo run format",

@@ -10,9 +10,9 @@
     "lint:oxlint": "oxlint . --fix -D correctness --ignore-path .gitignore",
     "lint:eslint": "eslint . --fix --cache",
     "lint": "run-s lint:*",
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs --force",
-    "docs:preview": "vitepress preview docs"
+    "dev": "vitepress dev docs",
+    "build": "vitepress build docs --force",
+    "preview": "vitepress preview docs"
   },
   "dependencies": {
     "@veebox/core": "workspace:*",
