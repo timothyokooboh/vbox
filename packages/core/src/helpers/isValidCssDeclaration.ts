@@ -5,6 +5,8 @@ export const isValidCssDeclaration = (cssProp: string, value: string) => {
 
   if (cssSupportCache.has(key)) return cssSupportCache.get(key)!;
 
+  if (typeof window === 'undefined') return false;
+
   const isValid = CSS.supports(`${cssProp}: ${value}`);
   cssSupportCache.set(key, isValid);
 
