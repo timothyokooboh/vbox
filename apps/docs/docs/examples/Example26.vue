@@ -3,7 +3,7 @@
     <!-- prefixing the token with br -->
     <v-box
       is="img"
-      src="/images/victor-osimhen.jpg"
+      src="/victor-osimhen.jpg"
       alt="Victor Osimhen"
       title="Victor Osimhen"
       height="50px"
@@ -15,7 +15,7 @@
     <!-- or via CSS custom properties -->
     <v-box
       is="img"
-      src="/images/victor-osimhen.jpg"
+      src="/victor-osimhen.jpg"
       alt="Victor Osimhen"
       title="Victor Osimhen"
       height="50px"
