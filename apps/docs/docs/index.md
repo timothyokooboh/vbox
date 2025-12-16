@@ -5,7 +5,7 @@ layout: home
 hero:
   name: 'VBox'
   text: 'A polymorphic Vue.js component with a lightweight styling engine'
-  tagline: Style Vue apps with expressive attributes & props.
+  tagline: Style Vue SPAs with expressive attributes & props.
   alt:
     'VBox - A polymorphic Vue component with a lightweight runtime styling
     engine'
