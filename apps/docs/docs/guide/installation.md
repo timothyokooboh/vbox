@@ -29,9 +29,14 @@ app.mount('#app');
 ```
 
 Next, run `npx vbox-type-gen` to generate a `vbox.d.ts` file that provides type
-definitions for the [default theme](./essentials/default-theme.md). Make sure to
-include this file in your `tsconfig.json` under the `include` array for
-type-safety and autocompletion support.
+definitions for the [default theme](./essentials/default-theme.md).
+
+::: info
+
+If using TypeScript, add `vbox.d.ts` to your `tsconfig.json` under the `include`
+array for type-safety and autocompletion support.
+
+:::
 
 Internally, the plugin registers the `VBox` component globally. Now you can use
 the component in your Vue templates to style elements.
