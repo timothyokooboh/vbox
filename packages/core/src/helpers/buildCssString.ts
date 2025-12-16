@@ -26,7 +26,6 @@ export const buildCssString = ({
   let cssString = `.${className} { ${buildRules(rootStyles)} }`;
 
   // append css string for dark theme styles
-
   if (
     isObjectLiteral(rootDarkStyles) &&
     Object.keys(rootDarkStyles).length > 0

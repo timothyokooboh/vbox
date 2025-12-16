@@ -1,8 +1,5 @@
 import { isObjectLiteral } from './isObjectLiteral';
-import type {
-  // StandardProperties,
-  StandardPropertiesHyphenFallback,
-} from 'csstype';
+import type { StandardPropertiesHyphenFallback } from 'csstype';
 import type { AliasMap, Breakpoints, VBoxProps } from '../types';
 import { toKebabCase } from './toKebabCase';
 import { kebabToCamelCase } from './kebabToCamelCase';
@@ -27,10 +24,11 @@ export const normalizeKey = (key: string, aliases: AliasMap): string => {
   if (cached) return cached;
 
   const camelCaseKey = kebabToCamelCase(key);
-  const resolved = aliases[camelCaseKey as keyof typeof aliases];
-  const resolvedKey = (resolved ?? camelCaseKey) as string;
-  normalizeCache.set(key, resolvedKey);
-  return resolvedKey;
+  const resolvedKey = aliases[camelCaseKey as keyof typeof aliases];
+  const finalKey = resolvedKey ?? camelCaseKey;
+  normalizeCache.set(key, finalKey);
+
+  return finalKey;
 };
 
 // Convert a style map into validated kebab-case CSS rules and nested selectors
@@ -68,16 +66,17 @@ const extractStylesFromValue = (value: unknown, aliases: AliasMap) => {
 
       nestedStyleRecord[subKey] = nestedValid;
     } else {
-      const propK = toKebabCase(
+      const subKeyToKebabCase = toKebabCase(
         subKey,
       ) as keyof StandardPropertiesHyphenFallback;
-      let propVal = String(subVal);
-      if (propK === 'content' && !/^['"]/.test(propVal)) {
-        propVal = `"${propVal}"`;
+      let stringifiedSubVal = String(subVal);
+      // auto-fix unquoted content values
+      if (subKeyToKebabCase === 'content' && !/^['"]/.test(stringifiedSubVal)) {
+        stringifiedSubVal = `"${stringifiedSubVal}"`;
       }
 
-      const parsedValue = parseTokens(propVal);
-      const parsedKey = normalizeKey(propK, aliases);
+      const parsedValue = parseTokens(stringifiedSubVal);
+      const parsedKey = normalizeKey(subKeyToKebabCase, aliases);
       const parsedKebabKey = toKebabCase(parsedKey);
       if (isValidCssDeclaration(parsedKebabKey, parsedValue)) {
         rootStyleRecord[parsedKebabKey] = parsedValue;
@@ -164,7 +163,7 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
   breakpoints,
 }: {
   obj: T;
-  aliases: AliasMap; //Record<string, keyof StandardProperties>;
+  aliases: AliasMap;
   className: string;
   breakpoints: Breakpoints;
 }) => {
@@ -181,7 +180,6 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
 
     const resolvedKey = normalizeKey(key, aliases);
 
-    // 1) handle direct CSS properties (including alias resolution)
     const cssProp = toKebabCase(
       resolvedKey,
     ) as keyof StandardPropertiesHyphenFallback;
@@ -194,7 +192,6 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
       rootStyles[parsedKebabKey] = parsedValue;
     }
 
-    // 2) unified `css` escape hatch
     if (resolvedKey === 'declarations') {
       const { rootStyleRecord, nestedStyleRecord } = extractStylesFromValue(
         rawValue,
@@ -209,7 +206,6 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
       continue;
     }
 
-    // 2) process dark theme styles
     if (resolvedKey === 'dark' && typeof rawValue === 'object') {
       const { rootStyleRecord, nestedStyleRecord } = extractStylesFromValue(
         rawValue,
@@ -222,7 +218,6 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
       continue;
     }
 
-    // 3) pseudo props (e.g. hover, focus)
     if (
       [
         'hover',
@@ -252,7 +247,6 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
       continue;
     }
 
-    // 4) pseudos (advanced pseudo selectors object)
     if (resolvedKey === 'pseudos' && typeof rawValue === 'object') {
       for (const [pseudoSelector, styles] of Object.entries(rawValue)) {
         if (!pseudoSelector.startsWith(':')) {
@@ -278,7 +272,6 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
       continue;
     }
 
-    // 5) custom media queries (mq)
     if (resolvedKey === 'mq') {
       customMediaQueries = {
         ...customMediaQueries,
@@ -293,7 +286,6 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
       continue;
     }
 
-    // 6) container queries (cq)
     if (resolvedKey === 'cq') {
       containerQueries = {
         ...containerQueries,
@@ -308,8 +300,7 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
       continue;
     }
 
-    // 7) explicit breakpoints (sm, md, lg, xl, "2xl")
-    if (['sm', 'md', 'lg', 'xl', '2xl'].includes(resolvedKey)) {
+    if (['sm', 'md', 'lg', 'xl'].includes(resolvedKey)) {
       const bpKey = resolvedKey as keyof typeof breakpoints;
       if (typeof rawValue === 'object') {
         const { rootStyleRecord, nestedStyleRecord } = extractStylesFromValue(
