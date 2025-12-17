@@ -1,8 +1,14 @@
-import type { StandardProperties, Pseudos } from 'csstype';
+import type {
+  StandardProperties,
+  VendorPropertiesHyphen,
+  Pseudos,
+} from 'csstype';
 import { type DefaultAliases } from './constants';
 
 export type CSSCustomProperties = { [index: `--${string}`]: unknown };
-export type CssProperties = StandardProperties & CSSCustomProperties;
+export type CssProperties = StandardProperties &
+  VendorPropertiesHyphen &
+  CSSCustomProperties;
 
 // filled by cli through npx vbox-type-gen
 export interface ColorTokensInterface {}
