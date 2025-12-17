@@ -1,5 +1,5 @@
 import { isObjectLiteral } from './isObjectLiteral';
-import type { StandardPropertiesHyphenFallback } from 'csstype';
+import type { StandardPropertiesHyphen } from 'csstype';
 import type { AliasMap, Breakpoints, VBoxProps } from '../types';
 import { toKebabCase } from './toKebabCase';
 import { kebabToCamelCase } from './kebabToCamelCase';
@@ -48,9 +48,7 @@ const extractStylesFromValue = (value: unknown, aliases: AliasMap) => {
 
       let nestedValid: Record<string, string> = {};
       for (const [prop, val] of Object.entries(subVal)) {
-        const propK = toKebabCase(
-          prop,
-        ) as keyof StandardPropertiesHyphenFallback;
+        const propK = toKebabCase(prop) as keyof StandardPropertiesHyphen;
         let propVal = String(val);
         if (propK === 'content' && !/^['"]/.test(propVal)) {
           propVal = `"${propVal}"`;
@@ -68,7 +66,7 @@ const extractStylesFromValue = (value: unknown, aliases: AliasMap) => {
     } else {
       const subKeyToKebabCase = toKebabCase(
         subKey,
-      ) as keyof StandardPropertiesHyphenFallback;
+      ) as keyof StandardPropertiesHyphen;
       let stringifiedSubVal = String(subVal);
       // auto-fix unquoted content values
       if (subKeyToKebabCase === 'content' && !/^['"]/.test(stringifiedSubVal)) {
@@ -176,18 +174,17 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
   let selectorBlocks: Record<string, Record<string, string>> = {};
 
   for (const [key, rawValue] of Object.entries(obj)) {
-    if (!rawValue) continue;
+    if (rawValue == undefined) continue;
 
     const resolvedKey = normalizeKey(key, aliases);
 
-    const cssProp = toKebabCase(
-      resolvedKey,
-    ) as keyof StandardPropertiesHyphenFallback;
+    const cssProp = toKebabCase(resolvedKey) as keyof StandardPropertiesHyphen;
     const stringValue = String(rawValue);
 
     const parsedValue = parseTokens(stringValue);
     const parsedKey = normalizeKey(cssProp, aliases);
     const parsedKebabKey = toKebabCase(parsedKey);
+
     if (isValidCssDeclaration(parsedKebabKey, parsedValue)) {
       rootStyles[parsedKebabKey] = parsedValue;
     }
