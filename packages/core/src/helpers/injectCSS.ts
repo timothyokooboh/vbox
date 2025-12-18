@@ -1,7 +1,7 @@
 import { compile, serialize, stringify, middleware, prefixer } from 'stylis';
 
 const cache = new Map<string, string>();
-const cssSink = new Set<string>();
+const cssRegistry = new Set<string>();
 
 const createVendorPrefix = (css: string) => {
   if (cache.has(css)) return cache.get(css)!;
@@ -24,9 +24,9 @@ export const injectCSS = (css: string) => {
   const prefixedCss = createVendorPrefix(css);
 
   // avoid duplicate css rules in the stylesheet
-  if (cssSink.has(prefixedCss)) return;
+  if (cssRegistry.has(prefixedCss)) return;
 
-  cssSink.add(prefixedCss);
+  cssRegistry.add(prefixedCss);
 
   if (!styleEl) {
     styleEl = document.createElement('style');
@@ -34,5 +34,5 @@ export const injectCSS = (css: string) => {
     document.head.appendChild(styleEl);
   }
 
-  styleEl.textContent = Array.from(cssSink).join('\n\n');
+  styleEl.textContent = Array.from(cssRegistry).join('\n\n');
 };
