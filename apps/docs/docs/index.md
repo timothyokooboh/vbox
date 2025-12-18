@@ -14,6 +14,9 @@ hero:
     - theme: brand
       text: Get Started
       link: /guide/introduction
+    - theme: alt
+      text: Demos
+      link: /demos/product-card
 
 features:
   - title: Style Props

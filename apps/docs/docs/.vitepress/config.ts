@@ -8,7 +8,16 @@ export default defineConfig({
     },
   },
   title: 'VBox',
-  head: [['link', { rel: 'icon', href: '/logo.ico' }]],
+  head: [
+    ['link', { rel: 'icon', href: '/logo.ico' }],
+    [
+      'link',
+      {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap',
+      },
+    ],
+  ],
   description:
     'A polymorphic Vue component with a lightweight runtime styling engine.',
   themeConfig: {
@@ -74,6 +83,15 @@ export default defineConfig({
           },
           { text: 'CSS resets', link: '/guide/customization/css-resets' },
           { text: 'Theme', link: '/guide/customization/theme' },
+        ],
+      },
+      {
+        text: 'Demos',
+        items: [
+          {
+            text: 'Product Card',
+            link: '/demos/product-card',
+          },
         ],
       },
     ],

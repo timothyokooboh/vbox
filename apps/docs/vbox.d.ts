@@ -16,14 +16,13 @@ interface AliasMap {
  */
   "red-50": "oklch(0.971 0.013 17.38)";
 /**
- * #370617
+ * oklch(0.936 0.032 17.717)
  */
-  "red-100": "#370617";
+  "red-100": "oklch(0.936 0.032 17.717)";
 /**
- * default: #dc2f02
- * dark: #efefef
+ *  oklch(0.885 0.062 18.334)
  */
-  "red-200": "#dc2f02" | "#efefef";
+  "red-200": " oklch(0.885 0.062 18.334)";
 /**
  * oklch(0.808 0.114 19.571)
  */
@@ -980,6 +979,20 @@ interface AliasMap {
  * oklch(0.147 0.004 49.25)
  */
   "stone-950": "oklch(0.147 0.004 49.25)";
+/**
+ * #FAF506
+ */
+  "primary": "#FAF506";
+/**
+ * default: #fff
+ * dark: #22210E
+ */
+  "bg-product": "#fff" | "#22210E";
+/**
+ * default: #1c1c0d
+ * dark: #fff
+ */
+  "text-product": "#1c1c0d" | "#fff";
 }
 
   interface FontSizeTokensInterface {
@@ -1196,18 +1209,7 @@ interface AliasMap {
 }
 
   interface ZIndexTokensInterface {
-/**
- * 0
- */
-  "base": "0";
-/**
- * 1000
- */
-  "dropdown": "1000";
-/**
- * 2000
- */
-  "modal": "2000";
+
 }
 
 }
