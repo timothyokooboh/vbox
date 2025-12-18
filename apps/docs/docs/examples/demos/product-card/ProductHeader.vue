@@ -11,6 +11,7 @@
           is="h2"
           fs="fs-3xl"
           fw="fw-bold"
+          lh="lh-snug"
           my="0"
           color="cl-text-product"
           class="vp-raw"

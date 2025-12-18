@@ -34,7 +34,10 @@
       z="10"
       display="flex"
       align-items="center"
-      gap="0.5rem"
+      gap="0.2rem"
+      :md="{
+        gap: '0.5rem',
+      }"
     >
       <v-box
         data-scope="icon"
@@ -42,10 +45,22 @@
         color="#1c1c0d"
         class="material-symbols-outlined"
         transition="transform 0.2s ease-in-out"
+        display="none !important"
+        :md="{
+          display: 'inline-block !important',
+        }"
       >
         shopping_cart
       </v-box>
-      <v-box is="span" fs="fs-base" fw="fw-bold" color="#1c1c0d">
+      <v-box
+        is="span"
+        fs="fs-sm"
+        fw="fw-bold"
+        color="#1c1c0d"
+        :md="{
+          fs: 'fs-base',
+        }"
+      >
         Add to cart
       </v-box>
     </v-box>
