@@ -6,9 +6,11 @@ import {
   parseStyleObject,
   buildCssString,
   injectCSS,
+  stableStringify,
+  createDjb2Hash,
 } from '@veebox/core';
 
-import { computed, watchEffect, useAttrs, useId, inject } from 'vue';
+import { computed, watchEffect, useAttrs, inject } from 'vue';
 import { useDeriveChildNode } from '@/composables/useDeriveChildNode';
 import {
   classNamePrefixKey,
@@ -22,11 +24,12 @@ const breakpoints = inject(breakpointsKey, DefaultBreakpoints) as Breakpoints;
 const aliases = inject<AliasMap>(aliasKey, DefaultAliases);
 const classNamePrefix = inject(classNamePrefixKey, '');
 
-const baseClassName = `css-${useId()}`;
+const attrs = useAttrs();
+
+const baseClassName = `css-${createDjb2Hash(stableStringify(attrs))}`;
 const className = classNamePrefix
   ? `${classNamePrefix}-${baseClassName}`
   : baseClassName;
-const attrs = useAttrs();
 
 const { childNode } = useDeriveChildNode(
   className,
