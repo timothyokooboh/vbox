@@ -18,9 +18,9 @@
           Urban Runner
         </v-box>
 
-        <v-box is="span" fs="fs-2xl" fw="fw-bold" color="cl-text-product"
-          >$120.00</v-box
-        >
+        <v-box is="span" fs="fs-2xl" fw="fw-bold" color="cl-text-product">
+          $120.00
+        </v-box>
       </v-box>
 
       <v-box
@@ -37,8 +37,9 @@
           :dark="{
             color: 'cl-gray-400',
           }"
-          >Men's Running Collection</v-box
         >
+          Men's Running Collection
+        </v-box>
 
         <v-box display="flex" align-items="center" gap="0.25rem">
           <v-box
@@ -51,9 +52,9 @@
             star
           </v-box>
 
-          <v-box is="span" fs="fs-sm" fw="fw-bold" color="cl-text-product"
-            >4.8</v-box
-          >
+          <v-box is="span" fs="fs-sm" fw="fw-bold" color="cl-text-product">
+            4.8
+          </v-box>
 
           <v-box
             is="span"
@@ -62,8 +63,9 @@
             :dark="{
               color: 'cl-gray-400',
             }"
-            >(120)</v-box
           >
+            (120)
+          </v-box>
         </v-box>
       </v-box>
     </v-box>

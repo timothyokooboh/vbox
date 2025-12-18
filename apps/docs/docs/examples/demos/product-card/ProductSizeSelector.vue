@@ -28,8 +28,9 @@
         :dark="{
           color: 'cl-gray-400',
         }"
-        >Size Guide</v-box
       >
+        Size Guide
+      </v-box>
     </v-box>
 
     <v-box
@@ -55,8 +56,9 @@
         :dark="{
           color: '#1c1c0d',
         }"
-        >41</v-box
       >
+        41
+      </v-box>
       <v-box is="button" v-bind="baseSizeSelectionStyles">42</v-box>
       <v-box is="button" v-bind="baseSizeSelectionStyles">43</v-box>
       <v-box is="button" v-bind="baseSizeSelectionStyles">44</v-box>
