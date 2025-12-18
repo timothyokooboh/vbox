@@ -13,9 +13,9 @@ beforeEach(() => {
 test('caches CSS.supports results', () => {
   const spy = vi.spyOn(globalThis.CSS, 'supports').mockReturnValue(true);
 
-  expect(isValidCssDeclaration('opacity', 0)).toBe(true);
-  expect(isValidCssDeclaration('opacity', 0)).toBe(true);
-  expect(isValidCssDeclaration('opacity', 0)).toBe(true);
+  expect(isValidCssDeclaration('opacity', '0')).toBe(true);
+  expect(isValidCssDeclaration('opacity', '0')).toBe(true);
+  expect(isValidCssDeclaration('opacity', '0')).toBe(true);
 
   // second and third call uses cache
   expect(spy).toHaveBeenCalledTimes(1);

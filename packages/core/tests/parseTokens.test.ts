@@ -66,7 +66,7 @@ describe('parseTokens', () => {
     );
   });
 
-  test('multiple tokens in same string', () => {
+  test('parses multiple tokens in same string', () => {
     expect(parseTokens('fs-xs sp-sm cl-red-200')).toBe(
       'var(--font-size-xs) var(--spacing-sm) var(--color-red-200)',
     );

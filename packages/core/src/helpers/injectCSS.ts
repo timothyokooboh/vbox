@@ -3,7 +3,7 @@ import { compile, serialize, stringify, middleware, prefixer } from 'stylis';
 const cache = new Map<string, string>();
 const cssRegistry = new Set<string>();
 
-const createVendorPrefix = (css: string) => {
+export const createVendorPrefix = (css: string) => {
   if (cache.has(css)) return cache.get(css)!;
 
   const prefixedCss = serialize(

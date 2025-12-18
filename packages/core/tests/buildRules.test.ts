@@ -3,7 +3,7 @@ import { buildRules } from '../src/helpers/buildRules';
 
 describe('buildRules', () => {
   test('returns valid css string', () => {
-    expect(buildRules({ color: 'red', fontSize: '1rem' })).toStrictEqual(
+    expect(buildRules({ color: 'red', fontSize: '1rem' })).toEqual(
       'color: red; fontSize: 1rem;',
     );
 
