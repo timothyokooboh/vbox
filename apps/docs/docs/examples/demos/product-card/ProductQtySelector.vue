@@ -52,9 +52,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { VBoxProps } from '@veebox/core';
+import type { VBoxStyleProps } from '@veebox/core';
 
-const qtySelectorStyles: VBoxProps = {
+const qtySelectorStyles: VBoxStyleProps = {
   cursor: 'pointer',
   border: 'none',
   backgroundColor: 'transparent',
