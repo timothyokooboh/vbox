@@ -8,7 +8,10 @@
     border-top-left-radius="1.56rem"
     border-top-right-radius="1.56rem"
     py="1rem"
-    px="1.5rem"
+    px="0.6rem"
+    :md="{
+      px: '1.5rem',
+    }"
   >
     <v-box display="flex" justify-content="space-between" align-items="center">
       <ProductMediaIcons>
