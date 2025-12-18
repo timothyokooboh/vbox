@@ -63,6 +63,10 @@ export default defineConfig({
             text: 'Declarations Prop',
             link: '/guide/essentials/declarations-prop',
           },
+          {
+            text: 'Reusing styles',
+            link: '/guide/essentials/reusing-styles',
+          },
         ],
       },
       {
