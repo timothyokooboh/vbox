@@ -44,3 +44,5 @@ the component in your Vue templates to style elements.
   />
 </template>
 ```
+
+[Documentation](https://veebox.xyz)
