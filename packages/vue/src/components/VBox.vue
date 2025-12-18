@@ -6,11 +6,9 @@ import {
   parseStyleObject,
   buildCssString,
   injectCSS,
-  stableStringify,
-  createDjb2Hash,
 } from '@veebox/core';
 
-import { computed, watchEffect, useAttrs, inject } from 'vue';
+import { computed, watchEffect, useAttrs, useId, inject } from 'vue';
 import { useDeriveChildNode } from '@/composables/useDeriveChildNode';
 import {
   classNamePrefixKey,
@@ -26,7 +24,7 @@ const classNamePrefix = inject(classNamePrefixKey, '');
 
 const attrs = useAttrs();
 
-const baseClassName = `css-${createDjb2Hash(stableStringify(attrs))}`;
+const baseClassName = `css-${useId()}`;
 const className = classNamePrefix
   ? `${classNamePrefix}-${baseClassName}`
   : baseClassName;
