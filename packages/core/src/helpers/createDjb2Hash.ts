@@ -1,8 +1,8 @@
 /**
  * Creates a deterministic hash using the djb2 algorithm.
  *
- * This is fast, lightweight, and suitable for generating stable
- * keyframe names, etc.
+ * This is fast, lightweight, and suitable for generating stable strings
+ * e.g. keyframe names, etc.
  *
  * @param str - The input string to hash
  * @returns A hex string representation of the 32-bit hash

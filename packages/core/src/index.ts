@@ -6,6 +6,8 @@ export { parseStyleObject } from './helpers/parseStyleObject';
 export { buildCssString } from './helpers/buildCssString';
 export { injectCSS } from './helpers/injectCSS';
 export { deepMerge } from './helpers/mergeTheme';
+export { createDjb2Hash } from './helpers/createDjb2Hash';
+export { stableStringify } from './helpers/stableStringify';
 export {
   normalizeTheme,
   resolveToken,

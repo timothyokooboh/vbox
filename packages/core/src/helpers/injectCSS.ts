@@ -1,9 +1,10 @@
 import { compile, serialize, stringify, middleware, prefixer } from 'stylis';
 
 const cache = new Map<string, string>();
+const cssSink = new Set<string>();
 
 const createVendorPrefix = (css: string) => {
-  if (cache.has(css)) return cache.get(css);
+  if (cache.has(css)) return cache.get(css)!;
 
   const prefixedCss = serialize(
     compile(css),
@@ -20,15 +21,18 @@ export const injectCSS = (css: string) => {
   const id = 'vbox-style-sheet';
   let styleEl = document.getElementById(id) as HTMLStyleElement | null;
 
-  if (styleEl) {
-    const prefixedCss = createVendorPrefix(css);
-    styleEl.textContent += prefixedCss;
-    return;
+  const prefixedCss = createVendorPrefix(css);
+
+  // avoid duplicate css rules in the stylesheet
+  if (cssSink.has(prefixedCss)) return;
+
+  cssSink.add(prefixedCss);
+
+  if (!styleEl) {
+    styleEl = document.createElement('style');
+    styleEl.id = id;
+    document.head.appendChild(styleEl);
   }
 
-  styleEl = document.createElement('style');
-  styleEl.id = id;
-  const prefixedCss = createVendorPrefix(css);
-  styleEl.textContent += prefixedCss;
-  document.head.appendChild(styleEl);
+  styleEl.textContent = Array.from(cssSink).join('\n\n');
 };
