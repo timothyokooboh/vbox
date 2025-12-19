@@ -98,6 +98,19 @@ export default defineConfig({
           },
         ],
       },
+      {
+        text: 'Up Next',
+        items: [
+          {
+            text: 'Full SSR Support',
+            link: '/up-next/ssr-support',
+          },
+          {
+            text: 'Enhanced DX',
+            link: '/up-next/enhanced-dx',
+          },
+        ],
+      },
     ],
 
     socialLinks: [
