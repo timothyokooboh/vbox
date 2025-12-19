@@ -1,5 +1,5 @@
 <template>
-  <v-box is="section">
+  <v-box is="section" data-scope="product-size-selector">
     <v-box
       display="flex"
       align-items="center"
@@ -28,6 +28,7 @@
         :dark="{
           color: 'cl-gray-400',
         }"
+        v-bind="outlineStyles"
       >
         Size Guide
       </v-box>
@@ -36,6 +37,7 @@
     <v-box
       display="flex"
       gap="sp-3"
+      py="sp-1"
       overflow-x="auto"
       scrollbar-width="none"
       :declarations="{
@@ -69,6 +71,7 @@
 
 <script setup lang="ts">
 import type { VBoxStyleProps } from '@veebox/core';
+import { outlineStyles } from '../style-utils';
 
 const baseSizeSelectionStyles: VBoxStyleProps = {
   cursor: 'pointer',
@@ -97,5 +100,6 @@ const baseSizeSelectionStyles: VBoxStyleProps = {
       borderColor: 'cl-primary',
     },
   },
+  ...outlineStyles,
 };
 </script>

@@ -1,5 +1,6 @@
 <template>
   <v-box
+    data-scope="add-to-cart-btn"
     is="button"
     cursor="pointer"
     border="none"
@@ -16,6 +17,7 @@
     px="1.5rem"
     shadow="0 8px 20px -6px rgba(249,245,6,0.5)"
     transition="scale 0.2s ease-in-out"
+    v-bind="outlineStyles"
     :hover="{
       '[data-scope=empty-div]': {
         opacity: 1,
@@ -81,4 +83,5 @@
 
 <script lang="ts" setup>
 import { VBox } from '@veebox/vue';
+import { outlineStyles } from '../style-utils';
 </script>

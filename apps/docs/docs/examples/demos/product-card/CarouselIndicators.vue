@@ -1,5 +1,6 @@
 <template>
   <v-box
+    data-scope="carousel-indicators"
     position="absolute"
     left="0"
     right="0"

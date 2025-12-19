@@ -1,5 +1,6 @@
 <template>
   <v-box
+    data-scope="product-card"
     bg="cl-bg-product"
     border-radius="br-lg"
     p="1rem"

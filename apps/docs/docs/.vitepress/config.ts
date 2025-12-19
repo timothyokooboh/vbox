@@ -96,6 +96,10 @@ export default defineConfig({
             text: 'Product Card',
             link: '/demos/product-card',
           },
+          {
+            text: 'Banner',
+            link: '/demos/banner',
+          },
         ],
       },
       {

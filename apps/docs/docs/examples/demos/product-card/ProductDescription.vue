@@ -1,5 +1,5 @@
 <template>
-  <v-box is="section" flex-grow="1">
+  <v-box is="section" data-scope="product-description" flex-grow="1">
     <v-box
       is="h2"
       my="0"

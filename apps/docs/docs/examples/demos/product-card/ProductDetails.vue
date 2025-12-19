@@ -1,5 +1,6 @@
 <template>
   <v-box
+    data-scope="product-details"
     position="relative"
     z="10"
     mt="-1.5rem"

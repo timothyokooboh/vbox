@@ -1,6 +1,7 @@
 <template>
   <v-box
-    as-child
+    data-scope="product-media-icons"
+    is="button"
     display="flex"
     justify-content="center"
     align-items="center"
@@ -15,9 +16,12 @@
     :active="{
       scale: 0.95,
     }"
+    v-bind="outlineStyles"
   >
-    <button>
-      <slot />
-    </button>
+    <slot />
   </v-box>
 </template>
+
+<script setup lang="ts">
+import { outlineStyles } from '../style-utils';
+</script>

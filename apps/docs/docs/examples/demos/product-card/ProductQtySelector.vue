@@ -1,5 +1,6 @@
 <template>
   <v-box
+    data-scope="product-qty-selector"
     display="flex"
     h="3.5rem"
     flex-shrink="0"
@@ -53,6 +54,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import type { VBoxStyleProps } from '@veebox/core';
+import { outlineStyles } from '../style-utils';
 
 const qtySelectorStyles: VBoxStyleProps = {
   cursor: 'pointer',
@@ -81,6 +83,7 @@ const qtySelectorStyles: VBoxStyleProps = {
     cursor: 'no-drop',
     opacity: 0.5,
   },
+  ...outlineStyles,
 };
 
 const qty = ref(1);

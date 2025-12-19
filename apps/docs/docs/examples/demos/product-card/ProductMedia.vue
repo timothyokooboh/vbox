@@ -1,5 +1,6 @@
 <template>
   <v-box
+    data-scope="product-media"
     h="50vh"
     position="relative"
     bg-image="url(https://lh3.googleusercontent.com/aida-public/AB6AXuAlppFN5BODyDL2tmrrUPK5zdu5XBZIA0tmroi3O-CLXDMmNRctRfcgJK58d0bbrvhBYjlcZV9A-xW03kShBwyqGq75ujCBzFb7DWMrGtaRmwIhizMvx1Ui4GbrfksZwdBAXz9eFYGF9Vd30ch2C_TfNF-LWefyDEp7GN-X0sH-yh2aqc-WImiT0xlr012AfnOSmOrmJWjnB8w6JxptCwfE89_joas0HMRuAXfe8xj2qzCjI4yLHJj_497IOWj9js6VTQ1Tu-CEqwI)"

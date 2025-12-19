@@ -1,5 +1,5 @@
 <template>
-  <v-box is="section" flex-grow="1">
+  <v-box is="section" data-scope="product-header" flex-grow="1">
     <v-box display="flex" flex-direction="column" gap="0.25rem">
       <v-box
         display="flex"
