@@ -9,20 +9,19 @@ import {
 } from '@veebox/core';
 
 import { computed, watchEffect, useAttrs, useId, inject } from 'vue';
-import { useDeriveChildNode } from '@/composables/useDeriveChildNode';
+import { useDeriveChildNode } from '../composables/useDeriveChildNode';
 import {
   classNamePrefixKey,
   aliasKey,
   breakpointsKey,
-} from '@/injectionSymbols';
+} from '../injectionSymbols';
 
 const props = defineProps<VBoxProps>();
+const attrs = useAttrs();
 
 const breakpoints = inject(breakpointsKey, DefaultBreakpoints) as Breakpoints;
 const aliases = inject<AliasMap>(aliasKey, DefaultAliases);
 const classNamePrefix = inject(classNamePrefixKey, '');
-
-const attrs = useAttrs();
 
 const baseClassName = `css-${useId()}`;
 const className = classNamePrefix
@@ -34,7 +33,7 @@ const { childNode } = useDeriveChildNode(
   computed(() => props.asChild),
 );
 
-const styleProps = computed(() => ({ ...props, ...attrs }));
+const propsAndAttrs = computed(() => ({ ...props, ...attrs }));
 
 watchEffect(() => {
   const {
@@ -46,7 +45,7 @@ watchEffect(() => {
     containerQueries,
     customMediaQueries,
   } = parseStyleObject({
-    obj: styleProps.value,
+    obj: propsAndAttrs.value,
     aliases,
     className,
     breakpoints,
