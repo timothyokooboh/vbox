@@ -370,3 +370,6 @@ export const DefaultTheme: VBoxPluginOptions['theme'] = {
     full: '9999px',
   },
 };
+
+export const CSS_REGISTRY_KEY = '__VBOX__CSS__REGISTRY__';
+export const VENDOR_PREFIX_KEY = '__VBOX__VENDOR__PREFIXES__';

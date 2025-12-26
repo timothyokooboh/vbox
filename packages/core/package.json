@@ -1,6 +1,6 @@
 {
   "name": "@veebox/core",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "The core package of VBox - a polymorphic Vue.js component with a runtime styling engine.",
   "publishConfig": {
     "access": "public"
@@ -36,7 +36,8 @@
     "build": "vite build && pnpm copy:assets && tsc -p tsconfig.cli.json",
     "copy:assets": "cpx src/styles/resets.css dist/styles/",
     "test": "vitest",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",

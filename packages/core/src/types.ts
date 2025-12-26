@@ -106,7 +106,7 @@ export type PropertiesAndSelectors =
 /**
  * Maps shorthand keys to full CSS property names.
  * Used internally to expand alias props at runtime.
- * Example: `{ d: 'display', p: 'padding' }`
+ * Example: `{ m: 'margin', p: 'padding' }`
  */
 type DefaultAliasesType = typeof DefaultAliases;
 export interface AliasMap extends DefaultAliasesType {}

@@ -2,8 +2,9 @@
   <v-box
     :declarations="{
       color: 'tomato',
+      padding: '0.5rem',
       '&:has(p)': {
-        bg: 'indigo',
+        background: 'indigo',
       },
     }"
   >

@@ -5,9 +5,9 @@
 `v-box` takes an optional `is` prop that accepts any valid HTML element. If the
 `is` prop is not passed, the component renders a `div` by default.
 
-<<< @/examples/Example3.vue
+<<< @/examples/ExampleThree.vue
 
-<Example3
+<ExampleThree
  />
 
 <hr />
@@ -28,11 +28,11 @@ for stactic analysis of accessible elements.
 NB: Only a single root element is allowed inside the default slot when using
 `asChild`.
 
-<<< @/examples/Example4.vue
+<<< @/examples/ExampleFour.vue
 
-<Example4 />
+<ExampleFour />
 
 <script lang='ts' setup>
-  import Example3 from '../../examples/Example3.vue'
-  import Example4 from '../../examples/Example4.vue'
+  import ExampleThree from '../../examples/ExampleThree.vue'
+  import ExampleFour from '../../examples/ExampleFour.vue'
 </script>

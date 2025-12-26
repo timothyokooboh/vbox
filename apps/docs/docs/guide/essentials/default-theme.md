@@ -15,9 +15,9 @@ more.
 As discussed in the [theme customization section](../customization/theme.md),
 you can use color tokens in two ways
 
-<<< @/examples/Example19.vue
+<<< @/examples/ExampleNineteen.vue
 
-<Example19 />
+<ExampleNineteen />
 
 ```ts
 // default theme colors
@@ -292,9 +292,9 @@ you can use color tokens in two ways
 
 VBox's default theme includes a set of predefined font sizes that you can use.
 
-<<< @/examples/Example20.vue
+<<< @/examples/ExampleTwenty.vue
 
-<Example20 />
+<ExampleTwenty />
 
 ```ts
 // default theme font sizes
@@ -314,9 +314,9 @@ VBox's default theme includes a set of predefined font sizes that you can use.
 
 VBox's default theme includes a set of predefined font weights that you can use.
 
-<<< @/examples/Example21.vue
+<<< @/examples/ExampleTwentyOne.vue
 
-<Example21 />
+<ExampleTw />
 
 ```ts
 // default theme font weights
@@ -338,9 +338,9 @@ VBox's default theme includes a set of predefined font weights that you can use.
 VBox's default theme includes a set of predefined font families that you can
 use.
 
-<<< @/examples/Example22.vue
+<<< @/examples/ExampleTwentyTwo.vue
 
-<Example22 />
+<ExampleTwentyTwo />
 
 ```ts
 // default theme font family
@@ -355,9 +355,9 @@ use.
 
 VBox's default theme includes a set of predefined line heights that you can use.
 
-<<< @/examples/Example23.vue
+<<< @/examples/ExampleTwentyThree.vue
 
-<Example23 />
+<ExampleTwentyThree />
 
 ```ts
 // default theme line heights
@@ -376,9 +376,9 @@ VBox's default theme includes a set of predefined line heights that you can use.
 VBox's default theme includes a set of predefined letter spacings that you can
 use.
 
-<<< @/examples/Example24.vue
+<<< @/examples/ExampleTwentyFour.vue
 
-<Example24 />
+<ExampleTwentyFour />
 
 ```ts
 // default theme letter spacing
@@ -396,9 +396,9 @@ use.
 VBox's default theme includes a set of predefined spacing values that you can
 use
 
-<<< @/examples/Example25.vue{8-9,20}
+<<< @/examples/ExampleTwentyFive.vue{8-9,20}
 
-<Example25 />
+<ExampleTwentyFive />
 
 ```ts
 // default theme spacing
@@ -422,9 +422,9 @@ use
 VBox's default theme includes a set of predefined border radius values that you
 can use.
 
-<<< @/examples/Example26.vue{12,24}
+<<< @/examples/ExampleTwentySix.vue{12,24}
 
-<Example26 />
+<ExampleTwentySix />
 
 ```ts
 // default theme border radius
@@ -452,12 +452,12 @@ export default defineConfig({
 ```
 
 <script lang="ts" setup>
-import Example19 from '../../examples/Example19.vue'
-import Example20 from '../../examples/Example20.vue'
-import Example21 from '../../examples/Example21.vue'
-import Example22 from '../../examples/Example22.vue'
-import Example23 from '../../examples/Example23.vue'
-import Example24 from '../../examples/Example24.vue'
-import Example25 from '../../examples/Example25.vue'
-import Example26 from '../../examples/Example26.vue'
+import ExampleNineteen from '../../examples/ExampleNineteen.vue'
+import ExampleTwenty from '../../examples/ExampleTwenty.vue'
+import ExampleTwentyOne from '../../examples/ExampleTwentyOne.vue'
+import ExampleTwentyTwo from '../../examples/ExampleTwentyTwo.vue'
+import ExampleTwentyThree from '../../examples/ExampleTwentyThree.vue'
+import ExampleTwentyFour from '../../examples/ExampleTwentyFour.vue'
+import ExampleTwentyFive from '../../examples/ExampleTwentyFive.vue'
+import ExampleTwentySix from '../../examples/ExampleTwentySix.vue'
 </script>

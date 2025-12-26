@@ -3,10 +3,10 @@
 VBox supports every CSS property as an attribute. Under the hood, it parses them
 into CSS rules.
 
-<<< @/examples/Example5.vue
+<<< @/examples/ExampleFive.vue
 
-<Example5 />
+<ExampleFive />
 
 <script lang="ts" setup>
-  import Example5 from '../../examples/Example5.vue'
+  import ExampleFive from '../../examples/ExampleFive.vue'
 </script>

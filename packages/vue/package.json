@@ -1,6 +1,6 @@
 {
   "name": "@veebox/vue",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A polymorphic Vue.js component with a runtime styling engine.",
   "type": "module",
   "license": "MIT",
@@ -24,6 +24,8 @@
   "scripts": {
     "build": "vite build",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
     "test": "vitest"
   },
   "devDependencies": {
@@ -33,9 +35,15 @@
     "@types/jsdom": "^27.0.0",
     "@types/node": "^24.10.0",
     "@vitejs/plugin-vue": "^6.0.3",
+    "@vue/eslint-config-prettier": "^10.2.0",
+    "@vue/eslint-config-typescript": "^14.6.0",
     "@vue/tsconfig": "^0.8.1",
+    "eslint": "^9.39.2",
+    "eslint-plugin-oxlint": "^1.35.0",
+    "eslint-plugin-vue": "^10.6.2",
     "fs-extra": "^11.3.2",
     "jiti": "^2.6.1",
+    "oxlint": "^1.35.0",
     "prettier": "^3.7.3",
     "typescript": "~5.9.3",
     "vite": "^7.2.4",

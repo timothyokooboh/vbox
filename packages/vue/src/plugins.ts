@@ -23,7 +23,7 @@ export default {
   install(app: App<Element>, options?: VBoxPluginOptions) {
     const enableDefaults = options?.enableDefaultTheme !== false;
     const baseTheme = enableDefaults ? DefaultTheme : {};
-    const mergedTheme = deepMerge(baseTheme as any, options?.theme ?? {});
+    const mergedTheme = deepMerge(baseTheme, options?.theme ?? {});
 
     if (Object.keys(mergedTheme).length > 0) {
       const { normalized, colorDarkMap } = normalizeTheme(mergedTheme);

@@ -200,10 +200,14 @@ function buildThemeInterfaceBlock(
     }
   }
 
+  if (lines.length === 0) return '';
+
   return `interface ${typeName} {\n${lines.join('\n')}\n}\n`;
 }
 
 const buildAliasDts = (aliases = {}) => {
+  if (Object.keys(aliases).length === 0) return '';
+
   const entries = Object.entries(aliases)
     .map(([k, v]) => `    ${k}: "${v}";`)
     .join('\n');

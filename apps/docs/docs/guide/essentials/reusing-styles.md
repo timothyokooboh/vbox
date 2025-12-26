@@ -10,12 +10,12 @@ safety & intellisense support for every VBox style props.
 
 :::
 
-<<< @/examples/Example31.vue
+<<< @/examples/ExampleThirtyOne.vue
 
 <ClientOnly>
-    <Example31 />
+    <ExampleThirtyOne />
 </ClientOnly>
 
 <script lang="ts" setup>
-    import Example31 from '../../examples/Example31.vue'
+    import ExampleThirtyOne from '../../examples/ExampleThirtyOne.vue'
 </script>

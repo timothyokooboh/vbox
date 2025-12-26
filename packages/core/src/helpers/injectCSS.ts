@@ -1,17 +1,23 @@
 import { compile, serialize, stringify, middleware, prefixer } from 'stylis';
+import { CSS_REGISTRY_KEY, VENDOR_PREFIX_KEY } from '../constants';
 
-const cache = new Map<string, string>();
-const cssRegistry = new Set<string>();
+const vendorPrefixes: Map<string, string> =
+  (globalThis as any)[VENDOR_PREFIX_KEY] ??
+  ((globalThis as any)[VENDOR_PREFIX_KEY] = new Map());
+
+const cssRegistry: Set<string> =
+  (globalThis as any)[CSS_REGISTRY_KEY] ??
+  ((globalThis as any)[CSS_REGISTRY_KEY] = new Set());
 
 export const createVendorPrefix = (css: string) => {
-  if (cache.has(css)) return cache.get(css)!;
+  if (vendorPrefixes.has(css)) return vendorPrefixes.get(css)!;
 
   const prefixedCss = serialize(
     compile(css),
     middleware([prefixer, stringify]),
   );
 
-  cache.set(css, prefixedCss);
+  vendorPrefixes.set(css, prefixedCss);
   return prefixedCss;
 };
 
@@ -34,5 +40,6 @@ export const injectCSS = (css: string) => {
     document.head.appendChild(styleEl);
   }
 
-  styleEl.textContent = Array.from(cssRegistry).join('\n\n');
+  const content = Array.from(cssRegistry);
+  styleEl.textContent = content.join(`\n`);
 };

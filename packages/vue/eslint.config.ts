@@ -15,7 +15,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 export default defineConfigWithVueTs(
   {
     name: 'app/files-to-lint',
-    files: ['**/*.{ts,mts,tsx,vue}'],
+    files: ['**/*.{ts,mts,vue}'],
     languageOptions: {
       parserOptions: {
         tsconfigRootDir: __dirname,
@@ -23,12 +23,7 @@ export default defineConfigWithVueTs(
     },
   },
 
-  globalIgnores([
-    '**/dist/**',
-    '**/dist-ssr/**',
-    '**/coverage/**',
-    '**/cache/**',
-  ]),
+  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
 
   pluginVue.configs['flat/essential'],
   vueTsConfigs.recommended,

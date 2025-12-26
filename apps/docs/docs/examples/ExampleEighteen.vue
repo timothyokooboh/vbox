@@ -1,5 +1,5 @@
 <template>
-  <v-box is="p" :animation="`${slideFromTop} 0.3s ease-in-out`">
+  <v-box is="p" color="tomato" :animation="`${slideFromTop} 0.5s ease-in-out`">
     VBox is cool
   </v-box>
 </template>

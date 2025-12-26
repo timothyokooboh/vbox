@@ -41,10 +41,10 @@ array for type-safety and autocompletion support.
 Internally, the plugin registers the `VBox` component globally. Now you can use
 the component in your Vue templates to style elements.
 
-<<< @/examples/Example2.vue
+<<< @/examples/ExampleTwo.vue
 
-<Example2 />
+<ExampleTwo />
 
 <script lang="ts" setup>
-import Example2 from '../examples/Example2.vue'
+import ExampleTwo from '../examples/ExampleTwo.vue'
 </script>

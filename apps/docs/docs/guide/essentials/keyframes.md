@@ -3,11 +3,9 @@
 VBox provides a `keyframes` helper function that allows you to define CSS
 keyframe animations directly within your Vue components.
 
-<<< @/examples/Example18.vue
+<ExampleEighteen />
 
-<Example18 />
-
-<hr />
+<<< @/examples/ExampleEighteen.vue
 
 ::: tip
 
@@ -52,7 +50,7 @@ const slideFromTop = keyframes({
 
 <hr />
 
-By default, `keyframes` generates unique and stable identifiers used for the
+By default, `keyframes` generate unique and stable identifiers used for the
 `animation-name` e.g vbox-kf-15614bc4, where 15614bc4 is a stable hash based on
 the object passed to the `keyframes` function. However, you can customize the
 animation name by providing a string as the first argument.
@@ -78,5 +76,5 @@ And the usage is still the same:
 ```
 
 <script lang="ts" setup>
-import Example18 from '../../examples/Example18.vue'
+import ExampleEighteen from '../../examples/ExampleEighteen.vue'
 </script>

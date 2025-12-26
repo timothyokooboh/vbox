@@ -4,9 +4,9 @@ VBox provides convenient aliases for common CSS properties to simplify styling.
 You can also
 [provide your own custom aliases](../customization/custom-aliases.md)
 
-<<< @/examples/Example6.vue
+<<< @/examples/ExampleSix.vue
 
-<Example6 />
+<ExampleSix />
 
 ## Default Aliases
 
@@ -55,5 +55,5 @@ You can also
 [provide your own custom aliases](../customization/custom-aliases.md).
 
 <script lang="ts" setup>
-import Example6 from '../../examples/Example6.vue'
+import ExampleSix from '../../examples/ExampleSix.vue'
 </script>

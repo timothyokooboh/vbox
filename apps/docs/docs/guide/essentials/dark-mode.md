@@ -12,11 +12,11 @@ There are three ways to handle dark mode styling in VBox: `dark` prop,
 The `dark` prop applies styles specifically for dark mode when the html element
 has a `dark` class.
 
-<<< @/examples/Example17.vue{7-9}
+<<< @/examples/ExampleSeventeen.vue{7-9}
 
 Toggle light/dark mode of this page to see the effect.
 
-<Example17 />
+<ExampleSeventeen />
 
 ::: tip
 
@@ -97,5 +97,5 @@ for more information on `color-scheme` property.
 ```
 
 <script setup lang="ts">
-import Example17 from '../../examples/Example17.vue'
+import ExampleSeventeen from '../../examples/ExampleSeventeen.vue'
 </script>

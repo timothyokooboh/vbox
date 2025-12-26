@@ -5,15 +5,15 @@ seen that all the pseudo props and responsive style props accepts CSS selectors.
 The `declarations` prop is a good place to apply selectors that are not scoped
 to pseudo states, responsive design etc.
 
-:x:
+<<< @/examples/ExampleTwentyNine.vue
 
-<<< @/examples/Example29.vue
-
-<Example29 />
+<ExampleTwentyNine />
 
 ::: tip
 
 This is also a good place to apply _scoped CSS custom properties_.
+
+<br />
 
 :x: won't work as Vue.js does not consider --border-input a valid attribute
 
@@ -25,9 +25,9 @@ This is also a good place to apply _scoped CSS custom properties_.
 
 :white_check_mark: works
 
-<<< @/examples/Example30.vue
+<<< @/examples/ExampleThirty.vue
 
-<Example30 />
+<ExampleThirty />
 
 :::
 
@@ -66,6 +66,6 @@ rules that are supported by the that browser.
 :::
 
 <script lang="ts" setup>
-import Example29 from '../../examples/Example29.vue'
-import Example30 from '../../examples/Example30.vue'
+import ExampleTwentyNine from '../../examples/ExampleTwentyNine.vue'
+import ExampleThirty from '../../examples/ExampleThirty.vue'
 </script>

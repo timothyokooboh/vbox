@@ -4,6 +4,7 @@
   "tasks": {
     "lint": {},
     "format": {},
+    "format:check": {},
     "test": {
       "inputs": ["src/**/*.vue", "src/**/*.ts"]
     },
