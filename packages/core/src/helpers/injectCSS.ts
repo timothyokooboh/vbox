@@ -5,6 +5,7 @@ const vendorPrefixes: Map<string, string> =
   (globalThis as any)[VENDOR_PREFIX_KEY] ??
   ((globalThis as any)[VENDOR_PREFIX_KEY] = new Map());
 
+// avoid duplicate css string in the stylesheet
 const cssRegistry: Set<string> =
   (globalThis as any)[CSS_REGISTRY_KEY] ??
   ((globalThis as any)[CSS_REGISTRY_KEY] = new Set());
@@ -28,9 +29,6 @@ export const injectCSS = (css: string) => {
   let styleEl = document.getElementById(id) as HTMLStyleElement | null;
 
   const prefixedCss = createVendorPrefix(css);
-
-  // avoid duplicate css rules in the stylesheet
-  if (cssRegistry.has(prefixedCss)) return;
 
   cssRegistry.add(prefixedCss);
 
