@@ -109,8 +109,9 @@ const processMediaQueries = (
       aliases,
     );
     customMediaQueries[query] = rootStyleRecord;
+    const prefix = `mbp::${query}::`;
     for (const [selector, value] of Object.entries(nestedStyleRecord)) {
-      selectorBlocks[`mbp::${query}::${selector}`] = value;
+      selectorBlocks[`${prefix}${selector}`] = value;
     }
   }
 
@@ -144,8 +145,10 @@ const processContainerQueries = (
       aliases,
     );
     containerQueries[query] = rootStyleRecord;
-    for (const [selector, value] of Object.entries(nestedStyleRecord))
-      selectorBlocks[`cbp::${query}::${selector}`] = value;
+    const prefix = `cbp::${query}::`;
+    for (const [selector, value] of Object.entries(nestedStyleRecord)) {
+      selectorBlocks[`${prefix}${selector}`] = value;
+    }
   }
 
   return {
