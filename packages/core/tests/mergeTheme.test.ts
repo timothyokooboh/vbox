@@ -1,5 +1,5 @@
 import { deepMerge } from '../src/helpers/mergeTheme';
-import { test, describe, vi, expect } from 'vitest';
+import { test, describe, expect } from 'vitest';
 
 describe('deepMerge', () => {
   test('returns base object when override object is undefined', () => {

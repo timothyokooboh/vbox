@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach, vi } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { injectCSS, createVendorPrefix } from '../src/helpers/injectCSS';
 
 describe('injectCSS', () => {
