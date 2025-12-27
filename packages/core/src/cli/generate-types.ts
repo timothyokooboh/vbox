@@ -147,7 +147,8 @@ function resolveColorTokenValues(
 
 // Build interface entries for a category
 function buildThemeInterfaceBlock(
-  values: Record<string, unknown>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  values: Record<string, any>,
   typeName: string,
   theme?: Theme,
 ) {
