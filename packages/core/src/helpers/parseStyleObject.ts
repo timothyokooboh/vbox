@@ -33,7 +33,7 @@ export const normalizeKey = (key: string, aliases: AliasMap): string => {
 
 // Convert a style map into validated kebab-case CSS rules and nested selectors
 const extractStylesFromValue = (value: unknown, aliases: AliasMap) => {
-  let rootStyleRecord: Record<string, string> = {};
+  const rootStyleRecord: Record<string, string> = {};
   const nestedStyleRecord: Record<string, Record<string, string>> = {};
 
   if (!value || !isObjectLiteral(value)) {
@@ -46,7 +46,7 @@ const extractStylesFromValue = (value: unknown, aliases: AliasMap) => {
         continue;
       }
 
-      let nestedValid: Record<string, string> = {};
+      const nestedValid: Record<string, string> = {};
       for (const [prop, val] of Object.entries(subVal)) {
         const propK = toKebabCase(prop) as keyof StandardPropertiesHyphen;
         let propVal = String(val);
@@ -168,7 +168,7 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
   className: string;
   breakpoints: Breakpoints;
 }) => {
-  let rootStyles: Record<string, string> = {};
+  const rootStyles: Record<string, string> = {};
   const rootDarkStyles: Record<string, string> = {};
   const pseudoStyles: Record<string, Record<string, string>> = {};
   const breakpointStyles: Record<string, Record<string, string>> = {};

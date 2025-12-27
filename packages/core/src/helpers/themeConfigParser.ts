@@ -43,8 +43,8 @@ export const resolveToken = (
   }
 
   // For non-string (objects) or string primitives, return as-is.
-  // Note: for colors we will treat references differently in normalizeTheme (we will produce var(...))
-  return typeof target === 'string' ? target : (target as any);
+  // for colors, references is treated differently; in normalizeTheme css custom properties are produced)
+  return target as unknown as string;
 };
 
 /**

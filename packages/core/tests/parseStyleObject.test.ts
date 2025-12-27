@@ -5,10 +5,18 @@ import type { AliasMap } from '../src/types';
 beforeEach(() => {
   // ensure global CSS object exists
   if (!globalThis.CSS) {
-    globalThis.CSS = {
-      supports: vi.fn(),
-    } as any;
+    Object.defineProperty(globalThis, 'CSS', {
+      value: {},
+      configurable: true,
+      writable: true,
+    });
   }
+
+  Object.defineProperty(globalThis.CSS, 'supports', {
+    value: vi.fn(),
+    configurable: true,
+    writable: true,
+  });
 
   vi.spyOn(globalThis.CSS, 'supports').mockReturnValue(true);
 });

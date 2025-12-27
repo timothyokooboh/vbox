@@ -11,7 +11,7 @@ export const deepMerge = (
 ) => {
   if (!override) return { ...base };
 
-  const output: Record<string, any> = { ...base };
+  const output: Record<string, unknown> = { ...base };
 
   for (const key of Object.keys(override)) {
     const baseVal = base[key as keyof VBoxPluginOptions['theme']];

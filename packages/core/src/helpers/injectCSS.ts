@@ -1,14 +1,18 @@
 import { compile, serialize, stringify, middleware, prefixer } from 'stylis';
 import { CSS_REGISTRY_KEY, VENDOR_PREFIX_KEY } from '../constants';
 
+const typedGlobal = globalThis as typeof globalThis & {
+  [VENDOR_PREFIX_KEY]?: Map<string, string>;
+  [CSS_REGISTRY_KEY]?: Set<string>;
+};
+
 const vendorPrefixes: Map<string, string> =
-  (globalThis as any)[VENDOR_PREFIX_KEY] ??
-  ((globalThis as any)[VENDOR_PREFIX_KEY] = new Map());
+  typedGlobal[VENDOR_PREFIX_KEY] ??
+  (typedGlobal[VENDOR_PREFIX_KEY] = new Map());
 
 // avoid duplicate css string in the stylesheet
 const cssRegistry: Set<string> =
-  (globalThis as any)[CSS_REGISTRY_KEY] ??
-  ((globalThis as any)[CSS_REGISTRY_KEY] = new Set());
+  typedGlobal[CSS_REGISTRY_KEY] ?? (typedGlobal[CSS_REGISTRY_KEY] = new Set());
 
 export const createVendorPrefix = (css: string) => {
   if (vendorPrefixes.has(css)) return vendorPrefixes.get(css)!;

@@ -4,6 +4,7 @@ import {
   normalizeTheme,
   resolveToken,
 } from '../src/helpers/themeConfigParser';
+import type { Theme } from '../src/types';
 
 describe('theme config parser', () => {
   let warnSpy: ReturnType<typeof vi.spyOn>;
@@ -42,7 +43,7 @@ describe('theme config parser', () => {
         fontSize: { xl: '2rem', heading: '$fontSize.xl' },
       };
 
-      const output = resolveToken(theme as any, '$fontSize.heading');
+      const output = resolveToken(theme, '$fontSize.heading');
       expect(output).toBe('2rem');
     });
 
@@ -52,7 +53,7 @@ describe('theme config parser', () => {
       };
 
       const ref = '$fontSize.lg';
-      const output = resolveToken(theme as any, ref);
+      const output = resolveToken(theme, ref);
       expect(output).toBe(ref);
       expect(warnSpy).toHaveBeenCalledWith(
         `[VBox] Unknown token reference: ${ref}`,
@@ -65,12 +66,12 @@ describe('theme config parser', () => {
       };
 
       const ref = '$fontSize.a';
-      const output = resolveToken(theme as any, ref);
+      const output = resolveToken(theme, ref);
       expect(output).toBe(ref);
       expect(warnSpy).toHaveBeenCalled();
       // expects message to contain "Circular token reference detected"
       expect(
-        warnSpy.mock.calls.some((c: any[]) =>
+        warnSpy.mock.calls.some((c: string[]) =>
           String(c[0]).includes('Circular token reference detected'),
         ),
       ).toBe(true);
@@ -96,7 +97,7 @@ describe('theme config parser', () => {
         },
       };
 
-      const { normalized, colorDarkMap } = normalizeTheme(theme as any);
+      const { normalized, colorDarkMap } = normalizeTheme(theme);
 
       expect(normalized.color!['danger']).toBe('var(--color-red-300)');
       // referenced var handles mode, so no dark map for danger
@@ -132,9 +133,9 @@ describe('theme config parser', () => {
         color: {
           weird: 123,
         },
-      };
+      } as unknown as Theme;
 
-      const { normalized } = normalizeTheme(theme as any);
+      const { normalized } = normalizeTheme(theme);
       // color.weird should not be present (because unsupported)
       expect(normalized.color!['weird']).toBeUndefined();
       expect(warnSpy).toHaveBeenCalled();
@@ -150,7 +151,7 @@ describe('theme config parser', () => {
       const colorDarkMap = { 'red-200': '#222' };
 
       const css = buildCSSVariables({
-        normalized: normalized as any,
+        normalized: normalized,
         colorDarkMap,
       });
 
@@ -171,7 +172,7 @@ describe('theme config parser', () => {
       const colorDarkMap: Record<string, string> = {};
 
       const css = buildCSSVariables({
-        normalized: normalized as any,
+        normalized: normalized,
         colorDarkMap,
       });
 

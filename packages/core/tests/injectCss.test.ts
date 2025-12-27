@@ -3,15 +3,14 @@ import { injectCSS, createVendorPrefix } from '../src/helpers/injectCSS';
 
 describe('injectCSS', () => {
   test('does not throw in SSR (window undefined)', () => {
-    // @ts-ignore
     const originalWindow = global.window;
-    // @ts-ignore
+
+    // @ts-expect-error as window object is not optional
     delete global.window;
 
     expect(() => injectCSS('.foo { color: red; }')).not.toThrow();
 
     // restore
-    // @ts-ignore
     global.window = originalWindow;
   });
 

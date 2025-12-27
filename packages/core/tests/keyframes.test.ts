@@ -6,10 +6,18 @@ describe('keyframes', () => {
     document.head.innerHTML = '';
 
     if (!globalThis.CSS) {
-      globalThis.CSS = {
-        supports: vi.fn(),
-      } as any;
+      Object.defineProperty(globalThis, 'CSS', {
+        value: {},
+        configurable: true,
+        writable: true,
+      });
     }
+
+    Object.defineProperty(globalThis.CSS, 'supports', {
+      value: vi.fn(),
+      configurable: true,
+      writable: true,
+    });
   });
 
   test('generates a stable hashed name when no name is provided', () => {

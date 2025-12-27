@@ -44,7 +44,7 @@ const isReference = (v: unknown): v is string =>
 function getBucket(theme: Theme, category: ThemeKeys) {
   if (!ThemeCategories.includes(category)) return undefined;
 
-  const bucket = (theme as any)[category];
+  const bucket = theme[category];
   return typeof bucket === 'object' && bucket ? bucket : undefined;
 }
 
@@ -88,7 +88,7 @@ function resolvePrimitiveToken(
 
   // fallback for unexpected object
   if (typeof val === 'object' && val !== null) {
-    if (typeof (val as any).default === 'string') return (val as any).default;
+    if (typeof val.default === 'string') return val.default;
     const first = Object.values(val).find((v) => typeof v === 'string');
     return (first as string) ?? `$${category}.${key}`;
   }
@@ -147,7 +147,7 @@ function resolveColorTokenValues(
 
 // Build interface entries for a category
 function buildThemeInterfaceBlock(
-  values: Record<string, any>,
+  values: Record<string, unknown>,
   typeName: string,
   theme?: Theme,
 ) {
@@ -186,8 +186,8 @@ function buildThemeInterfaceBlock(
       } else if (typeof rawVal === 'object' && rawVal !== null) {
         // it's unexpected for non-color, but try to pick default or first string
         finalValue =
-          (rawVal as any).default ??
-          Object.values(rawVal).find((v: any) => typeof v === 'string') ??
+          (rawVal as { default: string }).default ??
+          Object.values(rawVal).find((v) => typeof v === 'string') ??
           String(rawVal);
       } else {
         finalValue = String(rawVal);
@@ -229,7 +229,7 @@ const main = async () => {
 
   const enableDefaultTheme = config?.enableDefaultTheme !== false;
   const base = enableDefaultTheme ? DefaultTheme : {};
-  const mergedTheme = deepMerge(base as any, config?.theme ?? {});
+  const mergedTheme = deepMerge(base, config?.theme ?? {});
 
   const aliases = config?.aliases?.values ?? config?.aliases?.values ?? {};
   const color = mergedTheme?.color ?? {};
