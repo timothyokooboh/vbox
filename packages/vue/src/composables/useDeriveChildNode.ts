@@ -1,4 +1,4 @@
-import { ref, watchEffect, isVNode, cloneVNode, useSlots } from 'vue';
+import { ref, watchEffect, isVNode, cloneVNode, useSlots, Fragment } from 'vue';
 import type { ComputedRef, VNode } from 'vue';
 import { __DEV__ } from '@veebox/core';
 
@@ -7,7 +7,7 @@ export const useDeriveChildNode = (
   asChild: ComputedRef<boolean | undefined>,
 ) => {
   const slots = useSlots();
-  const childNode = ref<VNode | null>(null); // as unknown as Ref<VNode>;
+  const childNode = ref<VNode | null>(null);
 
   watchEffect(() => {
     if (asChild.value) {
@@ -19,19 +19,26 @@ export const useDeriveChildNode = (
 
       const child = children?.[0];
 
-      if (!isVNode(child) && __DEV__) {
+      if (!child || (!isVNode(child) && __DEV__)) {
         console.warn('[VBox]: asChild child must be a VNode.');
+        return childNode;
       }
 
-      if (child) {
-        childNode.value = cloneVNode(child, {
-          class: [className],
-        });
+      const isFragment = child.type === Fragment;
+      const finalChild = (
+        isFragment && Array.isArray(child.children) ? child.children[0] : child
+      ) as VNode;
+
+      if (!finalChild || (!isVNode(finalChild) && __DEV__)) {
+        console.warn('[VBox]: asChild child must be a VNode.');
+        return childNode;
       }
+
+      childNode.value = cloneVNode(finalChild, {
+        class: [className],
+      });
     }
   });
 
-  return {
-    childNode,
-  };
+  return childNode;
 };
