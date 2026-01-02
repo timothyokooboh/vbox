@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'node:url';
-import { dirname } from 'node:path';
+import path from 'node:path';
 
 import { globalIgnores } from 'eslint/config';
 import {
@@ -10,7 +10,8 @@ import pluginVue from 'eslint-plugin-vue';
 import pluginOxlint from 'eslint-plugin-oxlint';
 import skipFormatting from '@vue/eslint-config-prettier/skip-formatting';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default defineConfigWithVueTs(
   {
@@ -18,7 +19,7 @@ export default defineConfigWithVueTs(
     files: ['**/*.{ts,mts,vue}'],
     languageOptions: {
       parserOptions: {
-        tsconfigRootDir: __dirname,
+        tsconfigRootDir: path.resolve(__dirname),
         project: ['./tsconfig.tooling.json'],
       },
     },

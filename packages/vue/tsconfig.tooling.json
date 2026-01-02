@@ -2,7 +2,16 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "noEmit": true,
-    "rootDir": "."
+    "rootDir": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
-  "include": ["eslint.config.ts", "vitest.config.ts", "tests", "**/*.config.ts"]
+  "include": [
+    "eslint.config.ts",
+    "vitest.config.ts",
+    "tests",
+    "**/*.ts",
+    "**/*.vue"
+  ]
 }

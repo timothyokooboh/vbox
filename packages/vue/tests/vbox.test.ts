@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/vue';
 import { describe, test, expect, beforeEach, vi } from 'vitest';
-import VBox from '@/components/VBox.vue';
+import VBox from '../src/components/VBox.vue';
 
 beforeEach(() => {
   // ensure global CSS object exists
