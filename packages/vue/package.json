@@ -1,6 +1,6 @@
 {
   "name": "@veebox/vue",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "A polymorphic Vue.js component with a runtime styling engine.",
   "type": "module",
   "license": "MIT",
