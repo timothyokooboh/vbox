@@ -57,6 +57,7 @@ export const DefaultBreakpoints: Breakpoints = {
   md: '48rem', // ~768px
   lg: '64rem', // ~1024px
   xl: '80rem', // ~1280px
+  _2xl: '96rem', // ~1536px
 };
 
 export const DefaultTheme: VBoxPluginOptions['theme'] = {
@@ -313,6 +314,9 @@ export const DefaultTheme: VBoxPluginOptions['theme'] = {
     '2xl': '1.5rem', // 24px
     '3xl': '1.875rem', // 30px
     '4xl': '2.25rem', // 36px
+    '5xl': '3rem', // '48px
+    '6xl': '3.75rem', // 60px
+    '7xl': '4.5rem', // 72px
   },
   fontWeight: {
     hairline: '100',
@@ -367,9 +371,13 @@ export const DefaultTheme: VBoxPluginOptions['theme'] = {
     sm: '0.125rem',
     md: '0.375rem',
     lg: '0.5rem',
+    xl: '0.75rem',
+    '2xl': '1rem',
+    '3xl': '1.5rem',
     full: '9999px',
   },
 };
 
 export const CSS_REGISTRY_KEY = '__VBOX__CSS__REGISTRY__';
 export const VENDOR_PREFIX_KEY = '__VBOX__VENDOR__PREFIXES__';
+export const CSS_REGISTRY_LISTENERS_KEY = '_VBOX__CSS__REGISTRY__LISTENERS';
