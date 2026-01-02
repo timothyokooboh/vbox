@@ -19,6 +19,7 @@ export default defineConfigWithVueTs(
     languageOptions: {
       parserOptions: {
         tsconfigRootDir: __dirname,
+        project: ['./tsconfig.tooling.json'],
       },
     },
   },
