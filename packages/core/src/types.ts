@@ -144,7 +144,7 @@ export interface BreakpointProps {
   md?: PropertiesAndSelectors;
   lg?: PropertiesAndSelectors;
   xl?: PropertiesAndSelectors;
-  // "2xl"?: PropertiesAndSelectors;
+  _2xl?: PropertiesAndSelectors;
 }
 
 export type Breakpoints = Required<{
@@ -202,6 +202,7 @@ export interface VBoxPluginOptions {
     md: string;
     lg: string;
     xl: string;
+    _2xl: string;
   };
   aliases?: {
     strategy?: AliasStrategy;
