@@ -13,6 +13,7 @@ export {
   resolveToken,
   buildCSSVariables,
 } from './helpers/themeConfigParser';
+export { getCss } from './helpers/styleRegistry';
 export { keyframes } from './helpers/keyframes';
 export { __DEV__ } from './helpers/isDevelopment';
 export { DefaultAliases, DefaultBreakpoints, DefaultTheme } from './constants';
