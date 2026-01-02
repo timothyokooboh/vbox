@@ -38,3 +38,19 @@ jobs:
 
       - name: test
         run: pnpm test
+
+      - name: Publish @veebox/core
+        if: github.ref == 'refs/heads/main'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd packages/core
+          pnpm publish
+
+      - name: Publish @veebox/vue
+        if: github.ref == 'refs/heads/main'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd packages/vue
+          pnpm publish
