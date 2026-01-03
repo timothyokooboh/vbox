@@ -14,13 +14,15 @@ export const vendorPrefixes: Map<string, string> =
   typedGlobal[VENDOR_PREFIX_KEY] ??
   (typedGlobal[VENDOR_PREFIX_KEY] = new Map());
 
-// avoid duplicate css string in the stylesheet
 export const cssRegistry =
   typedGlobal[CSS_REGISTRY_KEY] ?? (typedGlobal[CSS_REGISTRY_KEY] = new Set());
 
 export const registerCss = (css: string) => {
-  if (cssRegistry.has(css)) return;
+  if (cssRegistry.has(css)) {
+    cssRegistry.delete(css);
+  }
 
+  // maintain css cascade
   cssRegistry.add(css);
 };
 
