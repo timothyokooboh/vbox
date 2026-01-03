@@ -1,5 +1,11 @@
 # @veebox/core
 
+## 1.1.1
+
+### Patch Changes
+
+- fix: maintain css cascade when preventing duplicate css string
+
 ## 1.1.0
 
 ### Minor Changes

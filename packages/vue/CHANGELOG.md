@@ -1,5 +1,12 @@
 # @veebox/vue
 
+## 1.1.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @veebox/core@1.1.1
+
 ## 1.1.0
 
 ### Minor Changes
