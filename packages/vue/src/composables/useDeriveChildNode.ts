@@ -15,11 +15,12 @@ export const useDeriveChildNode = (
 
       if (!children || (children.length !== 1 && __DEV__)) {
         console.warn('[VBox]: asChild expects exactly one child element.');
+        return childNode;
       }
 
-      const child = children?.[0];
+      const child = children[0];
 
-      if (!child || (!isVNode(child) && __DEV__)) {
+      if (!isVNode(child) && __DEV__) {
         console.warn('[VBox]: asChild child must be a VNode.');
         return childNode;
       }
