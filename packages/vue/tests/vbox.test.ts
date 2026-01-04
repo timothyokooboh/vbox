@@ -48,7 +48,9 @@ describe('VBox', () => {
     expect(link).toBeDefined();
   });
 
-  test('asChild renders the first DOM element of its children and ignores the rest', () => {
+  test('asChild warns when multiple root nodes are passed', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
     render(VBox, {
       props: {
         asChild: true,
@@ -61,17 +63,10 @@ describe('VBox', () => {
       },
     });
 
-    const mainHeading = screen.getByRole('heading', {
-      level: 1,
-      name: 'VBox makes styling easy',
-    });
+    expect(warnSpy).toHaveBeenCalledWith(
+      '[VBox]: asChild expects exactly one root node.',
+    );
 
-    const subHeding = screen.queryByRole('heading', {
-      level: 2,
-      name: 'VBox is cool',
-    });
-
-    expect(mainHeading).toBeDefined();
-    expect(subHeding).toBe(null);
+    warnSpy.mockRestore();
   });
 });

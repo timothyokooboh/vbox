@@ -28,10 +28,7 @@ const className = classNamePrefix
   ? `${classNamePrefix}-${baseClassName}`
   : baseClassName;
 
-const childNode = useDeriveChildNode(
-  className,
-  computed(() => props.asChild),
-);
+const childNode = useDeriveChildNode(className, props.asChild);
 
 const propsAndAttrs = computed(() => ({ ...props, ...attrs }));
 
