@@ -41,7 +41,7 @@ export const useDeriveChildNode = (
     let child = slotChildren[0];
 
     // Unwrap fragment (e.g slots)
-    if (child.type === Fragment) {
+    if (child?.type === Fragment) {
       const fragmentChildren = child.children;
 
       if (!Array.isArray(fragmentChildren) || fragmentChildren.length !== 1) {

@@ -35,3 +35,13 @@ test('calls CSS.supports with correct args', () => {
   expect(spy).toHaveBeenCalledWith('display: flex !important');
   spy.mockRestore();
 });
+
+test('returns true in SSR when window is undefined', () => {
+  const originalWindow = globalThis.window;
+  // @ts-expect-error remove window to simulate SSR
+  delete globalThis.window;
+
+  expect(isValidCssDeclaration('color', 'red')).toBe(true);
+
+  globalThis.window = originalWindow;
+});

@@ -1,6 +1,5 @@
 export const isValidCssSelector = (selector: string): boolean => {
-  // test in ssr
-  // if (typeof document === 'undefined') return true
+  if (typeof document === 'undefined') return true;
 
   try {
     document.createDocumentFragment().querySelector(selector);

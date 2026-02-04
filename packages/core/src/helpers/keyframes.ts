@@ -8,6 +8,7 @@ import { DefaultAliases } from '../constants';
 import { createDjb2Hash } from './createDjb2Hash';
 import { __DEV__ } from './isDevelopment';
 import { stableStringify } from './stableStringify';
+import type { StyleCollector } from './styleRegistry';
 
 export type KeyframeStep = 'from' | 'to' | `${number}%`;
 
@@ -18,6 +19,7 @@ export type KeyframeDefinition = {
 export const keyframes = (
   identifierOrRules: string | KeyframeDefinition,
   rules?: KeyframeDefinition,
+  options?: { collector?: StyleCollector },
 ) => {
   const hasName = typeof identifierOrRules === 'string';
   const name = hasName ? identifierOrRules : 'vbox-kf';
@@ -61,7 +63,11 @@ export const keyframes = (
 
   css += `}`;
 
-  injectCSS(css);
+  if (options?.collector) {
+    options.collector.collect(css);
+  } else {
+    injectCSS(css);
+  }
 
   return finalName;
 };

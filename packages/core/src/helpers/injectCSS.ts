@@ -1,16 +1,8 @@
-import { compile, serialize, stringify, middleware, prefixer } from 'stylis';
 import { getCss, registerCss, vendorPrefixes } from './styleRegistry';
+import { createVendorPrefix as createVendorPrefixWithCache } from './vendorPrefix';
 
 export const createVendorPrefix = (css: string) => {
-  if (vendorPrefixes.has(css)) return vendorPrefixes.get(css)!;
-
-  const prefixedCss = serialize(
-    compile(css),
-    middleware([prefixer, stringify]),
-  );
-
-  vendorPrefixes.set(css, prefixedCss);
-  return prefixedCss;
+  return createVendorPrefixWithCache(css, vendorPrefixes);
 };
 
 export const injectCSS = (css: string) => {
@@ -19,7 +11,7 @@ export const injectCSS = (css: string) => {
   const id = 'vbox-style-sheet';
   let styleEl = document.getElementById(id) as HTMLStyleElement | null;
 
-  const prefixedCss = createVendorPrefix(css);
+  const prefixedCss = createVendorPrefixWithCache(css, vendorPrefixes);
 
   registerCss(prefixedCss);
 

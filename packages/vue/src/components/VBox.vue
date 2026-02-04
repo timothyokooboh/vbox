@@ -8,13 +8,14 @@ import {
   injectCSS,
 } from '@veebox/core';
 
-import { computed, watchEffect, useAttrs, useId, inject } from 'vue';
+import { computed, watchEffect, useAttrs, useId, inject, useSSRContext } from 'vue';
 import { useDeriveChildNode } from '../composables/useDeriveChildNode';
 import {
   classNamePrefixKey,
   aliasKey,
   breakpointsKey,
 } from '../injectionSymbols';
+import { getSSRCollector, type VBoxSSRContext } from '../ssr';
 
 const props = defineProps<VBoxProps>();
 const attrs = useAttrs();
@@ -31,6 +32,8 @@ const className = classNamePrefix
 const childNode = useDeriveChildNode(className, props.asChild);
 
 const propsAndAttrs = computed(() => ({ ...props, ...attrs }));
+const isSSR = typeof window === 'undefined';
+const ssrContext = isSSR ? (useSSRContext() as VBoxSSRContext) : null;
 
 watchEffect(() => {
   const {
@@ -59,7 +62,12 @@ watchEffect(() => {
     className,
   });
 
-  injectCSS(cssString);
+  if (isSSR && ssrContext) {
+    const collector = getSSRCollector(ssrContext);
+    collector.collect(cssString);
+  } else {
+    injectCSS(cssString);
+  }
 });
 </script>
 

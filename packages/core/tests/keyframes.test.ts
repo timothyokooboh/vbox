@@ -1,5 +1,6 @@
 import { describe, test, vi, expect, beforeEach } from 'vitest';
 import { keyframes } from '../src/helpers/keyframes';
+import { createStyleCollector } from '../src/helpers/styleRegistry';
 
 describe('keyframes', () => {
   beforeEach(() => {
@@ -42,5 +43,17 @@ describe('keyframes', () => {
     });
 
     expect(fade!.startsWith('fadeIn-')).toBe(true);
+  });
+
+  test('collects keyframes in SSR collector when provided', () => {
+    const collector = createStyleCollector();
+    const name = keyframes(
+      'fadeIn',
+      { from: { opacity: '0' }, to: { opacity: '1' } },
+      { collector },
+    );
+
+    const css = collector.getCss();
+    expect(css).toContain(`@keyframes ${name}`);
   });
 });
