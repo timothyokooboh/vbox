@@ -3,13 +3,12 @@ import type { VBoxProps, Breakpoints, AliasMap } from '@veebox/core';
 import {
   DefaultAliases,
   DefaultBreakpoints,
-  parseStyleObject,
-  buildCssString,
   injectCSS,
 } from '@veebox/core';
 
 import { computed, watchEffect, useAttrs, useId, inject, useSSRContext } from 'vue';
 import { useDeriveChildNode } from '../composables/useDeriveChildNode';
+import { resolveVBoxCss } from '../composables/resolveVBoxStyles';
 import {
   classNamePrefixKey,
   aliasKey,
@@ -36,30 +35,11 @@ const isSSR = typeof window === 'undefined';
 const ssrContext = isSSR ? (useSSRContext() as VBoxSSRContext) : null;
 
 watchEffect(() => {
-  const {
-    rootStyles,
-    rootDarkStyles,
-    pseudoStyles,
-    selectorBlocks,
-    breakpointStyles,
-    containerQueries,
-    customMediaQueries,
-  } = parseStyleObject({
-    obj: propsAndAttrs.value,
+  const cssString = resolveVBoxCss({
+    styles: propsAndAttrs.value,
+    className,
     aliases,
-    className,
     breakpoints,
-  });
-
-  const cssString = buildCssString({
-    rootStyles,
-    rootDarkStyles,
-    pseudoStyles,
-    selectorBlocks,
-    breakpointStyles,
-    containerQueries,
-    customMediaQueries,
-    className,
   });
 
   if (isSSR && ssrContext) {

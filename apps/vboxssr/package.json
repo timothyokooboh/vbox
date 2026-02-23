@@ -1,0 +1,21 @@
+{
+  "name": "vboxssr",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "test": "node --test tests/**/*.test.mjs"
+  },
+  "dependencies": {
+    "@veebox/core": "workspace:*",
+    "@veebox/unplugin": "workspace:*",
+    "@veebox/vue": "workspace:*",
+    "nuxt": "^4.3.0",
+    "vue": "^3.5.27",
+    "vue-router": "^4.6.4"
+  }
+}
