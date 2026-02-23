@@ -48,3 +48,68 @@ the component in your Vue templates to style elements.
 <script lang="ts" setup>
 import ExampleTwo from '../examples/ExampleTwo.vue'
 </script>
+
+## Optional: Native Syntax Transform
+
+If you want native tags with VBox attributes (`<p vbox color=\"red\">`), install
+and register the transform plugin:
+
+```bash
+pnpm add @veebox/unplugin
+```
+
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import { vboxNativePlugin } from '@veebox/unplugin/vite';
+import vboxConfig from './vbox.config';
+
+export default defineConfig({
+  plugins: [
+    vboxNativePlugin({
+      aliases: Object.keys(vboxConfig.aliases?.values ?? {}),
+    }),
+    vue(),
+  ],
+});
+```
+
+## Optional: IDE Token Hover Previews
+
+If you want hover previews for token values like `fs-xl -> 1.25rem` or
+`cl-brand -> #c52341`, install the Volar plugin:
+
+```bash
+pnpm add -D @veebox/volar
+```
+
+Then register it in your `tsconfig.json`:
+
+```json
+{
+  "vueCompilerOptions": {
+    "plugins": ["@veebox/volar"]
+  }
+}
+```
+
+You can also pass options:
+
+```json
+{
+  "vueCompilerOptions": {
+    "plugins": [
+      {
+        "name": "@veebox/volar",
+        "configPath": "./vbox.config.ts"
+      }
+    ]
+  }
+}
+```
+
+Current behavior:
+
+1. Works for static token literals in template attributes (for example `color="cl-brand"`).
+2. Does not resolve dynamic expressions like `:color="tokenName"` at hover time.

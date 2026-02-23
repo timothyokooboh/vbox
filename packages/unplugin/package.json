@@ -1,0 +1,47 @@
+{
+  "name": "@veebox/unplugin",
+  "version": "0.0.1",
+  "description": "Compile-time transform for native VBox syntax in Vue templates.",
+  "type": "module",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./vite": {
+      "types": "./dist/vite.d.ts",
+      "import": "./dist/vite.js",
+      "require": "./dist/vite.js"
+    },
+    "./transform": {
+      "types": "./dist/transform.d.ts",
+      "import": "./dist/transform.js",
+      "require": "./dist/transform.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "lint": "echo \"No lint script yet\"",
+    "build": "tsc -p tsconfig.json",
+    "postinstall": "pnpm build",
+    "test": "pnpm build && node --test tests/**/*.test.mjs"
+  },
+  "dependencies": {
+    "@veebox/core": "^1.1.1",
+    "known-css-properties": "^0.37.0"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3"
+  }
+}

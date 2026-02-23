@@ -20,6 +20,7 @@ export { DefaultAliases, DefaultBreakpoints, DefaultTheme } from './constants';
 export type {
   VBoxProps,
   VBoxStyleProps,
+  VBoxNativeStyleProps,
   VBoxPluginOptions,
   AliasStrategy,
   Breakpoints,

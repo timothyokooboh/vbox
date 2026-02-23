@@ -40,6 +40,7 @@ export default defineConfig({
         text: 'Essentials',
         items: [
           { text: 'Polymorphism', link: '/guide/essentials/polymorphism' },
+          { text: 'Native syntax', link: '/guide/essentials/native-syntax' },
           { text: 'Style props', link: '/guide/essentials/style-props' },
           {
             text: 'CSS property aliases',

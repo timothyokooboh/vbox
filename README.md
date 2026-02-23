@@ -83,3 +83,98 @@ export default defineNitroPlugin((nitroApp) => {
 ```
 
 [Documentation](https://veebox.xyz/)
+
+## Native Tag Syntax (Compile-time Transform)
+
+If you want to keep semantic native tags while still using VBox style attributes,
+enable the `@veebox/unplugin` transform.
+
+### Install
+
+```bash
+pnpm add @veebox/unplugin
+```
+
+### Vite Setup
+
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import { vboxNativePlugin } from '@veebox/unplugin/vite';
+import vboxConfig from './vbox.config';
+
+export default defineConfig({
+  plugins: [
+    vboxNativePlugin({
+      aliases: Object.keys(vboxConfig.aliases?.values ?? {}),
+    }),
+    vue(),
+  ],
+});
+```
+
+### Nuxt Setup
+
+```ts
+// nuxt.config.ts
+import { vboxNativePlugin } from '@veebox/unplugin/vite';
+
+export default defineNuxtConfig({
+  vite: {
+    plugins: [vboxNativePlugin()],
+  },
+});
+```
+
+### Usage (Scoped API, Recommended)
+
+```vue
+<template>
+  <v-box p="sp-4" bg="cl-slate-100">
+    <section>
+      <h1 color="red" fs="fs-4xl">Title</h1>
+      <p color="cl-slate-800">Body copy</p>
+      <button
+      aria-label="Save"
+      bg="cl-blue-600"
+      color="white"
+      :hover="{ backgroundColor: 'var(--color-blue-700)' }"
+      >
+        Save
+      </button>
+    </section>
+  </v-box>
+</template>
+```
+
+Rules:
+
+1. Wrap the subtree with `<v-box>` to enable scoped parsing of native descendants.
+2. Object style props must use bound syntax, e.g. `:hover`, `:mq`, `:cq`.
+3. String object literals are rejected, e.g. `hover="{ ... }"` is invalid.
+4. Use `vbox-ignore` on any element to skip transform for that subtree.
+5. If you use custom aliases in `vbox.config.ts`, pass them to the plugin via `aliases`.
+
+Legacy per-element mode is still supported:
+
+```vue
+<p vbox color="red">Hello</p>
+```
+
+## IDE Token Hover Previews (Volar)
+
+To show resolved token values on hover in `.vue` templates (for example
+`fs-xl => 1.25rem`), install and register the Volar plugin:
+
+```bash
+pnpm add -D @veebox/volar
+```
+
+```json
+{
+  "vueCompilerOptions": {
+    "plugins": ["@veebox/volar"]
+  }
+}
+```

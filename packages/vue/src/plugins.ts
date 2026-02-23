@@ -16,6 +16,7 @@ import {
   aliasKey,
   breakpointsKey,
 } from './injectionSymbols';
+import { vboxRuntimeDirective } from './directives/vboxRuntime';
 
 export type AliasStrategy = 'merge' | 'replace';
 
@@ -46,5 +47,6 @@ export default {
     app.provide(aliasKey, finalAlias);
     app.provide(classNamePrefixKey, options?.classNamePrefix);
     app.component('VBox', VBox);
+    app.directive('vbox-runtime', vboxRuntimeDirective);
   },
 };

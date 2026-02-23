@@ -92,7 +92,7 @@ export type Selectors = Record<string, AugmentedCSSProperties>;
  * Example: `d="flex"` → `display: flex`.
  */
 export type AliasProps = {
-  [K in keyof AliasMap]?: CssProperties[AliasMap[K]] | DesignTokens;
+  [K in AliasKeyVariants<Extract<keyof AliasMap, string>>]?: AliasValue<K> | DesignTokens;
 };
 
 /**
@@ -191,8 +191,31 @@ export type VBoxProps = PseudoProps &
   };
 
 export type VBoxStyleProps = Omit<VBoxProps, 'is'>;
+export type VBoxNativeStyleProps = Omit<VBoxProps, 'is' | 'asChild'>;
 
 export type AliasStrategy = 'merge' | 'replace';
+
+type KebabCase<S extends string> = S extends `${infer H}${infer T}`
+  ? T extends Uncapitalize<T>
+    ? `${Lowercase<H>}${KebabCase<T>}`
+    : `${Lowercase<H>}-${KebabCase<T>}`
+  : S;
+
+type KebabToCamelCase<S extends string> = S extends `${infer H}-${infer T}`
+  ? `${H}${Capitalize<KebabToCamelCase<T>>}`
+  : S;
+
+type AliasKeyVariants<K extends string> = K | KebabCase<K>;
+
+type AliasProperty<K extends string> = K extends keyof AliasMap
+  ? AliasMap[K]
+  : KebabToCamelCase<K> extends keyof AliasMap
+    ? AliasMap[KebabToCamelCase<K>]
+    : never;
+
+type AliasValue<K extends string> = AliasProperty<K> extends keyof CssProperties
+  ? CssProperties[AliasProperty<K>]
+  : never;
 export interface VBoxPluginOptions {
   classNamePrefix?: string;
   enableDefaultTheme?: boolean;

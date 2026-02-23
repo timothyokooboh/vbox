@@ -25,6 +25,27 @@ You can then use these custom aliases in your `v-box` components like so:
 <v-box m-top="1rem" m-bottom="2rem"> Custom margin using aliases! </v-box>
 ```
 
+## Native Syntax Plugin Note
+
+If you use the native syntax transform (`@veebox/unplugin`), also pass your
+custom alias keys into the plugin so compile-time parsing recognizes them:
+
+```ts
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import { vboxNativePlugin } from '@veebox/unplugin/vite'
+import vboxConfig from './vbox.config'
+
+export default defineConfig({
+  plugins: [
+    vboxNativePlugin({
+      aliases: Object.keys(vboxConfig.aliases?.values ?? {}),
+    }),
+    vue(),
+  ],
+})
+```
+
 ## Intellisense Support
 
 When you run `npx vbox-type-gen`, the vbox cli will automatically pick up your custom aliases defined in the `vbox.config.ts` file and update the generated types accordingly. This ensures that you get proper Intellisense support in your IDE for both default and custom aliases :ok_hand:
