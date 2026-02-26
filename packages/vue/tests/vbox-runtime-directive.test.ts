@@ -137,6 +137,32 @@ describe('vbox runtime directive', () => {
     expect(styleEl?.textContent).toContain('color:green');
   });
 
+  test('keeps multiple runtime classes when parent and child both use vbox-runtime', () => {
+    render(
+      {
+        components: {
+          AppButton: {
+            template: `<button v-vbox-runtime="{ bg: 'cl-brand', color: 'white' }">View Details</button>`,
+          },
+        },
+        template: `<AppButton v-vbox-runtime="{ color: 'yellow' }" />`,
+      },
+      {
+        global: {
+          plugins: [VBoxPlugin],
+        },
+      },
+    );
+
+    const el = screen.getByText('View Details');
+    const runtimeClasses = [...el.classList].filter((cls) => cls.startsWith('css-'));
+    expect(runtimeClasses.length).toBe(2);
+
+    const styleEl = document.getElementById('vbox-style-sheet');
+    expect(styleEl?.textContent).toContain('color:yellow');
+    expect(styleEl?.textContent).toContain('background:var(--color-brand)');
+  });
+
   test('collects css during SSR', async () => {
     const originalWindow = globalThis.window;
     const originalDocument = globalThis.document;

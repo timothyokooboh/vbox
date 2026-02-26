@@ -16,10 +16,25 @@ import {
 } from '../injectionSymbols';
 import { getSSRCollector, type VBoxSSRContext } from '../ssr';
 
-type RuntimeElement = HTMLElement & { __vboxRuntimeClassName?: string };
+type RuntimeElement = HTMLElement & {
+  __vboxRuntimeClassMap?: Map<string, string>;
+};
 
-const ensureClass = (el: RuntimeElement, className: string) => {
-  const previousClassName = el.__vboxRuntimeClassName;
+const getOwnerKey = (binding: DirectiveBinding<Record<string, unknown>>) => {
+  const uid = binding.instance?.$?.uid;
+  return uid != null ? `uid:${uid}` : 'uid:unknown';
+};
+
+const ensureClass = (
+  el: RuntimeElement,
+  ownerKey: string,
+  className: string,
+) => {
+  if (!el.__vboxRuntimeClassMap) {
+    el.__vboxRuntimeClassMap = new Map();
+  }
+
+  const previousClassName = el.__vboxRuntimeClassMap.get(ownerKey);
   if (previousClassName && previousClassName !== className) {
     el.classList.remove(previousClassName);
   }
@@ -28,7 +43,22 @@ const ensureClass = (el: RuntimeElement, className: string) => {
     el.classList.add(className);
   }
 
-  el.__vboxRuntimeClassName = className;
+  el.__vboxRuntimeClassMap.set(ownerKey, className);
+};
+
+const clearClass = (el: RuntimeElement, ownerKey: string) => {
+  const map = el.__vboxRuntimeClassMap;
+  if (!map) return;
+
+  const previousClassName = map.get(ownerKey);
+  if (previousClassName) {
+    el.classList.remove(previousClassName);
+    map.delete(ownerKey);
+  }
+
+  if (map.size === 0) {
+    delete el.__vboxRuntimeClassMap;
+  }
 };
 
 const resolveAppContextValues = (
@@ -83,11 +113,15 @@ const applyRuntimeStyles = (
   el: RuntimeElement,
   binding: DirectiveBinding<Record<string, unknown>>,
 ) => {
+  const ownerKey = getOwnerKey(binding);
   const styles = binding.value;
-  if (!styles || typeof styles !== 'object') return;
+  if (!styles || typeof styles !== 'object') {
+    clearClass(el, ownerKey);
+    return;
+  }
 
   const { className, css } = computeClassAndCss(styles, binding);
-  ensureClass(el, className);
+  ensureClass(el, ownerKey, className);
   injectCSS(css);
 };
 
@@ -97,6 +131,9 @@ export const vboxRuntimeDirective: Directive<RuntimeElement, Record<string, unkn
   },
   updated(el, binding) {
     applyRuntimeStyles(el, binding);
+  },
+  unmounted(el, binding) {
+    clearClass(el, getOwnerKey(binding));
   },
   getSSRProps(binding) {
     const styles = binding.value;
