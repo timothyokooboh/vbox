@@ -50,6 +50,7 @@ export const DefaultAliases = {
   bgOrigin: 'backgroundOrigin',
   radius: 'borderRadius',
   shadow: 'boxShadow',
+  pos: 'position',
 } as const;
 
 export const DefaultBreakpoints: Breakpoints = {

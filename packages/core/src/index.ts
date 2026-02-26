@@ -16,6 +16,8 @@ export {
 export { getCss, createStyleCollector } from './helpers/styleRegistry';
 export { keyframes } from './helpers/keyframes';
 export { __DEV__ } from './helpers/isDevelopment';
+export { toKebabCase } from './helpers/toKebabCase';
+export { kebabToCamelCase } from './helpers/kebabToCamelCase';
 export { DefaultAliases, DefaultBreakpoints, DefaultTheme } from './constants';
 export type {
   VBoxProps,
