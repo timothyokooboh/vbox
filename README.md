@@ -108,6 +108,9 @@ export default defineConfig({
   plugins: [
     vboxNativePlugin({
       aliases: Object.keys(vboxConfig.aliases?.values ?? {}),
+      // Optional edge-case overrides:
+      // forceSemanticAttrs: ['src'],
+      // forceStyleAttrs: ['myCustomStyleAttr'],
     }),
     vue(),
   ],
@@ -127,40 +130,44 @@ export default defineNuxtConfig({
 });
 ```
 
-### Usage (Scoped API, Recommended)
+### Usage (Global Native Parsing)
 
 ```vue
 <template>
-  <v-box p="sp-4" bg="cl-slate-100">
-    <section>
-      <h1 color="red" fs="fs-4xl">Title</h1>
-      <p color="cl-slate-800">Body copy</p>
-      <button
+  <section>
+    <h1 color="red" fs="fs-4xl">Title</h1>
+    <p color="cl-slate-800">Body copy</p>
+    <button
       aria-label="Save"
       bg="cl-blue-600"
       color="white"
       :hover="{ backgroundColor: 'var(--color-blue-700)' }"
-      >
-        Save
-      </button>
-    </section>
-  </v-box>
+    >
+      Save
+    </button>
+  </section>
 </template>
 ```
 
 Rules:
 
-1. Wrap the subtree with `<v-box>` to enable scoped parsing of native descendants.
+1. Native HTML tags are parsed globally in Vue templates.
 2. Object style props must use bound syntax, e.g. `:hover`, `:mq`, `:cq`.
 3. String object literals are rejected, e.g. `hover="{ ... }"` is invalid.
-4. Use `vbox-ignore` on any element to skip transform for that subtree.
-5. If you use custom aliases in `vbox.config.ts`, pass them to the plugin via `aliases`.
+4. `router-link` and `nuxt-link` are parsed by default.
+5. Other custom components are parsed only when marked with `vbox`.
+6. Set `parseAllComponents: true` to parse all custom components globally.
+7. Use `vbox-ignore` on any element to skip transform for that subtree.
+8. If you use custom aliases in `vbox.config.ts`, pass them to the plugin via `aliases`.
 
 Legacy per-element mode is still supported:
 
 ```vue
 <p vbox color="red">Hello</p>
+<BaseButton vbox color="blue">Sign in</BaseButton>
 ```
+
+For custom components, `v-vbox-runtime` works reliably only when the component renders a single root element and allows directive inheritance to root. Components with fragments/multiple roots can break this behavior.
 
 ## IDE Token Hover Previews (Volar)
 

@@ -115,18 +115,56 @@ describe('native vbox template transform', () => {
     expect(out).toBeNull();
   });
 
-  test('does not transform kebab custom components inside scope', () => {
-    const source = `<template><v-box><router-link color="red" to="/">go</router-link></v-box></template>`;
+  test('does not transform non-visual resource tags inside scope', () => {
+    const source = `<template><v-box><script type="application/json" color="red"></script><p color="blue">Hi</p></v-box></template>`;
     const out = transformVueSfc(source, '/tmp/example.vue');
 
-    expect(out).toBeNull();
+    expect(out?.code).toContain(`<script type="application/json" color="red"></script>`);
+    expect(out?.code).toContain(`<p v-vbox-runtime="{ 'color': 'blue' }">Hi</p>`);
+    expect(out?.code).not.toContain(`<script type="application/json" v-vbox-runtime`);
+  });
+
+  test('explicit vbox marker does not force transform on denylisted tags', () => {
+    const source = `<template><script vbox type="application/json" color="red"></script></template>`;
+    const out = transformVueSfc(source, '/tmp/example.vue');
+
+    expect(out?.code).toContain(`<script type="application/json" color="red"></script>`);
+    expect(out?.code).not.toContain(`v-vbox-runtime`);
+    expect(out?.code).not.toContain(`vbox`);
+  });
+
+  test('auto-transforms router-link without marker', () => {
+    const source = `<template><router-link color="red" to="/">go</router-link></template>`;
+    const out = transformVueSfc(source, '/tmp/example.vue');
+
+    expect(out?.code).toContain(
+      `<router-link to="/" v-vbox-runtime="{ 'color': 'red' }">go</router-link>`,
+    );
+  });
+
+  test('auto-transforms nuxt-link without marker', () => {
+    const source = `<template><nuxt-link color="red" to="/">go</nuxt-link></template>`;
+    const out = transformVueSfc(source, '/tmp/example.vue');
+
+    expect(out?.code).toContain(
+      `<nuxt-link to="/" v-vbox-runtime="{ 'color': 'red' }">go</nuxt-link>`,
+    );
+  });
+
+  test('parseAllComponents transforms unmarked custom components when enabled', () => {
+    const source = `<template><MyCard color="red" /></template>`;
+    const out = transformVueSfc(source, '/tmp/example.vue', {
+      parseAllComponents: true,
+    });
+
+    expect(out?.code).toContain(`<MyCard v-vbox-runtime="{ 'color': 'red' }" />`);
   });
 
   test('supports self-closing tags in scoped mode', () => {
-    const source = `<template><v-box><img src="/a.png" width="48px" /></v-box></template>`;
+    const source = `<template><v-box><img src="/a.png" width="48px" color="red" /></v-box></template>`;
     const out = transformVueSfc(source, '/tmp/example.vue');
 
-    expect(out?.code).toContain(`<img src="/a.png" v-vbox-runtime="{ 'width': '48px' }" />`);
+    expect(out?.code).toContain(`<img src="/a.png" v-vbox-runtime="{ 'width': '48px', 'color': 'red' }" />`);
     expect(out?.code).not.toContain(`'src':`);
   });
 
@@ -142,6 +180,40 @@ describe('native vbox template transform', () => {
     expect(out?.code).not.toContain(`'href':`);
     expect(out?.code).not.toContain(`'target':`);
     expect(out?.code).not.toContain(`'rel':`);
+  });
+
+  test('treats input size as style key so width/size attrs can style form controls', () => {
+    const source = `<template><v-box><input size="12" color="red" /></v-box></template>`;
+    const out = transformVueSfc(source, '/tmp/example.vue');
+
+    expect(out?.code).toContain(`<input v-vbox-runtime="{ 'size': '12', 'color': 'red' }" />`);
+  });
+
+  test('treats svg semantic attrs as non-style', () => {
+    const source = `<template><v-box><svg viewBox="0 0 100 100"><path d="M10 10 L90 90" stroke="red" /></svg></v-box></template>`;
+    const out = transformVueSfc(source, '/tmp/example.vue');
+
+    expect(out?.code).toContain(`<svg viewBox="0 0 100 100">`);
+    expect(out?.code).toContain(`<path d="M10 10 L90 90" v-vbox-runtime="{ 'stroke': 'red' }" />`);
+    expect(out?.code).not.toContain(`'d':`);
+  });
+
+  test('forceStyleAttrs can override semantic classification', () => {
+    const source = `<template><v-box><img src="/hero.png" /></v-box></template>`;
+    const out = transformVueSfc(source, '/tmp/example.vue', {
+      forceStyleAttrs: ['src'],
+    });
+
+    expect(out?.code).toContain(`v-vbox-runtime="{ 'src': '/hero.png' }"`);
+  });
+
+  test('forceSemanticAttrs can override style classification', () => {
+    const source = `<template><v-box><p color="red" fs="fs-lg">Hello</p></v-box></template>`;
+    const out = transformVueSfc(source, '/tmp/example.vue', {
+      forceSemanticAttrs: ['color'],
+    });
+
+    expect(out?.code).toContain(`<p color="red" v-vbox-runtime="{ 'fs': 'fs-lg' }">Hello</p>`);
   });
 
   test('recognizes custom alias when passed through plugin options', () => {
@@ -222,10 +294,24 @@ describe('native vbox template transform', () => {
     expect(out).toBeNull();
   });
 
-  test('returns null when scope marker is absent and explicit marker is absent', () => {
+  test('auto-transforms native tags globally without scope marker', () => {
     const source = `<template><p color="red">Hello</p></template>`;
     const out = transformVueSfc(source, '/tmp/example.vue');
+    expect(out?.code).toContain(`<p v-vbox-runtime="{ 'color': 'red' }">Hello</p>`);
+  });
+
+  test('keeps unmarked custom components untouched', () => {
+    const source = `<template><BaseButton color="blue">Sign in</BaseButton></template>`;
+    const out = transformVueSfc(source, '/tmp/example.vue');
     expect(out).toBeNull();
+  });
+
+  test('transforms marked custom components', () => {
+    const source = `<template><BaseButton vbox color="blue" fs="1.2rem">Sign in</BaseButton></template>`;
+    const out = transformVueSfc(source, '/tmp/example.vue');
+    expect(out?.code).toContain(
+      `<BaseButton v-vbox-runtime="{ 'color': 'blue', 'fs': '1.2rem' }">Sign in</BaseButton>`,
+    );
   });
 
   test('supports comments and preserves content around transformed tags', () => {

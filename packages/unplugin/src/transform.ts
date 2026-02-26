@@ -1,15 +1,11 @@
 import * as knownCssPropertiesModule from 'known-css-properties';
-import {
-  ExplicitStyleKeys,
-  NonStyleAttributeKeys,
-  ObjectStyleKeys,
-} from './constants.js';
+import { kebabToCamelCase, toKebabCase } from '@veebox/core';
+import { ExplicitStyleKeys, ObjectStyleKeys } from './constants.js';
+import { isSemanticAttributeForTag } from './semantic.js';
 import type {
   VBoxNativePluginOptions,
   VBoxSfcTransformResult,
 } from './types.js';
-
-const TemplateRegex = /<template\b[^>]*>([\s\S]*?)<\/template>/i;
 
 const resolveKnownCssProperties = () => {
   const moduleAsRecord = knownCssPropertiesModule as Record<string, unknown>;
@@ -48,16 +44,25 @@ const getBindingKey = (name) => {
 
 const isVBoxMarker = (attr) => attr.name === 'vbox';
 const isVBoxIgnoreMarker = (attr) => attr.name === 'vbox-ignore';
-const isScopeRootTag = (tagName) => tagName === 'v-box' || tagName === 'VBox';
+const isVBoxComponentTag = (tagName) => tagName === 'v-box' || tagName === 'VBox';
+const isFrameworkLinkTag = (tagName) => {
+  const normalized = toKebabCase(String(tagName));
+  return normalized === 'router-link' || normalized === 'nuxt-link';
+};
+const NonTransformNativeTags = new Set([
+  'script',
+  'style',
+  'meta',
+  'link',
+  'base',
+  'title',
+]);
 
 const isNativeHtmlTag = (tagName) => /^[a-z][a-z0-9]*$/.test(tagName);
+const canTransformNativeTag = (tagName) =>
+  !NonTransformNativeTags.has(String(tagName).toLowerCase());
 
-const normalizeCssPropertyKey = (name) => {
-  return name.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`).toLowerCase();
-};
-
-const kebabToCamelCase = (name) =>
-  name.replace(/-([a-z0-9])/g, (_, char) => char.toUpperCase());
+const normalizeCssPropertyKey = (name) => toKebabCase(name);
 
 const getKeyVariants = (name) => {
   const normalized = normalizeCssPropertyKey(name);
@@ -78,7 +83,6 @@ const isLikelyCssProperty = (name) => {
   if (!/^[A-Za-z_][A-Za-z0-9_-]*$/.test(name)) return false;
   if (name.startsWith('aria-') || name.startsWith('data-')) return false;
   if (name.includes(':')) return false;
-  if (setHasAnyVariant(NonStyleAttributeKeys, name)) return false;
 
   const normalized = normalizeCssPropertyKey(name);
   return KnownCssPropertySet.has(normalized);
@@ -88,8 +92,17 @@ const createStyleKeyMatcher = (options: VBoxNativePluginOptions = {}) => {
   const userAliases = new Set(
     Array.isArray(options.aliases) ? options.aliases : [],
   );
+  const forceStyleAttrs = new Set(
+    Array.isArray(options.forceStyleAttrs) ? options.forceStyleAttrs : [],
+  );
+  const forceSemanticAttrs = new Set(
+    Array.isArray(options.forceSemanticAttrs) ? options.forceSemanticAttrs : [],
+  );
 
-  return (name) => {
+  return (tagName, name) => {
+    if (setHasAnyVariant(forceSemanticAttrs, name)) return false;
+    if (setHasAnyVariant(forceStyleAttrs, name)) return true;
+    if (isSemanticAttributeForTag(tagName, name)) return false;
     if (setHasAnyVariant(ExplicitStyleKeys, name)) return true;
     if (setHasAnyVariant(userAliases, name)) return true;
     return isLikelyCssProperty(name);
@@ -228,7 +241,7 @@ const quoteJsString = (value) => {
     .replace(/\r/g, '\\r')}'`;
 };
 
-const buildRuntimeStyleObject = (attrs, id, code, isStyleKey) => {
+const buildRuntimeStyleObject = (tagName, attrs, id, code, isStyleKey) => {
   const keptAttrs = [];
   const fragments = [];
 
@@ -254,7 +267,7 @@ const buildRuntimeStyleObject = (attrs, id, code, isStyleKey) => {
 
     const key = bindingKey ?? attr.name;
 
-    if (!isStyleKey(key)) {
+    if (!isStyleKey(tagName, key)) {
       keptAttrs.push(attr);
       continue;
     }
@@ -315,10 +328,15 @@ const stringifyStartTag = (tagName, attrs, styleExpression, selfClosing) => {
   return `<${tagName}${attrsPart}${selfClosing ? ' /' : ''}>`;
 };
 
-const transformTemplateContent = (templateSource, id, fullCode, isStyleKey) => {
+const transformTemplateContent = (
+  templateSource,
+  id,
+  fullCode,
+  isStyleKey,
+  options,
+) => {
   let cursor = 0;
   let transformed = '';
-  let scopeDepth = 0;
   let ignoreDepth = 0;
 
   const stack = [];
@@ -348,7 +366,6 @@ const transformTemplateContent = (templateSource, id, fullCode, isStyleKey) => {
       const top = stack[stack.length - 1];
       if (top && top.name === closing.name) {
         stack.pop();
-        if (top.opensScope) scopeDepth -= 1;
         if (top.opensIgnore) ignoreDepth -= 1;
       }
       continue;
@@ -364,18 +381,41 @@ const transformTemplateContent = (templateSource, id, fullCode, isStyleKey) => {
     const hasExplicitMarker = opening.attrs.some(isVBoxMarker);
     const hasIgnoreMarker = opening.attrs.some(isVBoxIgnoreMarker);
 
-    const insideActiveScope = scopeDepth > 0 && ignoreDepth === 0;
-    const shouldAutoTransform =
-      insideActiveScope &&
-      isNativeHtmlTag(opening.name) &&
-      !isScopeRootTag(opening.name);
+    const isNativeTag = isNativeHtmlTag(opening.name);
+    const isCustomComponent =
+      !isNativeTag && !isVBoxComponentTag(opening.name);
+    const shouldAutoTransformNativeTag =
+      ignoreDepth === 0 &&
+      isNativeTag &&
+      canTransformNativeTag(opening.name);
+    const shouldAutoTransformFrameworkLink =
+      ignoreDepth === 0 &&
+      isCustomComponent &&
+      isFrameworkLinkTag(opening.name);
+
+    // Custom components stay opt-in by default, except framework link components.
+    const shouldTransformMarkedCustomComponent =
+      hasExplicitMarker &&
+      !hasIgnoreMarker &&
+      ignoreDepth === 0 &&
+      isCustomComponent;
+
+    const shouldTransformAllCustomComponents =
+      !hasIgnoreMarker &&
+      ignoreDepth === 0 &&
+      options?.parseAllComponents === true &&
+      isCustomComponent;
 
     const shouldTransform =
-      !hasIgnoreMarker && (hasExplicitMarker || shouldAutoTransform);
+      shouldTransformMarkedCustomComponent ||
+      shouldTransformAllCustomComponents ||
+      (!hasIgnoreMarker &&
+        (shouldAutoTransformNativeTag || shouldAutoTransformFrameworkLink));
 
     let rewritten;
     if (shouldTransform) {
       const { keptAttrs, styleExpression } = buildRuntimeStyleObject(
+        opening.name,
         opening.attrs,
         id,
         fullCode,
@@ -403,11 +443,8 @@ const transformTemplateContent = (templateSource, id, fullCode, isStyleKey) => {
     cursor = opening.end;
 
     if (!opening.selfClosing) {
-      const opensScope = isScopeRootTag(opening.name);
       const opensIgnore = hasIgnoreMarker || ignoreDepth > 0;
-      stack.push({ name: opening.name, opensScope, opensIgnore });
-
-      if (opensScope) scopeDepth += 1;
+      stack.push({ name: opening.name, opensIgnore });
       if (opensIgnore) ignoreDepth += 1;
     }
   }
@@ -415,13 +452,17 @@ const transformTemplateContent = (templateSource, id, fullCode, isStyleKey) => {
   return transformed;
 };
 
+const TemplateRegex = /<template\b[^>]*>([\s\S]*?)<\/template>/i;
+
 export const transformVueSfc = (
   code: string,
   id: string,
   options: VBoxNativePluginOptions = {},
 ): VBoxSfcTransformResult => {
+  // only run on .vue files
   if (!id.endsWith('.vue')) return null;
 
+  // extract template and its content
   const match = code.match(TemplateRegex);
   if (!match || match.index == null) return null;
 
@@ -432,6 +473,7 @@ export const transformVueSfc = (
     id,
     code,
     isStyleKey,
+    options,
   );
 
   if (transformedTemplate === originalTemplate) return null;

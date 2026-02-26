@@ -16,8 +16,8 @@ test('buildTokenResolutionMap resolves default theme tokens', () => {
   assert.equal(typeof map.get('cl-red-400'), 'string');
 });
 
-test('collectTokenHints finds static token values in scoped native syntax', () => {
-  const ast = baseParse(`<v-box><p color="cl-brand" font-size="fs-xl">Hello</p></v-box>`);
+test('collectTokenHints finds static token values on native tags globally', () => {
+  const ast = baseParse(`<p color="cl-brand" font-size="fs-xl">Hello</p>`);
 
   const map = new Map([
     ['cl-brand', '#c52341'],
@@ -58,6 +58,54 @@ test('collectTokenHints supports token hovers directly on <v-box> props', () => 
   );
 
   assert.equal(hints.length, 2);
+});
+
+test('collectTokenHints supports marked custom components', () => {
+  const ast = baseParse(`<BaseButton vbox color="cl-brand">Save</BaseButton>`);
+  const hints = collectTokenHints(
+    ast,
+    (token) => (token === 'cl-brand' ? '#c52341' : null),
+    () => true,
+  );
+
+  assert.equal(hints.length, 1);
+  assert.equal(hints[0].token, 'cl-brand');
+});
+
+test('collectTokenHints supports framework links without marker', () => {
+  const ast = baseParse(`<router-link color="cl-brand">Home</router-link>`);
+  const hints = collectTokenHints(
+    ast,
+    (token) => (token === 'cl-brand' ? '#c52341' : null),
+    () => true,
+  );
+
+  assert.equal(hints.length, 1);
+  assert.equal(hints[0].token, 'cl-brand');
+});
+
+test('collectTokenHints ignores unmarked custom components', () => {
+  const ast = baseParse(`<BaseButton color="cl-brand">Save</BaseButton>`);
+  const hints = collectTokenHints(
+    ast,
+    (token) => (token === 'cl-brand' ? '#c52341' : null),
+    () => true,
+  );
+
+  assert.equal(hints.length, 0);
+});
+
+test('collectTokenHints supports parseAllComponents option for custom components', () => {
+  const ast = baseParse(`<BaseButton color="cl-brand">Save</BaseButton>`);
+  const hints = collectTokenHints(
+    ast,
+    (token) => (token === 'cl-brand' ? '#c52341' : null),
+    () => true,
+    { parseAllComponents: true },
+  );
+
+  assert.equal(hints.length, 1);
+  assert.equal(hints[0].token, 'cl-brand');
 });
 
 test('collectTokenHints works on elements with v-if and children under that branch', () => {
@@ -125,11 +173,38 @@ test('collectTokenHints finds tokens inside bound object-style props', () => {
   assert.equal(hints.some((hint) => hint.token === 'cl-emerald-400'), true);
 });
 
+test('collectTokenHints skips denylisted native tags even with marker', () => {
+  const ast = baseParse(
+    `<v-box><script vbox color="cl-brand"></script><p color="cl-brand">Hello</p></v-box>`,
+  );
+  const hints = collectTokenHints(
+    ast,
+    (token) => (token === 'cl-brand' ? '#c52341' : null),
+    () => true,
+  );
+
+  assert.equal(hints.length, 1);
+  assert.equal(hints[0].token, 'cl-brand');
+});
+
 test('style key matcher excludes semantic attributes', () => {
   const isStyleKey = createStyleKeyMatcher({});
 
-  assert.equal(isStyleKey('src'), false);
-  assert.equal(isStyleKey('href'), false);
-  assert.equal(isStyleKey('color'), true);
-  assert.equal(isStyleKey('max-w'), true);
+  assert.equal(isStyleKey('img', 'src'), false);
+  assert.equal(isStyleKey('a', 'href'), false);
+  assert.equal(isStyleKey('p', 'color'), true);
+  assert.equal(isStyleKey('section', 'max-w'), true);
+});
+
+test('style key matcher supports semantic/style overrides', () => {
+  const isStyleKey = createStyleKeyMatcher(
+    {},
+    {
+      forceStyleAttrs: ['src'],
+      forceSemanticAttrs: ['width'],
+    },
+  );
+
+  assert.equal(isStyleKey('img', 'src'), true);
+  assert.equal(isStyleKey('img', 'width'), false);
 });

@@ -10,6 +10,22 @@ export interface VBoxVolarPluginConfig {
    * Example: "./vbox.config.ts"
    */
   configPath?: string;
+
+  /**
+   * Attribute names that should always be treated as style attrs in hover classification.
+   */
+  forceStyleAttrs?: string[];
+
+  /**
+   * Attribute names that should always be treated as semantic attrs in hover classification.
+   */
+  forceSemanticAttrs?: string[];
+
+  /**
+   * When true, treats all custom components as VBox-eligible for hover analysis.
+   * Default remains opt-in custom components (except router-link/nuxt-link which are included by default).
+   */
+  parseAllComponents?: boolean;
 }
 
 export interface VBoxVolarPluginReturn {

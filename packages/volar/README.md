@@ -24,7 +24,10 @@ Add the plugin to your tsconfig / jsconfig used by Vue language tools:
     "plugins": [
       {
         "name": "@veebox/volar",
-        "configPath": "./vbox.config.ts"
+        "configPath": "./vbox.config.ts",
+        "parseAllComponents": false,
+        "forceSemanticAttrs": ["src"],
+        "forceStyleAttrs": ["myCustomStyleAttr"]
       }
     ]
   }

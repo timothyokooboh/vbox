@@ -92,7 +92,7 @@ const TOKEN_PREFIX_TO_CATEGORY = {
   z: 'zIndex',
 };
 
-const NON_STYLE_ATTRIBUTE_KEYS = new Set([
+const GLOBAL_SEMANTIC_ATTRIBUTES = new Set([
   'id',
   'class',
   'style',
@@ -108,87 +108,72 @@ const NON_STYLE_ATTRIBUTE_KEYS = new Set([
   'role',
   'slot',
   'is',
-  'name',
-  'value',
-  'type',
-  'placeholder',
-  'disabled',
-  'readonly',
-  'required',
-  'checked',
-  'selected',
-  'multiple',
-  'min',
-  'max',
-  'step',
-  'maxlength',
-  'minlength',
-  'pattern',
-  'autocomplete',
-  'autofocus',
-  'for',
-  'form',
-  'src',
-  'srcset',
-  'sizes',
-  'href',
-  'target',
-  'rel',
-  'download',
-  'ping',
-  'referrerpolicy',
-  'integrity',
-  'crossorigin',
-  'fetchpriority',
-  'alt',
-  'loading',
-  'decoding',
-  'usemap',
-  'ismap',
-  'poster',
-  'preload',
-  'controls',
-  'muted',
-  'loop',
-  'playsinline',
-  'autoplay',
-  'kind',
-  'srclang',
-  'label',
-  'open',
-  'summary',
-  'method',
-  'action',
-  'enctype',
-  'novalidate',
-  'accept',
-  'accept-charset',
-  'capture',
-  'cols',
-  'rows',
-  'wrap',
-  'colspan',
-  'rowspan',
-  'scope',
-  'headers',
-  'datetime',
-  'cite',
-  'reversed',
-  'start',
-  'sandbox',
-  'allow',
-  'allowfullscreen',
-  'allowpaymentrequest',
-  'frameborder',
-  'marginwidth',
-  'marginheight',
-  'scrolling',
-  'xmlns',
-  'viewBox',
-  'preserveAspectRatio',
-  'd',
-  'xlink:href',
+  'part',
+  'inert',
+  'popover',
+  'inputmode',
+  'nonce',
+  'accesskey',
+  'autocapitalize',
+  'autocorrect',
+  'enterkeyhint',
+  'exportparts',
+  'itemid',
+  'itemprop',
+  'itemref',
+  'itemscope',
+  'itemtype',
+  'virtualkeyboardpolicy',
 ]);
+
+const SEMANTIC_ATTRIBUTES_BY_TAG = {
+  a: ['download', 'href', 'hreflang', 'ping', 'referrerpolicy', 'rel', 'target', 'type'],
+  area: ['alt', 'coords', 'download', 'href', 'ping', 'referrerpolicy', 'rel', 'shape', 'target'],
+  audio: ['autoplay', 'controls', 'crossorigin', 'loop', 'muted', 'preload', 'src'],
+  base: ['href', 'target'],
+  blockquote: ['cite'],
+  button: ['disabled', 'form', 'formaction', 'formenctype', 'formmethod', 'formnovalidate', 'formtarget', 'name', 'popovertarget', 'popovertargetaction', 'type', 'value'],
+  canvas: [],
+  col: ['span'],
+  colgroup: ['span'],
+  data: ['value'],
+  del: ['cite', 'datetime'],
+  details: ['name', 'open'],
+  embed: ['src', 'type'],
+  fieldset: ['disabled', 'form', 'name'],
+  form: ['accept-charset', 'action', 'autocomplete', 'enctype', 'method', 'name', 'novalidate', 'rel', 'target'],
+  iframe: ['allow', 'allowfullscreen', 'loading', 'name', 'referrerpolicy', 'sandbox', 'src', 'srcdoc'],
+  img: ['alt', 'crossorigin', 'decoding', 'fetchpriority', 'ismap', 'loading', 'referrerpolicy', 'sizes', 'src', 'srcset', 'usemap'],
+  input: ['accept', 'alt', 'autocomplete', 'autofocus', 'capture', 'checked', 'dirname', 'disabled', 'form', 'formaction', 'formenctype', 'formmethod', 'formnovalidate', 'formtarget', 'list', 'max', 'maxlength', 'min', 'minlength', 'multiple', 'name', 'pattern', 'placeholder', 'readonly', 'required', 'src', 'step', 'type', 'value'],
+  ins: ['cite', 'datetime'],
+  label: ['for', 'form'],
+  li: ['value'],
+  link: ['as', 'crossorigin', 'disabled', 'fetchpriority', 'href', 'hreflang', 'imagesizes', 'imagesrcset', 'integrity', 'media', 'referrerpolicy', 'rel', 'sizes', 'type'],
+  map: ['name'],
+  meter: ['form', 'high', 'low', 'max', 'min', 'optimum', 'value'],
+  object: ['data', 'form', 'name', 'type', 'usemap'],
+  ol: ['reversed', 'start', 'type'],
+  optgroup: ['disabled', 'label'],
+  option: ['disabled', 'label', 'selected', 'value'],
+  output: ['for', 'form', 'name'],
+  progress: ['max', 'value'],
+  q: ['cite'],
+  script: ['async', 'blocking', 'crossorigin', 'defer', 'fetchpriority', 'integrity', 'nomodule', 'nonce', 'referrerpolicy', 'src', 'type'],
+  select: ['autocomplete', 'disabled', 'form', 'multiple', 'name', 'required'],
+  slot: ['name'],
+  source: ['media', 'src', 'srcset', 'type'],
+  style: ['blocking', 'media', 'nonce', 'title'],
+  td: ['colspan', 'headers', 'rowspan'],
+  textarea: ['autocomplete', 'autocorrect', 'autofocus', 'cols', 'dirname', 'disabled', 'form', 'maxlength', 'minlength', 'name', 'placeholder', 'readonly', 'required', 'rows', 'wrap'],
+  th: ['abbr', 'colspan', 'headers', 'rowspan', 'scope'],
+  time: ['datetime'],
+  track: ['default', 'kind', 'label', 'src', 'srclang'],
+  video: ['autoplay', 'controls', 'crossorigin', 'loop', 'muted', 'playsinline', 'poster', 'preload', 'src'],
+  svg: ['viewBox', 'preserveAspectRatio', 'xmlns'],
+  path: ['d', 'pathLength'],
+  use: ['href', 'xlink:href'],
+  image: ['href', 'x', 'y', 'preserveAspectRatio', 'xlink:href'],
+};
 
 const HOVER_FEATURES = {
   verification: true,
@@ -239,7 +224,24 @@ const VBOX_DEFAULT_ALIAS_KEYS = new Set([
 ]);
 
 const isNativeHtmlTag = (tag) => /^[a-z][a-z0-9]*$/.test(tag);
-const isScopeRootTag = (tag) => tag === 'v-box' || tag === 'VBox';
+const isVBoxComponentTag = (tag) => tag === 'v-box' || tag === 'VBox';
+const isFrameworkLinkTag = (tag) => {
+  const normalized = String(tag)
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .replace(/^[-_]+/, '')
+    .toLowerCase();
+  return normalized === 'router-link' || normalized === 'nuxt-link';
+};
+const NON_TRANSFORM_NATIVE_TAGS = new Set([
+  'script',
+  'style',
+  'meta',
+  'link',
+  'base',
+  'title',
+]);
+const canProcessNativeTag = (tag) =>
+  !NON_TRANSFORM_NATIVE_TAGS.has(String(tag).toLowerCase());
 const TOKEN_IN_VALUE_REGEX = /\b([a-z]{1,3}-[A-Za-z0-9_-]+)\b/g;
 
 const normalizeCssPropertyKey = (name) =>
@@ -260,6 +262,32 @@ const setHasAnyVariant = (set, name) => {
     if (set.has(variant)) return true;
   }
   return false;
+};
+
+const toVariantSet = (list) => {
+  const set = new Set();
+  for (const item of list) {
+    for (const variant of getKeyVariants(item)) {
+      set.add(variant);
+    }
+  }
+  return set;
+};
+
+const GLOBAL_SEMANTIC_SET = toVariantSet(Array.from(GLOBAL_SEMANTIC_ATTRIBUTES));
+const TAG_SEMANTIC_SET_MAP = new Map(
+  Object.entries(SEMANTIC_ATTRIBUTES_BY_TAG).map(([tag, attrs]) => [
+    String(tag).toLowerCase(),
+    toVariantSet(attrs),
+  ]),
+);
+
+const isSemanticAttributeForTag = (tag, key) => {
+  if (!tag || !key) return false;
+  if (key.startsWith('aria-') || key.startsWith('data-')) return true;
+  if (setHasAnyVariant(GLOBAL_SEMANTIC_SET, key)) return true;
+  const perTag = TAG_SEMANTIC_SET_MAP.get(String(tag).toLowerCase());
+  return perTag ? setHasAnyVariant(perTag, key) : false;
 };
 
 const getAttrValueContentAndOffset = (attrValueNode) => {
@@ -344,14 +372,24 @@ const buildTokenResolutionMap = (vboxConfig, rootDir) => {
   return resolved;
 };
 
-const createStyleKeyMatcher = (vboxConfig = {}) => {
+const createStyleKeyMatcher = (vboxConfig = {}, pluginConfig = {}) => {
   const userAliases = new Set(Object.keys(vboxConfig?.aliases?.values ?? {}));
+  const forceStyleAttrs = new Set([
+    ...(vboxConfig?.compiler?.forceStyleAttrs ?? []),
+    ...(pluginConfig?.forceStyleAttrs ?? []),
+  ]);
+  const forceSemanticAttrs = new Set([
+    ...(vboxConfig?.compiler?.forceSemanticAttrs ?? []),
+    ...(pluginConfig?.forceSemanticAttrs ?? []),
+  ]);
 
-  return (key) => {
+  return (tag, key) => {
     if (!key) return false;
+    if (setHasAnyVariant(forceSemanticAttrs, key)) return false;
+    if (setHasAnyVariant(forceStyleAttrs, key)) return true;
+    if (isSemanticAttributeForTag(tag, key)) return false;
     if (key.startsWith('aria-') || key.startsWith('data-')) return false;
     if (key.includes(':')) return false;
-    if (setHasAnyVariant(NON_STYLE_ATTRIBUTE_KEYS, key)) return false;
     if (setHasAnyVariant(VBOX_DEFAULT_ALIAS_KEYS, key)) return true;
     if (setHasAnyVariant(userAliases, key)) return true;
 
@@ -360,7 +398,7 @@ const createStyleKeyMatcher = (vboxConfig = {}) => {
   };
 };
 
-const collectTokenHints = (templateAst, resolveTokenValue, isStyleKey) => {
+const collectTokenHints = (templateAst, resolveTokenValue, isStyleKey, options = {}) => {
   const hints = [];
   const pushTokensFromValue = (value, offset) => {
     let match;
@@ -381,33 +419,33 @@ const collectTokenHints = (templateAst, resolveTokenValue, isStyleKey) => {
     }
   };
 
-  const walk = (node, inScope, ignored) => {
+  const walk = (node, ignored) => {
     if (!node) return;
 
     if (node.type === 0 /* ROOT */) {
       for (const child of node.children || []) {
-        walk(child, inScope, ignored);
+        walk(child, ignored);
       }
       return;
     }
 
     if (node.type === 9 /* IF */) {
       for (const branch of node.branches || []) {
-        walk(branch, inScope, ignored);
+        walk(branch, ignored);
       }
       return;
     }
 
     if (node.type === 10 /* IF_BRANCH */) {
       for (const child of node.children || []) {
-        walk(child, inScope, ignored);
+        walk(child, ignored);
       }
       return;
     }
 
     if (node.type === 11 /* FOR */) {
       for (const child of node.children || []) {
-        walk(child, inScope, ignored);
+        walk(child, ignored);
       }
       return;
     }
@@ -425,22 +463,42 @@ const collectTokenHints = (templateAst, resolveTokenValue, isStyleKey) => {
       }
     }
 
-    const insideActiveScope = inScope && !ignored;
-    const autoEligible =
-      insideActiveScope && isNativeHtmlTag(tag) && !isScopeRootTag(tag);
-    const isVBoxComponent = isScopeRootTag(tag);
+    const nativeAutoEligible =
+      !ignored &&
+      isNativeHtmlTag(tag) &&
+      canProcessNativeTag(tag);
+    const isCustomComponent = !isNativeHtmlTag(tag) && !isVBoxComponentTag(tag);
+    const frameworkLinkAutoEligible =
+      !ignored &&
+      isCustomComponent &&
+      isFrameworkLinkTag(tag);
+    const vboxComponentEligible = !ignored && isVBoxComponentTag(tag);
+    const markedCustomComponentEligible =
+      !ignored &&
+      hasVBoxMarker &&
+      isCustomComponent;
+    const globalCustomComponentEligible =
+      !ignored &&
+      options.parseAllComponents === true &&
+      isCustomComponent;
 
     const shouldProcessElement =
       !ignored &&
       !hasIgnoreMarker &&
-      (hasVBoxMarker || autoEligible || isVBoxComponent);
+      (
+        nativeAutoEligible ||
+        frameworkLinkAutoEligible ||
+        markedCustomComponentEligible ||
+        globalCustomComponentEligible ||
+        vboxComponentEligible
+      );
 
     if (shouldProcessElement) {
       for (const prop of node.props) {
         if (prop.type === 6 /* ATTRIBUTE */) {
           if (!prop.value) continue;
           if (prop.name === 'vbox' || prop.name === 'vbox-ignore') continue;
-          if (!isStyleKey(prop.name)) continue;
+          if (!isStyleKey(tag, prop.name)) continue;
 
           const { content, offset } = getAttrValueContentAndOffset(prop.value);
           pushTokensFromValue(String(content || ''), offset);
@@ -453,22 +511,21 @@ const collectTokenHints = (templateAst, resolveTokenValue, isStyleKey) => {
         if (!prop.exp || prop.exp.type !== 4) continue;
 
         const boundKey = prop.arg.content;
-        if (!isStyleKey(boundKey)) continue;
+        if (!isStyleKey(tag, boundKey)) continue;
 
         pushTokensFromValue(String(prop.exp.content || ''), prop.exp.loc.start.offset);
       }
     }
 
-    const nextInScope = inScope || isScopeRootTag(tag);
     const nextIgnored = ignored || hasIgnoreMarker;
 
     for (const child of node.children || []) {
-      walk(child, nextInScope, nextIgnored);
+      walk(child, nextIgnored);
     }
   };
 
   for (const child of templateAst.children || []) {
-    walk(child, false, false);
+    walk(child, false);
   }
 
   return hints;
@@ -498,7 +555,7 @@ const createPlugin = (ctx) => {
   const rootDir = resolveRootDir(ctx, userConfig);
   const vboxConfig = loadVBoxConfig(rootDir, userConfig) ?? {};
   const tokenMap = buildTokenResolutionMap(vboxConfig, rootDir);
-  const isStyleKey = createStyleKeyMatcher(vboxConfig);
+  const isStyleKey = createStyleKeyMatcher(vboxConfig, userConfig);
 
   const resolveTokenValue = (token) => tokenMap.get(token) ?? null;
 
@@ -517,6 +574,7 @@ const createPlugin = (ctx) => {
         sfc.template.ast,
         resolveTokenValue,
         isStyleKey,
+        { parseAllComponents: userConfig.parseAllComponents === true },
       );
       if (hints.length === 0) return;
 

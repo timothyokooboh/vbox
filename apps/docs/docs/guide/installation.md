@@ -69,6 +69,11 @@ export default defineConfig({
   plugins: [
     vboxNativePlugin({
       aliases: Object.keys(vboxConfig.aliases?.values ?? {}),
+      // Optional: parse all custom components globally.
+      // parseAllComponents: true,
+      // Optional safety overrides for edge-case attr collisions:
+      // forceSemanticAttrs: ['src'],
+      // forceStyleAttrs: ['myCustomStyleAttr'],
     }),
     vue(),
   ],
@@ -102,7 +107,8 @@ You can also pass options:
     "plugins": [
       {
         "name": "@veebox/volar",
-        "configPath": "./vbox.config.ts"
+        "configPath": "./vbox.config.ts",
+        "parseAllComponents": false
       }
     ]
   }
