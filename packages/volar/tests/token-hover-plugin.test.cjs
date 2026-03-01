@@ -6,6 +6,11 @@ const createPlugin = require('../src/index.cjs');
 const {
   buildTokenResolutionMap,
   collectTokenHints,
+  collectCompletionHints,
+  buildCompletionCode,
+  buildTokenPrefixByProperty,
+  buildAttrCompletionKeys,
+  getTokenCandidatesForKey,
   createStyleKeyMatcher,
 } = createPlugin._test;
 
@@ -207,4 +212,53 @@ test('style key matcher supports semantic/style overrides', () => {
 
   assert.equal(isStyleKey('img', 'src'), true);
   assert.equal(isStyleKey('img', 'width'), false);
+});
+
+test('collectCompletionHints returns style attr and token value hints', () => {
+  const ast = baseParse(`<p color=\"cl-brand\" fs=\"fs-lg\">Hello</p>`);
+  const tokenMap = new Map([
+    ['cl-brand', '#c52341'],
+    ['cl-red-400', '#f87171'],
+    ['fs-lg', '1.125rem'],
+    ['fs-xl', '1.25rem'],
+  ]);
+  const prefixMap = buildTokenPrefixByProperty({});
+  const cache = new Map();
+  const hints = collectCompletionHints(
+    ast,
+    () => true,
+    (key) => getTokenCandidatesForKey(key, tokenMap, prefixMap, cache),
+    {},
+  );
+
+  assert.equal(hints.attrHints.some((hint) => hint.value === 'color'), true);
+  assert.equal(hints.attrHints.some((hint) => hint.value === 'fs'), true);
+  assert.equal(hints.valueHints.some((hint) => hint.value === 'cl-brand'), true);
+  assert.equal(hints.valueHints.some((hint) => hint.value === 'fs-lg'), true);
+});
+
+test('buildCompletionCode emits mapped completion segments', () => {
+  const code = buildCompletionCode(
+    [{ value: 'color', offset: 10, length: 5 }],
+    [
+      {
+        value: 'cl-brand',
+        offset: 20,
+        length: 8,
+        candidates: ['cl-brand', 'cl-red-400'],
+      },
+    ],
+    buildAttrCompletionKeys({}),
+    50,
+  );
+
+  assert.equal(code.length > 0, true);
+  assert.equal(code.some((part) => typeof part === 'string' && part.includes('__vboxAttrCompletion')), true);
+  assert.equal(code.some((part) => typeof part === 'string' && part.includes('__vboxTokenCompletion')), true);
+});
+
+test('buildAttrCompletionKeys includes broad css properties', () => {
+  const keys = buildAttrCompletionKeys({});
+  assert.equal(keys.includes('backdrop-filter'), true);
+  assert.equal(keys.includes('text-transform'), true);
 });

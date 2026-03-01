@@ -105,18 +105,20 @@ onMounted(() => {
             as="router-link"
             :to="`/movie/${movie.id}`"
             variant="solid"
-            vbox
-            color="yellow"
+            size="sm"
           >
             View Details
           </AppButton>
 
           <AppButton
             as="a"
+            vbox
             href="https://www.themoviedb.org/"
             target="_blank"
             rel="noreferrer noopener"
             variant="outline"
+            display="none"
+            :sm="{ display: 'block' }"
           >
             TMDB Attribution
           </AppButton>

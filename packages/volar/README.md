@@ -1,12 +1,15 @@
 # @veebox/volar
 
-Volar plugin that provides hover previews for VBox design tokens inside Vue templates.
+Volar plugin that provides hover previews and completion assistance for VBox style usage inside Vue templates.
 
 Examples:
 
 - `fs="fs-lg"` -> `VBox token preview fs-lg => 1.125rem`
 - `border="1px solid cl-brand"` -> hover on `cl-brand`
 - `:pseudos="{ ':hover': { bg: 'cl-emerald-400' } }"` -> hover on `cl-emerald-400`
+- `color=""` -> token value suggestions (for example `cl-*`)
+- `fs=""` -> token value suggestions (for example `fs-*`)
+- style attribute names/aliases receive completion support on parsed elements
 
 ## Install
 

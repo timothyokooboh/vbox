@@ -7,6 +7,11 @@ export default defineConfig({
     values: {
       glass: 'backdropFilter',
       mTop: 'marginTop',
+      bfilter: 'backdropFilter',
+      bImage: 'backgroundImage',
+      textTra: 'textTransform',
+      textDeco: 'textDecoration',
+      backFil: 'backdropFilter',
     },
   },
   breakpoints: {

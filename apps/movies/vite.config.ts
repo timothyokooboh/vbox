@@ -6,12 +6,12 @@ import vboxConfig from './vbox.config';
 export default defineConfig({
   plugins: [
     vboxNativePlugin({
-      aliases: Object.keys(vboxConfig.aliases?.values ?? {})
+      aliases: Object.keys(vboxConfig.aliases?.values ?? {}),
     }),
-    vue()
+    vue(),
   ],
   test: {
     environment: 'jsdom',
-    globals: true
-  }
+    globals: true,
+  },
 });

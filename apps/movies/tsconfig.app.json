@@ -4,8 +4,8 @@
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "types": ["vite/client", "vitest/globals"]
   },
-  "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
+  "include": ["env.d.ts", "vbox.d.ts", "src/**/*", "src/**/*.vue"],
   "vueCompilerOptions": {
-    "plugins": ["@veebox/volar"]
+    "plugins": [{ "name": "@veebox/volar", "configPath": "./vbox.config.ts" }]
   }
 }

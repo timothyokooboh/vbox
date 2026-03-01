@@ -44,7 +44,8 @@ const getBindingKey = (name) => {
 
 const isVBoxMarker = (attr) => attr.name === 'vbox';
 const isVBoxIgnoreMarker = (attr) => attr.name === 'vbox-ignore';
-const isVBoxComponentTag = (tagName) => tagName === 'v-box' || tagName === 'VBox';
+const isVBoxComponentTag = (tagName) =>
+  tagName === 'v-box' || tagName === 'VBox';
 const isFrameworkLinkTag = (tagName) => {
   const normalized = toKebabCase(String(tagName));
   return normalized === 'router-link' || normalized === 'nuxt-link';
@@ -316,11 +317,18 @@ const buildRuntimeStyleObject = (tagName, attrs, id, code, isStyleKey) => {
   };
 };
 
-const stringifyStartTag = (tagName, attrs, styleExpression, selfClosing) => {
+const stringifyStartTag = (
+  tagName,
+  attrs,
+  styleExpression,
+  selfClosing,
+  runtimeArg,
+) => {
   const renderedAttrs = attrs.map((attr) => attr.raw);
 
   if (styleExpression) {
-    renderedAttrs.push(`v-vbox-runtime="${styleExpression}"`);
+    const argSuffix = runtimeArg ? `:${runtimeArg}` : '';
+    renderedAttrs.push(`v-vbox-runtime${argSuffix}="${styleExpression}"`);
   }
 
   const attrsPart =
@@ -382,12 +390,9 @@ const transformTemplateContent = (
     const hasIgnoreMarker = opening.attrs.some(isVBoxIgnoreMarker);
 
     const isNativeTag = isNativeHtmlTag(opening.name);
-    const isCustomComponent =
-      !isNativeTag && !isVBoxComponentTag(opening.name);
+    const isCustomComponent = !isNativeTag && !isVBoxComponentTag(opening.name);
     const shouldAutoTransformNativeTag =
-      ignoreDepth === 0 &&
-      isNativeTag &&
-      canTransformNativeTag(opening.name);
+      ignoreDepth === 0 && isNativeTag && canTransformNativeTag(opening.name);
     const shouldAutoTransformFrameworkLink =
       ignoreDepth === 0 &&
       isCustomComponent &&
@@ -414,6 +419,7 @@ const transformTemplateContent = (
 
     let rewritten;
     if (shouldTransform) {
+      const runtimeArg = isCustomComponent ? 'override' : null;
       const { keptAttrs, styleExpression } = buildRuntimeStyleObject(
         opening.name,
         opening.attrs,
@@ -426,6 +432,7 @@ const transformTemplateContent = (
         keptAttrs,
         styleExpression,
         opening.selfClosing,
+        runtimeArg,
       );
     } else {
       const attrsWithoutScopeMarkers = opening.attrs.filter(
@@ -436,6 +443,7 @@ const transformTemplateContent = (
         attrsWithoutScopeMarkers,
         null,
         opening.selfClosing,
+        null,
       );
     }
 

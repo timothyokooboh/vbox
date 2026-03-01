@@ -75,4 +75,18 @@ describe('injectCSS', () => {
     expect(styleEl.textContent).toContain('-webkit-flex');
     expect(styleEl.textContent).toContain('display:flex');
   });
+
+  test('keeps override-priority rules after base rules', () => {
+    injectCSS('.base-rule { color: blue; }', 'base');
+    injectCSS('.override-rule { color: yellow; }', 'override');
+
+    const styleEl = document.getElementById(
+      'vbox-style-sheet',
+    ) as HTMLStyleElement;
+    const text = styleEl.textContent || '';
+
+    expect(text.indexOf('.override-rule')).toBeGreaterThan(
+      text.indexOf('.base-rule'),
+    );
+  });
 });

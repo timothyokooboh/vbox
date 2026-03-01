@@ -17,6 +17,7 @@
   "dependencies": {
     "@tanstack/vue-query": "^5.90.1",
     "@veebox/core": "workspace:*",
+    "@veebox/property-variance-authority": "workspace:*",
     "@veebox/unplugin": "workspace:*",
     "@veebox/vue": "workspace:*",
     "@vueuse/core": "^14.0.0",

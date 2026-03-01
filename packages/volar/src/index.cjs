@@ -2,6 +2,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { createRequire } = require('node:module');
 const { createJiti } = require('jiti');
+const knownCssPropertiesModule = require('known-css-properties');
 
 const importWithJiti = createJiti(__filename, { interopDefault: true });
 const requireFromHere = createRequire(__filename);
@@ -25,6 +26,9 @@ const loadCoreExports = (rootDir) => {
         normalizeTheme:
           core?.normalizeTheme ??
           ((theme) => ({ normalized: theme ?? {}, colorDarkMap: {} })),
+        ObjectStyleKeys: Array.isArray(core?.ObjectStyleKeys)
+          ? core.ObjectStyleKeys
+          : [],
       };
     }
   } catch {
@@ -63,6 +67,9 @@ const loadCoreExports = (rootDir) => {
         normalizeTheme:
           core?.normalizeTheme ??
           ((theme) => ({ normalized: theme ?? {}, colorDarkMap: {} })),
+        ObjectStyleKeys: Array.isArray(core?.ObjectStyleKeys)
+          ? core.ObjectStyleKeys
+          : [],
       };
     } catch {
       // continue
@@ -76,6 +83,7 @@ const loadCoreExports = (rootDir) => {
       normalized: theme ?? {},
       colorDarkMap: {},
     }),
+    ObjectStyleKeys: [],
   };
 };
 
@@ -178,6 +186,15 @@ const SEMANTIC_ATTRIBUTES_BY_TAG = {
 const HOVER_FEATURES = {
   verification: true,
   completion: false,
+  semantic: true,
+  navigation: true,
+  structure: false,
+  format: false,
+};
+
+const COMPLETION_FEATURES = {
+  verification: true,
+  completion: true,
   semantic: true,
   navigation: true,
   structure: false,
@@ -398,6 +415,174 @@ const createStyleKeyMatcher = (vboxConfig = {}, pluginConfig = {}) => {
   };
 };
 
+const buildTokenPrefixByProperty = (vboxConfig = {}) => {
+  const base = new Map([
+    ['color', 'cl'],
+    ['background', 'cl'],
+    ['background-color', 'cl'],
+    ['fill', 'cl'],
+    ['stroke', 'cl'],
+    ['font-size', 'fs'],
+    ['font-weight', 'fw'],
+    ['font-family', 'ff'],
+    ['line-height', 'lh'],
+    ['letter-spacing', 'ls'],
+    ['border-radius', 'br'],
+    ['box-shadow', 'bs'],
+    ['z-index', 'z'],
+    ['margin', 'sp'],
+    ['margin-top', 'sp'],
+    ['margin-right', 'sp'],
+    ['margin-bottom', 'sp'],
+    ['margin-left', 'sp'],
+    ['padding', 'sp'],
+    ['padding-top', 'sp'],
+    ['padding-right', 'sp'],
+    ['padding-bottom', 'sp'],
+    ['padding-left', 'sp'],
+    ['gap', 'sp'],
+    ['row-gap', 'sp'],
+    ['column-gap', 'sp'],
+    ['top', 'sp'],
+    ['right', 'sp'],
+    ['bottom', 'sp'],
+    ['left', 'sp'],
+    ['inset', 'sp'],
+    ['width', 'sp'],
+    ['height', 'sp'],
+    ['max-width', 'sp'],
+    ['min-width', 'sp'],
+    ['max-height', 'sp'],
+    ['min-height', 'sp'],
+  ]);
+
+  const defaultAliasToPrefix = new Map([
+    ['fs', 'fs'],
+    ['fw', 'fw'],
+    ['ff', 'ff'],
+    ['lh', 'lh'],
+    ['ls', 'ls'],
+    ['bg', 'cl'],
+    ['radius', 'br'],
+    ['shadow', 'bs'],
+    ['w', 'sp'],
+    ['max-w', 'sp'],
+    ['min-w', 'sp'],
+    ['h', 'sp'],
+    ['max-h', 'sp'],
+    ['min-h', 'sp'],
+    ['m', 'sp'],
+    ['mt', 'sp'],
+    ['mr', 'sp'],
+    ['mb', 'sp'],
+    ['ml', 'sp'],
+    ['mx', 'sp'],
+    ['my', 'sp'],
+    ['p', 'sp'],
+    ['pt', 'sp'],
+    ['pr', 'sp'],
+    ['pb', 'sp'],
+    ['pl', 'sp'],
+    ['px', 'sp'],
+    ['py', 'sp'],
+  ]);
+
+  for (const [alias, prefix] of defaultAliasToPrefix) {
+    for (const variant of getKeyVariants(alias)) {
+      base.set(normalizeCssPropertyKey(variant), prefix);
+    }
+  }
+
+  for (const [alias, cssProp] of Object.entries(vboxConfig?.aliases?.values ?? {})) {
+    const cssPrefix = base.get(normalizeCssPropertyKey(cssProp));
+    if (!cssPrefix) continue;
+    for (const variant of getKeyVariants(alias)) {
+      base.set(normalizeCssPropertyKey(variant), cssPrefix);
+    }
+  }
+
+  return base;
+};
+
+const getTokenCandidatesForKey = (
+  key,
+  tokenMap,
+  tokenPrefixByProperty,
+  cache,
+) => {
+  if (!key) return [];
+  const normalized = normalizeCssPropertyKey(key);
+
+  if (cache.has(normalized)) {
+    return cache.get(normalized);
+  }
+
+  const prefix = tokenPrefixByProperty.get(normalized);
+  if (!prefix) {
+    cache.set(normalized, []);
+    return [];
+  }
+
+  const candidates = [];
+  for (const token of tokenMap.keys()) {
+    if (token.startsWith(`${prefix}-`)) {
+      candidates.push(token);
+    }
+  }
+
+  candidates.sort();
+  cache.set(normalized, candidates);
+  return candidates;
+};
+
+const buildAttrCompletionKeys = (vboxConfig = {}, objectStyleKeys = []) => {
+  const out = new Set();
+
+  for (const key of VBOX_DEFAULT_ALIAS_KEYS) {
+    for (const variant of getKeyVariants(key)) {
+      out.add(variant);
+    }
+  }
+
+  for (const key of objectStyleKeys) {
+    for (const variant of getKeyVariants(key)) {
+      out.add(variant);
+    }
+  }
+
+  for (const key of Object.keys(vboxConfig?.aliases?.values ?? {})) {
+    for (const variant of getKeyVariants(key)) {
+      out.add(variant);
+    }
+  }
+
+  const knownCssProperties =
+    Array.isArray(knownCssPropertiesModule)
+      ? knownCssPropertiesModule
+      : Array.isArray(knownCssPropertiesModule?.all)
+        ? knownCssPropertiesModule.all
+        : Array.isArray(knownCssPropertiesModule?.default)
+          ? knownCssPropertiesModule.default
+          : Array.isArray(knownCssPropertiesModule?.default?.all)
+            ? knownCssPropertiesModule.default.all
+            : [];
+
+  for (const key of knownCssProperties) {
+    const str = String(key || '').trim();
+    if (!str) continue;
+    for (const variant of getKeyVariants(str)) {
+      out.add(variant);
+    }
+  }
+
+  return Array.from(out).sort();
+};
+
+const escapeTsString = (value) =>
+  String(value)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'");
+
 const collectTokenHints = (templateAst, resolveTokenValue, isStyleKey, options = {}) => {
   const hints = [];
   const pushTokensFromValue = (value, offset) => {
@@ -531,6 +716,184 @@ const collectTokenHints = (templateAst, resolveTokenValue, isStyleKey, options =
   return hints;
 };
 
+const collectCompletionHints = (
+  templateAst,
+  isStyleKey,
+  getTokenCandidates,
+  options = {},
+) => {
+  const attrHints = [];
+  const valueHints = [];
+  const valueHintSeen = new Set();
+
+  const pushAttrHint = (value, offset, length) => {
+    if (!value || !length) return;
+    attrHints.push({ value, offset, length });
+  };
+
+  const pushValueHint = (value, offset, length, candidates) => {
+    if (!value || !length || !Array.isArray(candidates) || candidates.length === 0) return;
+    const dedupeKey = `${offset}:${length}:${value}`;
+    if (valueHintSeen.has(dedupeKey)) return;
+    valueHintSeen.add(dedupeKey);
+    valueHints.push({
+      value,
+      offset,
+      length,
+      candidates,
+    });
+  };
+
+  const walk = (node, ignored) => {
+    if (!node) return;
+
+    if (node.type === 0 /* ROOT */) {
+      for (const child of node.children || []) {
+        walk(child, ignored);
+      }
+      return;
+    }
+
+    if (node.type === 9 /* IF */) {
+      for (const branch of node.branches || []) {
+        walk(branch, ignored);
+      }
+      return;
+    }
+
+    if (node.type === 10 /* IF_BRANCH */) {
+      for (const child of node.children || []) {
+        walk(child, ignored);
+      }
+      return;
+    }
+
+    if (node.type === 11 /* FOR */) {
+      for (const child of node.children || []) {
+        walk(child, ignored);
+      }
+      return;
+    }
+
+    if (node.type !== 1 /* ELEMENT */) return;
+
+    const tag = node.tag;
+    let hasVBoxMarker = false;
+    let hasIgnoreMarker = false;
+
+    for (const prop of node.props) {
+      if (prop.type === 6 /* ATTRIBUTE */) {
+        if (prop.name === 'vbox') hasVBoxMarker = true;
+        if (prop.name === 'vbox-ignore') hasIgnoreMarker = true;
+      }
+    }
+
+    const nativeAutoEligible =
+      !ignored &&
+      isNativeHtmlTag(tag) &&
+      canProcessNativeTag(tag);
+    const isCustomComponent = !isNativeHtmlTag(tag) && !isVBoxComponentTag(tag);
+    const frameworkLinkAutoEligible =
+      !ignored &&
+      isCustomComponent &&
+      isFrameworkLinkTag(tag);
+    const vboxComponentEligible = !ignored && isVBoxComponentTag(tag);
+    const markedCustomComponentEligible =
+      !ignored &&
+      hasVBoxMarker &&
+      isCustomComponent;
+    const globalCustomComponentEligible =
+      !ignored &&
+      options.parseAllComponents === true &&
+      isCustomComponent;
+
+    const shouldProcessElement =
+      !ignored &&
+      !hasIgnoreMarker &&
+      (
+        nativeAutoEligible ||
+        frameworkLinkAutoEligible ||
+        markedCustomComponentEligible ||
+        globalCustomComponentEligible ||
+        vboxComponentEligible
+      );
+
+    if (shouldProcessElement) {
+      for (const prop of node.props) {
+        if (prop.type === 6 /* ATTRIBUTE */) {
+          if (prop.name === 'vbox' || prop.name === 'vbox-ignore') continue;
+          if (!isStyleKey(tag, prop.name)) continue;
+
+          pushAttrHint(
+            prop.name,
+            prop.loc.start.offset,
+            prop.name.length,
+          );
+
+          if (!prop.value) continue;
+
+          const { content, offset } = getAttrValueContentAndOffset(prop.value);
+          const value = String(content || '');
+          const candidates = getTokenCandidates(prop.name);
+
+          let match;
+          TOKEN_IN_VALUE_REGEX.lastIndex = 0;
+          while ((match = TOKEN_IN_VALUE_REGEX.exec(value)) != null) {
+            const token = match[1];
+            if (!token) continue;
+            pushValueHint(token, offset + match.index, token.length, candidates);
+          }
+
+          if (!/\s/.test(value) && !value.includes('{') && !value.includes('}')) {
+            pushValueHint(value, offset, value.length, candidates);
+          }
+          continue;
+        }
+
+        if (prop.type !== 7 /* DIRECTIVE */) continue;
+        if (prop.name !== 'bind') continue;
+        if (!prop.arg || prop.arg.type !== 4 || !prop.arg.isStatic) continue;
+
+        const boundKey = prop.arg.content;
+        if (!isStyleKey(tag, boundKey)) continue;
+
+        pushAttrHint(boundKey, prop.arg.loc.start.offset, boundKey.length);
+
+        if (!prop.exp || prop.exp.type !== 4) continue;
+        const exp = String(prop.exp.content || '');
+        const candidates = getTokenCandidates(boundKey);
+
+        let match;
+        TOKEN_IN_VALUE_REGEX.lastIndex = 0;
+        while ((match = TOKEN_IN_VALUE_REGEX.exec(exp)) != null) {
+          const token = match[1];
+          if (!token) continue;
+          pushValueHint(
+            token,
+            prop.exp.loc.start.offset + match.index,
+            token.length,
+            candidates,
+          );
+        }
+      }
+    }
+
+    const nextIgnored = ignored || hasIgnoreMarker;
+    for (const child of node.children || []) {
+      walk(child, nextIgnored);
+    }
+  };
+
+  for (const child of templateAst.children || []) {
+    walk(child, false);
+  }
+
+  return {
+    attrHints,
+    valueHints,
+  };
+};
+
 const buildHoverCode = (hints) => {
   const out = [];
 
@@ -550,12 +913,75 @@ const buildHoverCode = (hints) => {
   return out;
 };
 
+const buildCompletionCode = (
+  attrHints,
+  valueHints,
+  attrCompletionKeys,
+  maxCompletionItems = 200,
+) => {
+  const out = [];
+  const attrUnionKeys = Array.isArray(attrCompletionKeys)
+    ? attrCompletionKeys
+    : [];
+  const attrUnionType = attrUnionKeys.length > 0
+    ? attrUnionKeys.map((key) => `'${escapeTsString(key)}'`).join(' | ')
+    : 'string';
+
+  const limitedAttrHints = attrHints.slice(0, maxCompletionItems);
+  const limitedValueHints = valueHints.slice(0, maxCompletionItems);
+
+  limitedAttrHints.forEach((hint, index) => {
+    out.push(`const __vboxAttrCompletion${index}: ${attrUnionType} = '`);
+    out.push([
+      hint.value,
+      'template',
+      hint.offset,
+      COMPLETION_FEATURES,
+    ]);
+    out.push(`';\n`);
+  });
+
+  limitedValueHints.forEach((hint, index) => {
+    const candidates = hint.candidates
+      .slice(0, maxCompletionItems)
+      .concat(hint.value)
+      .filter(Boolean);
+    const deduped = Array.from(new Set(candidates));
+    const valueUnionType = deduped.length > 0
+      ? deduped.map((token) => `'${escapeTsString(token)}'`).join(' | ')
+      : 'string';
+
+    out.push(`const __vboxTokenCompletion${index}: ${valueUnionType} = '`);
+    out.push([
+      hint.value,
+      'template',
+      hint.offset,
+      COMPLETION_FEATURES,
+    ]);
+    out.push(`';\n`);
+  });
+
+  return out;
+};
+
 const createPlugin = (ctx) => {
   const userConfig = ctx?.config ?? {};
   const rootDir = resolveRootDir(ctx, userConfig);
+  const { ObjectStyleKeys } = loadCoreExports(rootDir);
   const vboxConfig = loadVBoxConfig(rootDir, userConfig) ?? {};
   const tokenMap = buildTokenResolutionMap(vboxConfig, rootDir);
   const isStyleKey = createStyleKeyMatcher(vboxConfig, userConfig);
+  const tokenPrefixByProperty = buildTokenPrefixByProperty(vboxConfig);
+  const attrCompletionKeys = buildAttrCompletionKeys(vboxConfig, ObjectStyleKeys);
+  const tokenCandidatesCache = new Map();
+  const getTokenCandidates = (key) =>
+    getTokenCandidatesForKey(
+      key,
+      tokenMap,
+      tokenPrefixByProperty,
+      tokenCandidatesCache,
+    );
+  const maxCompletionItems = 200;
 
   const resolveTokenValue = (token) => tokenMap.get(token) ?? null;
 
@@ -576,10 +1002,40 @@ const createPlugin = (ctx) => {
         isStyleKey,
         { parseAllComponents: userConfig.parseAllComponents === true },
       );
-      if (hints.length === 0) return;
+      const completionHints = collectCompletionHints(
+        sfc.template.ast,
+        isStyleKey,
+        getTokenCandidates,
+        { parseAllComponents: userConfig.parseAllComponents === true },
+      );
 
-      embeddedFile.content.push('\n/* VBox token hovers */\n');
-      embeddedFile.content.push(...buildHoverCode(hints));
+      if (
+        hints.length === 0 &&
+        completionHints.attrHints.length === 0 &&
+        completionHints.valueHints.length === 0
+      ) {
+        return;
+      }
+
+      if (hints.length > 0) {
+        embeddedFile.content.push('\n/* VBox token hovers */\n');
+        embeddedFile.content.push(...buildHoverCode(hints));
+      }
+
+      if (
+        completionHints.attrHints.length > 0 ||
+        completionHints.valueHints.length > 0
+      ) {
+        embeddedFile.content.push('\n/* VBox completions */\n');
+        embeddedFile.content.push(
+          ...buildCompletionCode(
+            completionHints.attrHints,
+            completionHints.valueHints,
+            attrCompletionKeys,
+            maxCompletionItems,
+          ),
+        );
+      }
     },
   };
 };
@@ -588,6 +1044,11 @@ createPlugin._test = {
   loadCoreExports,
   buildTokenResolutionMap,
   collectTokenHints,
+  collectCompletionHints,
+  buildCompletionCode,
+  buildTokenPrefixByProperty,
+  buildAttrCompletionKeys,
+  getTokenCandidatesForKey,
   createStyleKeyMatcher,
 };
 

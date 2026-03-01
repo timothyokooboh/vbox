@@ -61,6 +61,29 @@ export const DefaultBreakpoints: Breakpoints = {
   _2xl: '96rem', // ~1536px
 };
 
+/**
+ * Style props that require bound object expressions in template usage.
+ * Shared source-of-truth for compiler/tooling packages.
+ */
+export const ObjectStyleKeys = [
+  'mq',
+  'cq',
+  'dark',
+  'declarations',
+  'pseudos',
+  'hover',
+  'focus',
+  'focusVisible',
+  'focusWithin',
+  'active',
+  '_disabled',
+  'sm',
+  'md',
+  'lg',
+  'xl',
+  '_2xl',
+] as const;
+
 export const DefaultTheme: VBoxPluginOptions['theme'] = {
   color: {
     'red-50': 'oklch(0.971 0.013 17.38)',

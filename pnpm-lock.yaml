@@ -102,6 +102,9 @@ importers:
       '@veebox/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@veebox/property-variance-authority':
+        specifier: workspace:*
+        version: link:../../packages/property-variance-authority
       '@veebox/unplugin':
         specifier: workspace:*
         version: link:../../packages/unplugin
@@ -334,6 +337,15 @@ importers:
         specifier: ^4.0.14
         version: 4.0.18(@types/node@24.10.13)(jiti@2.6.1)(jsdom@27.4.0)(terser@5.46.0)(yaml@2.8.2)
 
+  packages/property-variance-authority:
+    devDependencies:
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^4.0.18
+        version: 4.0.18(@types/node@24.10.13)(jiti@2.6.1)(jsdom@27.4.0)(terser@5.46.0)(yaml@2.8.2)
+
   packages/unplugin:
     dependencies:
       '@veebox/core':
@@ -355,6 +367,9 @@ importers:
       jiti:
         specifier: ^2.6.1
         version: 2.6.1
+      known-css-properties:
+        specifier: ^0.37.0
+        version: 0.37.0
     devDependencies:
       '@vue/compiler-dom':
         specifier: ^3.5.24

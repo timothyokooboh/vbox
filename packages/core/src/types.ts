@@ -92,7 +92,9 @@ export type Selectors = Record<string, AugmentedCSSProperties>;
  * Example: `d="flex"` → `display: flex`.
  */
 export type AliasProps = {
-  [K in AliasKeyVariants<Extract<keyof AliasMap, string>>]?: AliasValue<K> | DesignTokens;
+  [K in AliasKeyVariants<Extract<keyof AliasMap, string>>]?:
+    | AliasValue<K>
+    | DesignTokens;
 };
 
 /**
@@ -193,6 +195,71 @@ export type VBoxProps = PseudoProps &
 export type VBoxStyleProps = Omit<VBoxProps, 'is'>;
 export type VBoxNativeStyleProps = Omit<VBoxProps, 'is' | 'asChild'>;
 
+type NativeStyleValue = string | number | DesignTokens;
+
+/**
+ * Performance-oriented native attribute typing for template IntelliSense.
+ * This intentionally covers common style props and aliases without materializing
+ * the full CSS property surface on every HTML/SVG element.
+ * @veebox/volar fills the gap by adding a “broad + smart” completion layer on top.
+ */
+export type VBoxNativeTemplateProps = CommonPseudoProps &
+  PseudoProps &
+  BreakpointProps &
+  AliasProps &
+  CSSCustomProperties & {
+    color?: NativeStyleValue;
+    background?: NativeStyleValue;
+    backgroundColor?: NativeStyleValue;
+    border?: NativeStyleValue;
+    borderColor?: NativeStyleValue;
+    borderRadius?: NativeStyleValue;
+    display?: NativeStyleValue;
+    position?: NativeStyleValue;
+    top?: NativeStyleValue;
+    right?: NativeStyleValue;
+    bottom?: NativeStyleValue;
+    left?: NativeStyleValue;
+    width?: NativeStyleValue;
+    height?: NativeStyleValue;
+    maxWidth?: NativeStyleValue;
+    minWidth?: NativeStyleValue;
+    maxHeight?: NativeStyleValue;
+    minHeight?: NativeStyleValue;
+    margin?: NativeStyleValue;
+    marginTop?: NativeStyleValue;
+    marginRight?: NativeStyleValue;
+    marginBottom?: NativeStyleValue;
+    marginLeft?: NativeStyleValue;
+    padding?: NativeStyleValue;
+    paddingTop?: NativeStyleValue;
+    paddingRight?: NativeStyleValue;
+    paddingBottom?: NativeStyleValue;
+    paddingLeft?: NativeStyleValue;
+    gap?: NativeStyleValue;
+    rowGap?: NativeStyleValue;
+    columnGap?: NativeStyleValue;
+    fontSize?: NativeStyleValue;
+    fontWeight?: NativeStyleValue;
+    fontFamily?: NativeStyleValue;
+    lineHeight?: NativeStyleValue;
+    letterSpacing?: NativeStyleValue;
+    zIndex?: NativeStyleValue;
+    transform?: NativeStyleValue;
+    opacity?: NativeStyleValue;
+    overflow?: NativeStyleValue;
+    textDecoration?: NativeStyleValue;
+    whiteSpace?: NativeStyleValue;
+    objectFit?: NativeStyleValue;
+    objectPosition?: NativeStyleValue;
+    boxShadow?: NativeStyleValue;
+    mq?: Record<`@media ${string}`, PropertiesAndSelectors>;
+    cq?: Record<`@container ${string}`, PropertiesAndSelectors>;
+    declarations?: PropertiesAndSelectors;
+    dark?: PropertiesAndSelectors;
+    [key: string]: unknown;
+  };
+
 export type AliasStrategy = 'merge' | 'replace';
 
 type KebabCase<S extends string> = S extends `${infer H}${infer T}`
@@ -213,9 +280,10 @@ type AliasProperty<K extends string> = K extends keyof AliasMap
     ? AliasMap[KebabToCamelCase<K>]
     : never;
 
-type AliasValue<K extends string> = AliasProperty<K> extends keyof CssProperties
-  ? CssProperties[AliasProperty<K>]
-  : never;
+type AliasValue<K extends string> =
+  AliasProperty<K> extends keyof CssProperties
+    ? CssProperties[AliasProperty<K>]
+    : never;
 export interface VBoxPluginOptions {
   classNamePrefix?: string;
   enableDefaultTheme?: boolean;

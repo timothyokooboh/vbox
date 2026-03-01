@@ -21,8 +21,8 @@ const posterSrc = computed(() => getPosterUrl(props.movie.poster_path));
   <article
     class="movie-card"
     pos="relative"
-    overflow="hidden"
     border-radius="br-card"
+    overflow="hidden"
     bg="var(--color-canvas-soft)"
     border="1px solid color-mix(in oklab, var(--color-ink) 10%, transparent)"
     shadow="bs-glow"

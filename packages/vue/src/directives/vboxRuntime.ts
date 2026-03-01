@@ -2,6 +2,7 @@ import {
   DefaultAliases,
   DefaultBreakpoints,
   createDjb2Hash,
+  type CssPriority,
   injectCSS,
   stableStringify,
 } from '@veebox/core';
@@ -61,6 +62,12 @@ const clearClass = (el: RuntimeElement, ownerKey: string) => {
   }
 };
 
+const resolvePriority = (
+  binding: DirectiveBinding<Record<string, unknown>>,
+): CssPriority => {
+  return binding.arg === 'override' ? 'override' : 'base';
+};
+
 const resolveAppContextValues = (
   binding: DirectiveBinding<Record<string, unknown>>,
 ) => {
@@ -114,6 +121,7 @@ const applyRuntimeStyles = (
   binding: DirectiveBinding<Record<string, unknown>>,
 ) => {
   const ownerKey = getOwnerKey(binding);
+  const priority = resolvePriority(binding);
   const styles = binding.value;
   if (!styles || typeof styles !== 'object') {
     clearClass(el, ownerKey);
@@ -122,7 +130,7 @@ const applyRuntimeStyles = (
 
   const { className, css } = computeClassAndCss(styles, binding);
   ensureClass(el, ownerKey, className);
-  injectCSS(css);
+  injectCSS(css, priority);
 };
 
 export const vboxRuntimeDirective: Directive<RuntimeElement, Record<string, unknown>> = {
@@ -144,7 +152,7 @@ export const vboxRuntimeDirective: Directive<RuntimeElement, Record<string, unkn
 
     if (ssrContext) {
       const collector = getSSRCollector(ssrContext);
-      collector.collect(css);
+      collector.collect(css, resolvePriority(binding));
     }
 
     return {

@@ -163,6 +163,57 @@ describe('vbox runtime directive', () => {
     expect(styleEl?.textContent).toContain('background:var(--color-brand)');
   });
 
+  test('keeps parent override lane after internal lane across updates', async () => {
+    const result = render(
+      {
+        props: {
+          tone: {
+            type: String,
+            required: true,
+          },
+        },
+        components: {
+          AppButton: {
+            props: {
+              tone: {
+                type: String,
+                required: true,
+              },
+            },
+            template: `<button v-vbox-runtime="{ bg: 'papayawhip', color: tone }">View Details</button>`,
+          },
+        },
+        template: `<AppButton :tone="tone" v-vbox-runtime:override="{ color: 'mediumspringgreen' }" />`,
+      },
+      {
+        props: {
+          tone: 'salmon',
+        },
+        global: {
+          plugins: [VBoxPlugin],
+        },
+      },
+    );
+
+    const el = screen.getByText('View Details');
+    const runtimeClasses = [...el.classList].filter((cls) => cls.startsWith('css-'));
+    expect(runtimeClasses.length).toBe(2);
+
+    const styleEl = document.getElementById('vbox-style-sheet') as HTMLStyleElement;
+    const cssBefore = styleEl.textContent || '';
+    expect(cssBefore.indexOf('color:mediumspringgreen')).toBeGreaterThan(
+      cssBefore.indexOf('background:papayawhip;color:salmon'),
+    );
+
+    await result.rerender({ tone: 'tomato' });
+
+    const cssAfter = (document.getElementById('vbox-style-sheet') as HTMLStyleElement)
+      .textContent || '';
+    expect(cssAfter.indexOf('color:mediumspringgreen')).toBeGreaterThan(
+      cssAfter.indexOf('background:papayawhip;color:tomato'),
+    );
+  });
+
   test('collects css during SSR', async () => {
     const originalWindow = globalThis.window;
     const originalDocument = globalThis.document;

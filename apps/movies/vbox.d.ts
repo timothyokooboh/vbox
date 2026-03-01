@@ -9,6 +9,11 @@ declare module "@veebox/core" {
 interface AliasMap {
     glass: "backdropFilter";
     mTop: "marginTop";
+    bfilter: "backdropFilter";
+    bImage: "backgroundImage";
+    textTra: "textTransform";
+    textDeco: "textDecoration";
+    backFil: "backdropFilter";
 }
 
   interface ColorTokensInterface {
@@ -1276,7 +1281,11 @@ interface AliasMap {
 /**
  * 3
  */
-  "modal": "3";
+  "modalOverlay": "3";
+/**
+ * 4
+ */
+  "modalContent": "4";
 }
 
 }

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { RouterLink } from 'vue-router';
+import { pva } from '@veebox/property-variance-authority';
 
 const props = withDefaults(
   defineProps<{
     as?: 'button' | 'a' | 'router-link';
     variant?: 'solid' | 'outline';
+    size?: 'sm' | 'md' | 'lg';
     to?: string | Record<string, unknown>;
     href?: string;
     target?: string;
@@ -16,6 +18,7 @@ const props = withDefaults(
   {
     as: 'button',
     variant: 'solid',
+    size: 'md',
     type: 'button',
     disabled: false,
     target: undefined,
@@ -25,7 +28,32 @@ const props = withDefaults(
   },
 );
 
-const isSolid = computed(() => props.variant === 'solid');
+const buttonVariants = pva({
+  variants: {
+    variant: {
+      solid: {
+        bg: 'cl-brand',
+        border: '1px solid color-mix(in oklab, var(--color-brand) 65%, black)',
+        color: 'white',
+      },
+      outline: {
+        bg: 'color-mix(in oklab, var(--color-canvas) 70%, transparent)',
+        border:
+          '1px solid color-mix(in oklab, var(--color-ink) 20%, transparent)',
+        color: 'cl-ink',
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'solid',
+  },
+});
+
+const resolvedStyles = computed(() =>
+  buttonVariants({
+    variant: props.variant,
+  }),
+);
 
 const resolvedTag = computed(() => {
   if (props.as === 'router-link') return RouterLink;
@@ -57,29 +85,17 @@ const elementProps = computed(() => {
 <template>
   <component
     :is="resolvedTag"
-    v-bind="elementProps"
+    v-bind="{ ...elementProps, ...resolvedStyles }"
+    py="sp-3"
+    px="sp-5"
     display="inline-flex"
     align-items="center"
     justify-content="center"
     gap="sp-2"
-    px="sp-4"
-    py="sp-3"
     border-radius="br-pill"
     text-decoration="none"
     fw="700"
     cursor="pointer"
-    @mouseover="count++"
-    :bg="
-      isSolid
-        ? 'cl-brand'
-        : 'color-mix(in oklab, var(--color-canvas) 70%, transparent)'
-    "
-    :border="
-      isSolid
-        ? '1px solid color-mix(in oklab, var(--color-brand) 65%, black)'
-        : '1px solid color-mix(in oklab, var(--color-ink) 20%, transparent)'
-    "
-    :color="isSolid ? 'white' : 'cl-ink'"
     transition="background-color 180ms ease, border-color 180ms ease, color 180ms ease"
     :focus-visible="{
       outline: '3px solid var(--color-ring)',

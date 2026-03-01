@@ -138,7 +138,7 @@ describe('native vbox template transform', () => {
     const out = transformVueSfc(source, '/tmp/example.vue');
 
     expect(out?.code).toContain(
-      `<router-link to="/" v-vbox-runtime="{ 'color': 'red' }">go</router-link>`,
+      `<router-link to="/" v-vbox-runtime:override="{ 'color': 'red' }">go</router-link>`,
     );
   });
 
@@ -147,7 +147,7 @@ describe('native vbox template transform', () => {
     const out = transformVueSfc(source, '/tmp/example.vue');
 
     expect(out?.code).toContain(
-      `<nuxt-link to="/" v-vbox-runtime="{ 'color': 'red' }">go</nuxt-link>`,
+      `<nuxt-link to="/" v-vbox-runtime:override="{ 'color': 'red' }">go</nuxt-link>`,
     );
   });
 
@@ -157,7 +157,7 @@ describe('native vbox template transform', () => {
       parseAllComponents: true,
     });
 
-    expect(out?.code).toContain(`<MyCard v-vbox-runtime="{ 'color': 'red' }" />`);
+    expect(out?.code).toContain(`<MyCard v-vbox-runtime:override="{ 'color': 'red' }" />`);
   });
 
   test('supports self-closing tags in scoped mode', () => {
@@ -310,7 +310,7 @@ describe('native vbox template transform', () => {
     const source = `<template><BaseButton vbox color="blue" fs="1.2rem">Sign in</BaseButton></template>`;
     const out = transformVueSfc(source, '/tmp/example.vue');
     expect(out?.code).toContain(
-      `<BaseButton v-vbox-runtime="{ 'color': 'blue', 'fs': '1.2rem' }">Sign in</BaseButton>`,
+      `<BaseButton v-vbox-runtime:override="{ 'color': 'blue', 'fs': '1.2rem' }">Sign in</BaseButton>`,
     );
   });
 

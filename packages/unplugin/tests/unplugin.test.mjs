@@ -17,7 +17,7 @@ test('transformVueSfc transforms marked custom components', () => {
   const out = transformVueSfc(source, '/tmp/example.vue');
 
   assert.equal(typeof out?.code, 'string');
-  assert.match(out.code, /<BaseButton v-vbox-runtime="\{ 'color': 'blue' \}">Sign in<\/BaseButton>/);
+  assert.match(out.code, /<BaseButton v-vbox-runtime:override="\{ 'color': 'blue' \}">Sign in<\/BaseButton>/);
 });
 
 test('transformVueSfc auto-transforms framework links without marker', () => {
@@ -25,7 +25,7 @@ test('transformVueSfc auto-transforms framework links without marker', () => {
   const out = transformVueSfc(source, '/tmp/example.vue');
 
   assert.equal(typeof out?.code, 'string');
-  assert.match(out.code, /<router-link to="\/" v-vbox-runtime="\{ 'color': 'blue' \}">Home<\/router-link>/);
+  assert.match(out.code, /<router-link to="\/" v-vbox-runtime:override="\{ 'color': 'blue' \}">Home<\/router-link>/);
 });
 
 test('transformVueSfc keeps unmarked custom components untouched', () => {
@@ -42,7 +42,7 @@ test('transformVueSfc can parse all custom components when parseAllComponents is
   });
 
   assert.equal(typeof out?.code, 'string');
-  assert.match(out.code, /<BaseButton v-vbox-runtime="\{ 'color': 'blue' \}">Sign in<\/BaseButton>/);
+  assert.match(out.code, /<BaseButton v-vbox-runtime:override="\{ 'color': 'blue' \}">Sign in<\/BaseButton>/);
 });
 
 test('transformVueSfc preserves semantic attributes on media tags', () => {

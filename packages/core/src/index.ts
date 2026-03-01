@@ -18,11 +18,17 @@ export { keyframes } from './helpers/keyframes';
 export { __DEV__ } from './helpers/isDevelopment';
 export { toKebabCase } from './helpers/toKebabCase';
 export { kebabToCamelCase } from './helpers/kebabToCamelCase';
-export { DefaultAliases, DefaultBreakpoints, DefaultTheme } from './constants';
+export {
+  DefaultAliases,
+  DefaultBreakpoints,
+  DefaultTheme,
+  ObjectStyleKeys,
+} from './constants';
 export type {
   VBoxProps,
   VBoxStyleProps,
   VBoxNativeStyleProps,
+  VBoxNativeTemplateProps,
   VBoxPluginOptions,
   AliasStrategy,
   Breakpoints,
@@ -46,6 +52,7 @@ export type {
   CssProperties,
 } from './types';
 export type { StyleCollector } from './helpers/styleRegistry';
+export type { CssPriority } from './helpers/styleRegistry';
 
 export function defineConfig(config: VBoxPluginOptions) {
   return config;

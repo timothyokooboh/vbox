@@ -17,7 +17,7 @@ const movie = computed(() => detailsQuery.data.value ?? null);
 </script>
 
 <template>
-  <main p="sp-4" :sm="{ p: 'sp-6' }" role="main">
+  <main p="sp-4" :sm="{ p: 'sp-6' }">
     <router-link
       to="/"
       color="cl-accent"
@@ -77,7 +77,7 @@ const movie = computed(() => detailsQuery.data.value ?? null);
         <p m="0" color="cl-ink">Status: {{ movie.status }}</p>
 
         <div display="flex" flex-wrap="wrap" gap="sp-2" mt="sp-2">
-          <span
+          <p
             v-for="genre in movie.genres"
             :key="genre.id"
             px="sp-3"
@@ -85,9 +85,14 @@ const movie = computed(() => detailsQuery.data.value ?? null);
             border-radius="br-pill"
             bg="color-mix(in oklab, var(--color-brand) 22%, transparent)"
             color="cl-ink"
+            flex-grow="0"
+            display="flex"
+            justify-content="center"
+            align-items="center"
+            height="40px"
           >
             {{ genre.name }}
-          </span>
+          </p>
         </div>
 
         <img
