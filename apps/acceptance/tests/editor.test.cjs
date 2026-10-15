@@ -330,3 +330,24 @@ const sources: VBoxStyleInput = [styles, false, null, { mq: { '@media (min-width
   );
   assert.ok(editor.diagnostics().length > 0);
 });
+
+test('advanced selector lists and pseudo-elements typecheck and retain token previews', (t) => {
+  const source = `<script setup lang="ts">import '@veebox/vue'; import type { VBoxStyles } from '@veebox/core';
+const styles: VBoxStyles = { pseudos: { ':hover, :focus': { color: 'red' }, '::before': { content: 'attr(data-label)' } }, declarations: { '&:is(.active, .ready), .child': { color: 'blue' } } };
+</script><template><button :vb="styles" :vb-pseudos="{ '::after': { color: 'cl-brand' } }">Selectors</button></template>`;
+  const editor = createEditor(source);
+  t.after(() => editor.dispose());
+  assert.deepEqual(editor.diagnostics(), []);
+  assert.match(
+    ts.displayPartsToString(editor.hover('cl-brand')?.documentation),
+    /#123456/,
+  );
+});
+
+test('quoted CSS content values cannot corrupt editor-generated TypeScript', (t) => {
+  const editor = createEditor(
+    `<template><span vb---label="'Custom'" :vb-pseudos="{ '::before': { content: 'var(--label)' } }">Content</span></template>`,
+  );
+  t.after(() => editor.dispose());
+  assert.deepEqual(editor.diagnostics(), []);
+});

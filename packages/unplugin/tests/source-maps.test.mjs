@@ -72,3 +72,18 @@ test('decoded static strings cannot impersonate internal expression placeholders
   const out = transformVueSfc(source, '/project/StaticContent.vue');
   assert.ok(out.code.includes('&quot;__vboxStylesExpression0__&quot;'));
 });
+
+test('selector functions, pseudo-elements and encoded parent references retain expression locations', () => {
+  const source = `<template>\n<p\n :vb-declarations="{ '&amp;:is(.active, .ready), [data-x=&quot;a,b&quot;]': { color: selectorValue } }"\n :vb-pseudos="{ '::before': { content: contentValue } }"/>\n</template>`;
+  const out = transformVueSfc(source, '/project/Selectors.vue');
+  const map = new TraceMap(out.map);
+  for (const token of ['selectorValue', 'contentValue']) {
+    const actual = originalPositionFor(
+      map,
+      position(out.code, out.code.indexOf(token)),
+    );
+    const expected = position(source, source.indexOf(token));
+    assert.equal(actual.line, expected.line);
+    assert.equal(actual.column, expected.column);
+  }
+});
