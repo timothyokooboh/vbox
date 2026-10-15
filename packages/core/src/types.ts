@@ -201,7 +201,11 @@ type NullableStyleValues<T> = T extends object
 /** Style-only object boundary; template prefixes never belong in these keys. */
 export type VBoxStyles = NullableStyleValues<VBoxStyleProps> &
   Record<string, unknown>;
-export type VBoxStyleInput = VBoxStyles | null | undefined;
+export type VBoxStyleInput =
+  | VBoxStyles
+  | readonly (VBoxStyles | null | undefined | false)[]
+  | null
+  | undefined;
 
 export type VBoxNativeTemplateProps = CommonPseudoProps &
   PseudoProps &

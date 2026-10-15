@@ -71,3 +71,7 @@ export {
 } from './helpers/resolveConfig';
 
 export { readStyleObject } from './helpers/readStyleObject';
+
+export { composeStyleSources } from './styles/sources';
+export { renderStyleDeclarations } from './styles/render';
+export type { StyleContext, StyleDeclaration } from './styles/types';

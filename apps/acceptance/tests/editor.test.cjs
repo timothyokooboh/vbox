@@ -255,3 +255,13 @@ const styles: VBoxStyles = { hover: { color: null }, _disabled: { opacity: null 
   t.after(() => editor.dispose());
   assert.deepEqual(editor.diagnostics(), []);
 });
+
+test('readonly ordered style sources accept conditional omissions without widening native attrs', (t) => {
+  const editor = createEditor(`<script setup lang="ts">
+import '@veebox/vue'; import type { VBoxStyleProps, VBoxStyleInput } from '@veebox/core';
+const base: VBoxStyleProps = { translate: '8px' };
+const styles: VBoxStyleInput = [base, false, null, undefined, { hover: { color: null } }] as const;
+</script><template><button translate="no" :vb="styles">Save</button></template>`);
+  t.after(() => editor.dispose());
+  assert.deepEqual(editor.diagnostics(), []);
+});

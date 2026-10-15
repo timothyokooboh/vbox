@@ -15,7 +15,7 @@ const optional: VBoxStyles = { color: null, opacity: 'initial' };
 `translate="no"` remains HTML. The CSS translate inside the object belongs only
 to styling. `VBoxStyleProps` remains supported; `VBoxStyles` is the open,
 style-only object boundary and permits null declarations. `VBoxStyleInput`
-currently attaches one object, null or undefined. No full CSS-property set is
+attaches one object, an ordered readonly source array, null or undefined. No full CSS-property set is
 added to the native attribute interface; only the grouped `vb` value is typed.
 
 Use `:vb="buttonVariants(selection)"` for a plain object returned by PVA.
@@ -33,7 +33,7 @@ immutable input objects and SSR/hydration are exercised in the real fixture.
 Scalar/group shape errors and circular objects produce source-oriented runtime
 diagnostics instead of object-to-string CSS. Literal `vb="..."` is rejected by
 the compiler; use an expression binding. Source arrays and full multi-source
-composition are deliberately the next slice, not completed by this ticket.
+composition are described in `SOURCE-COMPOSITION.md`.
 
 ```sh
 pnpm --filter @vbox/acceptance test

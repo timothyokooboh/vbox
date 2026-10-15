@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import SourceComposition from './SourceComposition.vue';
 import GroupedObject from './GroupedObject.vue';
 import Vocabulary from './Vocabulary.vue';
 import NormalSetup from './NormalSetup.vue';
@@ -24,6 +25,7 @@ const badge = pva({
     <NativeScalar />
     <Vocabulary />
     <GroupedObject />
+    <SourceComposition />
     <NormalSetup />
     <LocalDirective />
     <VBox is="button" type="button" :hover="{ color: 'green' }"
