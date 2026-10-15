@@ -148,3 +148,16 @@ test('a declaration pseudo without an ampersand targets descendants, not the roo
   await expect(root).toHaveCSS('color', 'rgb(0, 0, 0)');
   await expect(child).toHaveCSS('color', 'rgb(255, 0, 0)');
 });
+
+test('escaped delimiter identifiers match only their scoped descendants', async ({
+  page,
+}) => {
+  await page.goto('/?ssr');
+  for (const id of ['selector-escaped-brace', 'selector-escaped-id'])
+    await expect(page.getByTestId(id)).toHaveCSS('color', 'rgb(128, 0, 128)');
+  await expect(page.getByTestId('selector-outside-brace')).toHaveCSS(
+    'color',
+    'rgb(0, 0, 0)',
+  );
+  await expect(page.locator('body')).toHaveCSS('color', 'rgb(0, 0, 0)');
+});

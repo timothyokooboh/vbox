@@ -81,3 +81,48 @@ test('simple root pseudo equivalents normalize but an unanchored declaration pse
   assert.notEqual(shorthand.html, descendant.html);
   assert.match(descendant.css, / :hover/);
 });
+
+test('class, id and namespace delimiters cannot escape the generated scope', async () => {
+  for (const selector of [
+    '.item} body',
+    '#item} body',
+    '.item}body',
+    '#item}body',
+    '.safe, .bad}body',
+    '.bad{body',
+    '#bad{body',
+    '.bad;body',
+    '#bad;body',
+    '.bad@media',
+    'bad}ns|*',
+  ])
+    await assert.rejects(
+      renderStyles({ declarations: { [selector]: { color: 'red' } } }),
+      /\[VBox\].*selector/i,
+      selector,
+    );
+});
+
+test('legitimately escaped class and id delimiters remain valid relative selectors', async () => {
+  for (const selector of [
+    '.brace\\}name',
+    '#brace\\}id',
+    '.brace\\7d name',
+    '#semi\\;id',
+  ]) {
+    const { css } = await renderStyles({
+      declarations: { [selector]: { color: 'red' } },
+    });
+    assert.ok(css.includes(selector));
+    assert.match(css, /^\.css-[\w-]+ /);
+  }
+});
+
+test('quoted attribute punctuation and comments are not declaration delimiters', async () => {
+  const { css } = await renderStyles({
+    declarations: { '[data-x=";{}@"], .child /* } ; @ */': { color: 'red' } },
+  });
+  assert.ok(css.includes('[data-x=";{}@"]'));
+  assert.ok(css.includes('.child'));
+  assert.doesNotMatch(css, /(?:^|})\s*body\s*\{/);
+});

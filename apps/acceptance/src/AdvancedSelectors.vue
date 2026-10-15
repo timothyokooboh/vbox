@@ -116,6 +116,19 @@ const changed = ref(false);
       Parent text
       <span data-testid="selector-descendant-state-child">Child target</span>
     </div>
+    <div
+      :vb-declarations="{ '.brace\\}name, #brace\\}id': { color: 'purple' } }"
+    >
+      <span class="brace}name" data-testid="selector-escaped-brace"
+        >Escaped brace class</span
+      >
+      <span id="brace}id" data-testid="selector-escaped-id"
+        >Escaped brace ID</span
+      >
+    </div>
+    <span class="brace}name" data-testid="selector-outside-brace"
+      >Outside escaped class</span
+    >
     <span class="selector-a" data-testid="selector-outside-a">A outside</span>
     <span class="selector-b" data-testid="selector-outside-b">B outside</span>
     <span data-comma="a,b" data-testid="selector-outside-comma"
