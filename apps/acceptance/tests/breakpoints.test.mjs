@@ -90,3 +90,33 @@ test('plain exported config modules receive the same threshold diagnostics with 
     fs.rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('invalid bigint and circular thresholds retain the actionable breakpoint diagnostic', () => {
+  const circular = {};
+  circular.self = circular;
+  for (const value of [
+    1n,
+    circular,
+    {
+      toJSON() {
+        throw new Error('Do not serialize me');
+      },
+    },
+  ]) {
+    for (const configure of [defineConfig, resolveVBoxConfig])
+      assert.throws(
+        () => configure({ breakpoints: { md: value } }),
+        /\[VBox\].*breakpoints\.md.*length/i,
+      );
+  }
+});
+
+test('known resolution dimensions including x cannot be used as length thresholds', () => {
+  for (const value of ['1x', '2X', '1dppx', '96dpi', '1dpcm']) {
+    for (const configure of [defineConfig, resolveVBoxConfig])
+      assert.throws(
+        () => configure({ breakpoints: { md: value } }),
+        /breakpoints\.md.*length/i,
+      );
+  }
+});

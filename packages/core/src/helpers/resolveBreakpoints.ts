@@ -16,6 +16,7 @@ const nonLengthUnits = new Set([
   'dpi',
   'dpcm',
   'dppx',
+  'x',
   'fr',
 ]);
 
@@ -62,7 +63,7 @@ export const resolveBreakpoints = (
     if (value === undefined) continue;
     if (!isThreshold(value))
       throw new TypeError(
-        `[VBox] breakpoints.${key} requires a CSS length threshold (for example "48rem" or "calc(40rem + 1px)"). Received ${JSON.stringify(value)}.`,
+        `[VBox] breakpoints.${key} requires a CSS length threshold (for example "48rem" or "calc(40rem + 1px)"). Received ${typeof value === 'string' ? JSON.stringify(value) : value === null ? 'null' : typeof value}.`,
       );
     resolved[key as keyof Breakpoints] = value;
   }
