@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import ComponentOverrides from './ComponentOverrides.vue';
 import AdvancedSelectors from './AdvancedSelectors.vue';
 import QueryStyles from './QueryStyles.vue';
 import ThemeResponsive from './ThemeResponsive.vue';
@@ -34,6 +35,7 @@ const badge = pva({
     <ThemeResponsive />
     <QueryStyles />
     <AdvancedSelectors />
+    <ComponentOverrides />
     <NormalSetup />
     <LocalDirective />
     <VBox is="button" type="button" :hover="{ color: 'green' }"

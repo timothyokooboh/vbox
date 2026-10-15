@@ -75,5 +75,11 @@ export {
 export { readStyleObject } from './helpers/readStyleObject';
 
 export { composeStyleSources } from './styles/sources';
-export { renderStyleDeclarations } from './styles/render';
-export type { StyleContext, StyleDeclaration } from './styles/types';
+export { renderStyleDeclarations, renderStyleRules } from './styles/render';
+export { injectStyleBundle } from './helpers/injectCSS';
+export type {
+  StyleContext,
+  StyleDeclaration,
+  StyleRule,
+  StyleBundle,
+} from './styles/types';

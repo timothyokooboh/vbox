@@ -1,3 +1,5 @@
+import { serializeStyleBundles } from '../styles/bundles';
+import type { StyleBundle } from '../styles/types';
 import {
   CSS_REGISTRY_KEY,
   CSS_REGISTRY_LISTENERS_KEY,
@@ -10,11 +12,13 @@ export type CssPriority = 'base' | 'override';
 type CssRegistry = {
   base: Set<string>;
   override: Set<string>;
+  styles?: Map<string, StyleBundle>;
 };
 
 const createRegistry = (): CssRegistry => ({
   base: new Set<string>(),
   override: new Set<string>(),
+  styles: new Map(),
 });
 
 const typedGlobal = globalThis as typeof globalThis & {
@@ -39,11 +43,13 @@ const resolveCssRegistry = (): CssRegistry => {
     const migrated: CssRegistry = {
       base: existing,
       override: new Set<string>(),
+      styles: new Map(),
     };
     typedGlobal[CSS_REGISTRY_KEY] = migrated;
     return migrated;
   }
 
+  existing.styles ??= new Map();
   return existing;
 };
 
@@ -71,14 +77,26 @@ export const getCss = (registry: CssRegistry = cssRegistry) => {
   const baseCss = Array.from(registry.base).join('\n\n');
   const overrideCss = Array.from(registry.override).join('\n\n');
 
-  if (baseCss && overrideCss) {
-    return `${baseCss}\n\n${overrideCss}`;
-  }
+  const explicitCss = serializeStyleBundles(registry.styles?.values() ?? []);
+  return [baseCss, overrideCss, explicitCss].filter(Boolean).join('\n\n');
+};
 
-  return baseCss || overrideCss;
+export const registerStyleBundle = (
+  bundle: StyleBundle,
+  registry: CssRegistry = cssRegistry,
+  cache: Map<string, string> = vendorPrefixes,
+) => {
+  (registry.styles ??= new Map()).set(bundle.key, {
+    ...bundle,
+    rules: bundle.rules.map((rule) => ({
+      context: rule.context.map((step) => ({ ...step })),
+      css: createVendorPrefix(rule.css, cache),
+    })),
+  });
 };
 
 export type StyleCollector = {
+  collectStyleBundle: (bundle: StyleBundle) => void;
   collect: (css: string, priority?: CssPriority) => void;
   getCss: () => string;
   reset: () => void;
@@ -89,6 +107,9 @@ export const createStyleCollector = (): StyleCollector => {
   const prefixCache = new Map<string, string>();
 
   return {
+    collectStyleBundle(bundle) {
+      registerStyleBundle(bundle, registry, prefixCache);
+    },
     collect(css: string, priority: CssPriority = 'base') {
       const prefixed = createVendorPrefix(css, prefixCache);
       registerCss(prefixed, registry, priority);
@@ -99,6 +120,7 @@ export const createStyleCollector = (): StyleCollector => {
     reset() {
       registry.base.clear();
       registry.override.clear();
+      registry.styles?.clear();
       prefixCache.clear();
     },
   };
