@@ -211,7 +211,7 @@ export type VBoxStyles = {
 } & {
   mq?: Partial<Record<`@media ${string}`, VBoxStyleGroup | null>> | null;
   cq?: Partial<Record<`@container ${string}`, VBoxStyleGroup | null>> | null;
-  pseudos?: { [Key in Pseudos]?: VBoxStyleGroup | null } | null;
+  pseudos?: { [Key in Pseudos | `:${string}`]?: VBoxStyleGroup | null } | null;
 } & Record<string, unknown>;
 export type VBoxStyleInput =
   | VBoxStyles
