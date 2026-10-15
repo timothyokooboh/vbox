@@ -5,7 +5,8 @@ Structured priority compares, low to high:
 1. Interaction-state flags (as documented in `INTERACTION-STYLES.md`).
 2. Theme qualification: dark-specific over generic in the same interaction set.
 3. Named breakpoint flags: sm, md, lg, xl, 2xl.
-4. Source order for matching contexts; individual bindings follow grouped sources.
+4. Arbitrary query priority as documented in `QUERY-STYLES.md`.
+5. Source order for matching contexts; individual bindings follow grouped sources.
 
 An additional lower-ranked flag refines an otherwise matching set. This preserves
 explicit combinations without making the raw number of conditions the priority.
@@ -53,6 +54,7 @@ tied/mixed/reversed thresholds and repeated registration without shared cache
 meaning. Public SSR tests separately verify request/config identity and unchanged
 units. Real editor-service tests check recursive theme/breakpoint objects.
 
-Arbitrary query overlap and parent style-owner priority remain follow-up slices.
+Arbitrary query overlap is documented in `QUERY-STYLES.md`. Parent style-owner
+priority remains a follow-up slice.
 External CSS, inline styles, important values and arbitrary-selector specificity
 still follow the browser cascade.

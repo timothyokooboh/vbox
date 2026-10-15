@@ -1,4 +1,5 @@
 import { canonicalState, normalizeStyleContext } from './contexts.js';
+import { normalizeQuery } from './queries.js';
 import { DefaultBreakpoints, InteractionStyleKeys } from '../constants.js';
 import type { AliasMap } from '../types.js';
 import { readStyleObject } from '../helpers/readStyleObject.js';
@@ -38,9 +39,9 @@ export const composeStyleSources = (
               InteractionStyleKeys.find((key) => key === simplePseudo);
             const step: StyleContext[number] =
               condition === 'mq'
-                ? { kind: 'media', value: query }
+                ? { kind: 'media', value: normalizeQuery('mq', query) }
                 : condition === 'cq'
-                  ? { kind: 'container', value: query }
+                  ? { kind: 'container', value: normalizeQuery('cq', query) }
                   : state
                     ? {
                         kind: 'state',

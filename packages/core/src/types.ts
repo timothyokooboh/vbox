@@ -199,7 +199,9 @@ type RecursiveConditionKey =
   | 'disabled'
   | '2xl';
 
-type VBoxStyleGroup = VBoxStyles | Record<string, VBoxStyles | null>;
+type VBoxStyleGroup =
+  | VBoxStyles
+  | Record<string, VBoxStyles | null | undefined>;
 
 /** Style-only object boundary; template prefixes never belong in these keys. */
 export type VBoxStyles = {
@@ -207,8 +209,8 @@ export type VBoxStyles = {
 } & {
   [Key in AliasKeyVariants<RecursiveConditionKey>]?: VBoxStyleGroup | null;
 } & {
-  mq?: Record<`@media ${string}`, VBoxStyleGroup | null> | null;
-  cq?: Record<`@container ${string}`, VBoxStyleGroup | null> | null;
+  mq?: Partial<Record<`@media ${string}`, VBoxStyleGroup | null>> | null;
+  cq?: Partial<Record<`@container ${string}`, VBoxStyleGroup | null>> | null;
   pseudos?: { [Key in Pseudos]?: VBoxStyleGroup | null } | null;
 } & Record<string, unknown>;
 export type VBoxStyleInput =
