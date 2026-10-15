@@ -1,3 +1,4 @@
+import { transformExplicitStyles } from './explicit.js';
 import * as knownCssPropertiesModule from 'known-css-properties';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -528,11 +529,17 @@ export const transformVueSfc = (
   id: string,
   options: VBoxNativePluginOptions = {},
 ): VBoxSfcTransformResult => {
+  if (id.includes('?')) return null;
   const normalizedId = normalizeIdPath(id);
 
   // only run on project .vue files
   if (!normalizedId.endsWith('.vue')) return null;
   if (/[\\/]+node_modules[\\/]+/.test(normalizedId)) return null;
+
+  // Internal expansion seam. Explicit files never enter the unpublished inference path.
+  // The integration cutover removes that fallback after consumers are migrated.
+  const explicit = transformExplicitStyles(code, normalizedId);
+  if (explicit) return explicit;
 
   // extract template and its content
   const match = code.match(TemplateRegex);

@@ -21,3 +21,8 @@ declare module 'vue' {
     'vbox-ignore'?: boolean | '';
   }
 }
+
+export {
+  useVBoxStyleBinding,
+  withVBoxStyleBinding,
+} from './composables/useVBoxStyleBinding';

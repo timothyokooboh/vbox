@@ -503,12 +503,18 @@ importers:
       '@veebox/core':
         specifier: workspace:*
         version: link:../core
+      '@vue/compiler-sfc':
+        specifier: ^3.5.24
+        version: 3.5.29
       jiti:
         specifier: ^2.6.1
         version: 2.6.1
       known-css-properties:
         specifier: ^0.37.0
         version: 0.37.0
+      magic-string:
+        specifier: ^0.30.21
+        version: 0.30.21
     devDependencies:
       '@types/node':
         specifier: ^24.10.1

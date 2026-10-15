@@ -42,7 +42,8 @@ export interface VBoxNativePluginOptions {
 
 export interface VBoxSfcTransformPayload {
   code: string;
-  map: null;
+  warnings?: Array<{ message: string; loc: { line: number; column: number; offset: number } }>;
+  map: import('magic-string').SourceMap | null;
 }
 
 export type VBoxSfcTransformResult = VBoxSfcTransformPayload | null;
