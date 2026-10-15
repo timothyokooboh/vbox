@@ -114,3 +114,33 @@ test('later base sources do not erase separate conditional contexts', async ({
     'rgb(0, 0, 255)',
   );
 });
+
+test('intervening arbitrary selector contexts preserve authored CSS source order', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await expect(page.getByTestId('sources-selectors')).toHaveCSS(
+    'color',
+    'rgb(0, 128, 0)',
+  );
+});
+
+test('direct state bindings override equivalent grouped pseudo entries', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await expect(page.getByTestId('sources-equivalent-pseudo')).toHaveCSS(
+    'color',
+    'rgb(0, 128, 0)',
+  );
+});
+
+test('content reset keywords remain CSS instead of visible literal text', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await expect(page.getByTestId('sources-content-reset')).toHaveCSS(
+    'content',
+    'normal',
+  );
+});

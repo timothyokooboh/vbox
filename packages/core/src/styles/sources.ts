@@ -1,3 +1,4 @@
+import { InteractionStyleKeys } from '../constants.js';
 import type { AliasMap } from '../types.js';
 import { readStyleObject } from '../helpers/readStyleObject.js';
 import { getConditionKey } from '../helpers/resolveConfig.js';
@@ -28,12 +29,23 @@ export const composeStyleSources = (
           condition === 'pseudos'
         ) {
           for (const [query, child] of Object.entries(group)) {
+            const simplePseudo = /^:[a-z-]+$/.test(query)
+              ? getConditionKey(query.slice(1))
+              : undefined;
+            const state =
+              simplePseudo &&
+              InteractionStyleKeys.find((key) => key === simplePseudo);
             const step: StyleContext[number] =
               condition === 'mq'
                 ? { kind: 'media', value: query }
                 : condition === 'cq'
                   ? { kind: 'container', value: query }
-                  : { kind: 'selector', value: `&${query}` };
+                  : state
+                    ? {
+                        kind: 'state',
+                        value: toKebabCase(state).replace(/^_/, ''),
+                      }
+                    : { kind: 'selector', value: `&${query}` };
             collect(child as Record<string, unknown>, [...context, step]);
           }
         } else {
@@ -56,7 +68,11 @@ export const composeStyleSources = (
       } else {
         const property = toKebabCase(normalizeKey(key, aliases));
         let text = String(value);
-        if (property === 'content' && !/^['"]/.test(text))
+        if (
+          property === 'content' &&
+          !/^['"]/.test(text) &&
+          !/^(initial|inherit|unset|revert(?:-layer)?|normal|none)$/.test(text)
+        )
           text = JSON.stringify(text);
         declarations.push({ property, value: parseTokens(text), context });
       }
