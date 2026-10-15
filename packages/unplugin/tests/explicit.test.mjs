@@ -167,3 +167,14 @@ test('reserved grouped bindings never enter inference while composition is unava
     );
   }
 });
+
+test('valid numeric and Unicode custom-property names retain their spelling', () => {
+  const out = transform('<p vb---2="4px" vb---\u03a3="8px" />');
+  assertVueCompiles(out.code);
+  const props = parse(out.code).descriptor.template.ast.children[0].props;
+  const expression = props.find(
+    (prop) => prop.type === 7 && prop.name === 'bind',
+  ).exp.content;
+  assert.ok(expression.includes('"--2"'));
+  assert.ok(expression.includes('"--\u03a3"'));
+});

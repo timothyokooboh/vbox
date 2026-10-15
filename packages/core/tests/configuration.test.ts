@@ -50,3 +50,16 @@ test('configuration rejects aliases that replace condition groups in any spellin
     ).toThrow(/reserved.*condition/i);
   }
 });
+
+test('unknown CSS keys do not accidentally resolve inherited Object properties as aliases', () => {
+  const result = parseStyleObject({
+    obj: { constructor: 'initial', toString: 'initial' },
+    aliases: {} as AliasMap,
+    className: 'future',
+    breakpoints: DefaultBreakpoints,
+  });
+  expect(result.rootStyles).toEqual({
+    constructor: 'initial',
+    'to-string': 'initial',
+  });
+});

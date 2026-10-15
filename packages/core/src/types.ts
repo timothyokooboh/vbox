@@ -233,13 +233,7 @@ export interface VBoxPluginOptions {
   classNamePrefix?: string;
   enableDefaultTheme?: boolean;
   cssResets?: boolean;
-  breakpoints?: {
-    sm: string;
-    md: string;
-    lg: string;
-    xl: string;
-    _2xl: string;
-  };
+  breakpoints?: Partial<Breakpoints>;
   aliases?: {
     strategy?: AliasStrategy;
     values: Record<string, keyof CSSStyleDeclaration>;

@@ -12,11 +12,11 @@ import { __DEV__ } from './isDevelopment';
 export const normalizeKey = (key: string, aliases: AliasMap): string => {
   if (key.startsWith('--')) return key;
   const camelCaseKey = kebabToCamelCase(key);
-  return (
-    aliases[key as keyof AliasMap] ??
-    aliases[camelCaseKey as keyof AliasMap] ??
-    camelCaseKey
-  );
+  for (const name of [key, camelCaseKey]) {
+    if (Object.hasOwn(aliases, name))
+      return aliases[name as keyof AliasMap] ?? camelCaseKey;
+  }
+  return camelCaseKey;
 };
 
 // Convert a style map into validated kebab-case CSS rules and nested selectors

@@ -65,6 +65,10 @@ function createEditor(source, root = path.resolve(__dirname, '..')) {
   const { proxy, initialize } = createProxyLanguageService(service);
   initialize(language);
   return {
+    completeAt: (offset) =>
+      proxy
+        .getCompletionsAtPosition(file, offset, {})
+        ?.entries.map((entry) => entry.name.replace(/^["']|["']$/g, '')) ?? [],
     hover: (token) =>
       proxy.getQuickInfoAtPosition(file, source.indexOf(token) + 1),
     diagnostics: () => proxy.getSemanticDiagnostics(file),
@@ -195,4 +199,22 @@ test('editor vocabulary is config-specific and refreshes on the next document ed
     ts.displayPartsToString(local.hover('cl-brand')?.documentation),
     /#445566/,
   );
+});
+
+test('explicit style completions use prefixed aliases and property-specific token values', (t) => {
+  const source = '<template><p vb-font-size="">Hello</p></template>';
+  const editor = createEditor(source);
+  t.after(() => editor.dispose());
+  const values = editor.completeAt(source.indexOf('""') + 1);
+  assert.ok(values.includes('fs-xl'));
+  assert.ok(
+    !values.some((name) => name.startsWith('cl-') || name.startsWith('sp-')),
+  );
+  const attributes = '<template><p vb-bran>Hello</p></template>';
+  editor.update(attributes);
+  const keys = editor.completeAt(
+    attributes.indexOf('vb-bran') + 'vb-bran'.length,
+  );
+  assert.ok(keys.includes('vb-brand-color'));
+  assert.ok(!keys.includes('brand-color'));
 });
