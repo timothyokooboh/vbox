@@ -8,7 +8,11 @@ export const vboxVitePlugin = (
     name: 'veebox-vite-transform',
     enforce: 'pre',
     transform(code, id) {
-      return transformVueSfc(code, id, options);
+      const result = transformVueSfc(code, id, options);
+      for (const warning of result?.warnings ?? []) {
+        (this as { warn?: (message: string) => void }).warn?.(warning.message);
+      }
+      return result;
     },
   };
 };

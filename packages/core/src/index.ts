@@ -56,3 +56,5 @@ export type { CssPriority } from './helpers/styleRegistry';
 export function defineConfig(config: VBoxPluginOptions) {
   return config;
 }
+
+export { getStyleBindingKey } from './helpers/styleBindingName';

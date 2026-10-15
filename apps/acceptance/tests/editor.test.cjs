@@ -66,6 +66,7 @@ function createEditor(source) {
   return {
     hover: (token) =>
       proxy.getQuickInfoAtPosition(file, source.indexOf(token) + 1),
+    diagnostics: () => proxy.getSemanticDiagnostics(file),
     update: (next) => {
       source = next;
       version++;
@@ -104,5 +105,34 @@ test('public editor service exposes the published token preview and refreshes ed
       coldHoverMs: Math.round(cold),
       warmHoverP95Ms: samples[18],
     }),
+  );
+});
+
+test('namespaced scalar styles do not widen semantic translate typing', (t) => {
+  const source = (value) =>
+    `<script setup lang="ts">import '@veebox/vue';</script><template><button translate="${value}" vb-translate="20px" vb-color="red">Save</button></template>`;
+  const editor = createEditor(source('no'));
+  t.after(() => editor.dispose());
+  assert.deepEqual(editor.diagnostics(), []);
+  editor.update(source('20px'));
+  assert.ok(
+    editor
+      .diagnostics()
+      .some((diagnostic) =>
+        /20px/.test(
+          ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'),
+        ),
+      ),
+  );
+});
+
+test('namespaced token values retain their source-mapped hover preview', (t) => {
+  const editor = createEditor(
+    '<template><p vb-color="cl-brand">Token</p></template>',
+  );
+  t.after(() => editor.dispose());
+  assert.match(
+    ts.displayPartsToString(editor.hover('cl-brand')?.documentation),
+    /cl-brand.*#123456/,
   );
 });

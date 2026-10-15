@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import LocalDirective from './LocalDirective.vue';
+import NativeScalar from './NativeScalar.vue';
 import { VBox } from '@veebox/vue';
 import { pva } from '@veebox/property-variance-authority';
 
@@ -16,6 +18,8 @@ const badge = pva({
 </script>
 <template>
   <main>
+    <NativeScalar />
+    <LocalDirective />
     <VBox is="button" type="button" :hover="{ color: 'green' }"
       >Hover baseline</VBox
     >

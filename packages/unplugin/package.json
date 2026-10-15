@@ -45,7 +45,9 @@
   "dependencies": {
     "@veebox/core": "workspace:*",
     "jiti": "^2.6.1",
-    "known-css-properties": "^0.37.0"
+    "known-css-properties": "^0.37.0",
+    "@vue/compiler-sfc": "^3.5.24",
+    "magic-string": "^0.30.21"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
