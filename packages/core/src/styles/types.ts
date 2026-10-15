@@ -9,3 +9,12 @@ export type StyleDeclaration = {
   value: string;
   context: StyleContext;
 };
+
+export type StyleRule = { context: StyleContext; css: string };
+
+/** A lexical style owner's ordered rule contribution, separate from applicability. */
+export type StyleBundle = {
+  key: string;
+  ownerDepth: number;
+  rules: readonly StyleRule[];
+};

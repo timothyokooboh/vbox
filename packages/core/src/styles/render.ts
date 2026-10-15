@@ -1,13 +1,13 @@
 import { compareStyleContexts } from './contexts.js';
 import type { Breakpoints } from '../types.js';
-import type { StyleContext, StyleDeclaration } from './types.js';
+import type { StyleContext, StyleDeclaration, StyleRule } from './types.js';
 
 /** Render matching contexts together, retaining authored declaration order. */
-export const renderStyleDeclarations = (
+export const renderStyleRules = (
   declarations: readonly StyleDeclaration[],
   className: string,
   breakpoints: Breakpoints,
-) => {
+): StyleRule[] => {
   const ordered = [...declarations].sort((a, b) =>
     compareStyleContexts(a.context, b.context),
   );
@@ -22,20 +22,27 @@ export const renderStyleDeclarations = (
     }
     block.css += `${declaration.property}:${declaration.value};`;
   }
-  return blocks
-    .map(({ context, css }) => {
-      for (const step of [...context].reverse()) {
-        const wrapper =
-          step.kind === 'state'
-            ? `&:where(:${step.value})`
-            : step.kind === 'theme'
-              ? ':where(html.dark) &'
-              : step.kind === 'breakpoint'
-                ? `@media (min-width: ${breakpoints[step.value as keyof Breakpoints]})`
-                : step.value;
-        css = `${wrapper}{${css}}`;
-      }
-      return `.${className}{${css}}`;
-    })
-    .join('\n');
+  return blocks.map(({ context, css }) => {
+    for (const step of [...context].reverse()) {
+      const wrapper =
+        step.kind === 'state'
+          ? `&:where(:${step.value})`
+          : step.kind === 'theme'
+            ? ':where(html.dark) &'
+            : step.kind === 'breakpoint'
+              ? `@media (min-width: ${breakpoints[step.value as keyof Breakpoints]})`
+              : step.value;
+      css = `${wrapper}{${css}}`;
+    }
+    return { context, css: `.${className}{${css}}` };
+  });
 };
+
+export const renderStyleDeclarations = (
+  declarations: readonly StyleDeclaration[],
+  className: string,
+  breakpoints: Breakpoints,
+) =>
+  renderStyleRules(declarations, className, breakpoints)
+    .map((rule) => rule.css)
+    .join('\n');
