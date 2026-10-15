@@ -176,7 +176,10 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
     const parsedKey = normalizeKey(cssProp, aliases);
     const parsedKebabKey = toKebabCase(parsedKey);
 
-    if (isValidCssDeclaration(parsedKebabKey, parsedValue)) {
+    if (
+      typeof rawValue !== 'object' &&
+      isValidCssDeclaration(parsedKebabKey, parsedValue)
+    ) {
       rootStyles[parsedKebabKey] = parsedValue;
     }
 

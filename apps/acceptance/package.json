@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "vite build && webpack --config webpack.config.mjs && vite build --ssr src/entry-server.ts --outDir dist/server",
-    "test": "pnpm build && node --test tests/config.test.mjs && playwright test",
+    "test": "pnpm build && node --test tests/*.test.mjs && playwright test",
     "type-check": "vue-tsc --noEmit -p tsconfig.json",
     "test:editor": "node --test tests/editor.test.cjs",
     "test:browser": "playwright test",
