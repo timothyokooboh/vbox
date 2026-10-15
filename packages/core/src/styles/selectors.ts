@@ -9,6 +9,17 @@ export const selectorContexts = (
   input: string,
   pseudo = false,
 ): StyleContext => {
+  const invalid = () => {
+    throw new TypeError(
+      `[VBox] Invalid selector ${JSON.stringify(input)}: expected a nonempty selector list with balanced syntax and no declaration blocks.`,
+    );
+  };
+  // The parser can repair invalid identifier punctuation. Reject authored rule
+  // delimiters first, while leaving escapes, quoted strings and comments intact.
+  const tokens =
+    /\\[\s\S]|"(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'|\/\*[\s\S]*?\*\/|[;{}@]/g;
+  for (const token of input.matchAll(tokens))
+    if (token[0].length === 1) invalid();
   let root: selectorParser.Root;
   try {
     root = selectorParser().astSync(input);
@@ -17,14 +28,7 @@ export const selectorContexts = (
       `[VBox] Invalid selector ${JSON.stringify(input)}: ${(error as Error).message}`,
     );
   }
-  const invalid = () => {
-    throw new TypeError(
-      `[VBox] Invalid selector ${JSON.stringify(input)}: expected a nonempty selector list with balanced syntax and no declaration blocks.`,
-    );
-  };
   if (Reflect.get(root, 'trailingComma')) invalid();
-  const unescapeForValidation = (value: string) =>
-    value.replace(/\\(?:[0-9a-f]{1,6}\s?|.)/gi, 'x');
   root.walk((node) => {
     if (node.type === 'selector') {
       const nodes = node.nodes.filter((child) => child.type !== 'comment');
@@ -39,30 +43,8 @@ export const selectorContexts = (
         invalid();
     } else if (node.type === 'combinator') {
       if (![' ', '>', '+', '~', '||'].includes(node.value)) invalid();
-    } else if (node.type === 'tag' || node.type === 'pseudo') {
-      if (
-        /[;{}@]/.test(
-          unescapeForValidation(
-            node.type === 'tag' ? node.toString() : node.value,
-          ),
-        )
-      )
-        invalid();
     } else if (node.type === 'attribute') {
       if (node.operator && node.value === undefined) invalid();
-      if (
-        /[;{}@]/.test(
-          unescapeForValidation(node.raws?.attribute ?? node.attribute),
-        )
-      )
-        invalid();
-      if (
-        !node.quoteMark &&
-        /[;{}@]/.test(
-          unescapeForValidation(node.raws?.value ?? node.value ?? ''),
-        )
-      )
-        invalid();
     }
   });
   return root.nodes.map((branch) => {
