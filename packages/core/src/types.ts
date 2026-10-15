@@ -194,22 +194,22 @@ export type VBoxProps = PseudoProps &
 
 export type VBoxStyleProps = Omit<VBoxProps, 'is' | 'asChild'>;
 
-type NullableStyleValues<T> = T extends object
-  ? { [Key in keyof T]: NullableStyleValues<T[Key]> | null }
-  : T;
-
-/** Style-only object boundary; template prefixes never belong in these keys. */
 type RecursiveConditionKey =
   | Exclude<(typeof ObjectStyleKeys)[number], 'mq' | 'cq' | 'pseudos'>
   | 'disabled'
   | '2xl';
 
-export type VBoxStyles = NullableStyleValues<CSSStyleProps> & {
-  [Key in AliasKeyVariants<RecursiveConditionKey>]?: VBoxStyles | null;
+type VBoxStyleGroup = VBoxStyles | Record<string, VBoxStyles | null>;
+
+/** Style-only object boundary; template prefixes never belong in these keys. */
+export type VBoxStyles = {
+  [Key in keyof CSSStyleProps]?: CSSStyleProps[Key] | null;
 } & {
-  mq?: Record<`@media ${string}`, VBoxStyles | null> | null;
-  cq?: Record<`@container ${string}`, VBoxStyles | null> | null;
-  pseudos?: { [Key in Pseudos]?: VBoxStyles | null } | null;
+  [Key in AliasKeyVariants<RecursiveConditionKey>]?: VBoxStyleGroup | null;
+} & {
+  mq?: Record<`@media ${string}`, VBoxStyleGroup | null> | null;
+  cq?: Record<`@container ${string}`, VBoxStyleGroup | null> | null;
+  pseudos?: { [Key in Pseudos]?: VBoxStyleGroup | null } | null;
 } & Record<string, unknown>;
 export type VBoxStyleInput =
   | VBoxStyles
