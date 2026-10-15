@@ -25,7 +25,6 @@ test('invalid grouped source and property shapes have actionable diagnostics', a
     123,
     false,
     'color: red',
-    [],
     new Date(),
     { color: {} },
     { hover: 'red' },

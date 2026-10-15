@@ -48,7 +48,7 @@ export const readStyleObject = (
       } else if (condition) {
         const name = toKebabCase(condition);
         result.push([
-          condition,
+          key,
           read(entry, at, true, ['mq', 'cq', 'pseudos'].includes(name)),
         ]);
       } else if (typeof entry === 'string' || typeof entry === 'number') {
