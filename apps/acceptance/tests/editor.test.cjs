@@ -288,3 +288,12 @@ const styles: VBoxStyles = { hover: { focus: { active: { color: 'red' } } }, dis
   );
   assert.ok(editor.diagnostics().length > 0);
 });
+
+test('recursive group typing preserves selector names that also name CSS properties', (t) => {
+  const editor =
+    createEditor(`<script setup lang="ts">import '@veebox/vue'; import type { VBoxStyles } from '@veebox/core';
+const styles: VBoxStyles = { declarations: { filter: { color: 'red' } }, hover: { filter: { color: 'blue' } } };
+</script><template><svg :vb="styles"><filter id="example" /></svg></template>`);
+  t.after(() => editor.dispose());
+  assert.deepEqual(editor.diagnostics(), []);
+});

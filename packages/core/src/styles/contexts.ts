@@ -2,9 +2,9 @@ import { InteractionStyleKeys } from '../constants.js';
 import { toKebabCase } from '../helpers/toKebabCase.js';
 import type { StyleContext } from './types.js';
 
-const states = InteractionStyleKeys.map((key) =>
-  toKebabCase(key).replace(/^_/, ''),
-);
+export const canonicalState = (key: string) =>
+  toKebabCase(key).replace(/^_/, '');
+const states = InteractionStyleKeys.map(canonicalState);
 
 const interactionPriority = (context: StyleContext) =>
   context.reduce(

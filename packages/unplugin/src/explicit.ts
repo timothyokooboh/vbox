@@ -5,6 +5,7 @@ import {
   type SFCTemplateBlock,
 } from '@vue/compiler-sfc';
 import MagicString from 'magic-string';
+import { createExpressionMapper } from './expressionMap.js';
 import {
   getStyleBindingKey,
   kebabToCamelCase,
@@ -97,6 +98,7 @@ export const transformExplicitStyles = (
     suffix++
   )
     bindingName = `__vboxStyles${suffix}`;
+  const mapper = createExpressionMapper(code);
   const warnings: NonNullable<VBoxSfcTransformPayload['warnings']> = [];
 
   const visit = (node: TemplateChildNode) => {
@@ -180,7 +182,7 @@ export const transformExplicitStyles = (
         prop.type === 6
           ? JSON.stringify(prop.value?.content ?? '')
           : prop.exp?.type === 4
-            ? `(${prop.exp.content})`
+            ? `(${mapper.expression(prop.exp.loc)})`
             : `(${kebabToCamelCase(name!)})`;
       if (name === 'vb') grouped = value;
       else declarations.push(`${JSON.stringify(key)}: ${value}`);
@@ -192,9 +194,11 @@ export const transformExplicitStyles = (
       );
       const semanticExpression =
         spread?.type === 7 && spread.exp?.type === 4
-          ? `, (${spread.exp.content})`
+          ? `, (${mapper.expression(spread.exp.loc)})`
           : ', undefined';
-      const binding = `v-bind="${escapeAttribute(`${bindingName}({ ${declarations.join(', ')} }${semanticExpression}, ${grouped ?? 'undefined'})`)}"`;
+      const binding = mapper.binding(
+        `v-bind="${escapeAttribute(`${bindingName}({ ${declarations.join(', ')} }${semanticExpression}, ${grouped ?? 'undefined'})`)}"`,
+      );
       if (spread)
         output.overwrite(
           spread.loc.start.offset,
@@ -242,11 +246,7 @@ export const transformExplicitStyles = (
     ? {
         warnings,
         code: output.toString(),
-        map: output.generateMap({
-          source: id,
-          includeContent: true,
-          hires: true,
-        }),
+        map: mapper.generateMap(output, id),
       }
     : null;
 };
