@@ -1,6 +1,5 @@
 <template>
-  <v-box
-    is="button"
+  <button
     color="white"
     background-color="indigo"
     padding="0.5rem 1rem"
@@ -10,5 +9,5 @@
     }"
   >
     Keep pressing tab until I receive focus
-  </v-box>
+  </button>
 </template>

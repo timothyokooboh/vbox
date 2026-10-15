@@ -126,7 +126,6 @@ const searchQuery = useMovieSearchQuery(debouncedSearchValue);
 
         <DialogPortal>
           <DialogOverlay
-            vbox
             position="fixed"
             inset="0"
             bg="color-mix(in oklab, black 65%, transparent)"
@@ -134,7 +133,6 @@ const searchQuery = useMovieSearchQuery(debouncedSearchValue);
           >
           </DialogOverlay>
           <DialogContent
-            vbox
             pos="fixed"
             top="50%"
             left="50%"
@@ -149,11 +147,10 @@ const searchQuery = useMovieSearchQuery(debouncedSearchValue);
             shadow="bs-card"
             z="1001"
           >
-            <DialogTitle vbox fs="fs-xl" m="0" color="cl-ink"
+            <DialogTitle fs="fs-xl" m="0" color="cl-ink"
               >Search Movies</DialogTitle
             >
             <DialogDescription
-              vbox
               mt="sp-2"
               mb="sp-4"
               color="color-mix(in oklab, var(--color-ink) 70%, transparent)"
@@ -261,14 +258,13 @@ const searchQuery = useMovieSearchQuery(debouncedSearchValue);
             cursor="pointer"
           >
             <SwitchThumb
-              vbox
               display="block"
               w="1.35rem"
               h="1.35rem"
               border-radius="999px"
               bg="cl-brand"
               transform="translateX(-3px)"
-              transition="transform 200ms ease"
+              transition="transform 5s ease"
               :declarations="{
                 '&[data-state=checked]': {
                   transform: 'translateX(16px)',

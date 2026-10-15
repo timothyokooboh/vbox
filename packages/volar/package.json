@@ -17,24 +17,26 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "./src/index.cjs",
-  "types": "./src/index.d.ts",
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.ts",
   "sideEffects": false,
   "exports": {
     ".": {
-      "types": "./src/index.d.ts",
-      "require": "./src/index.cjs",
-      "default": "./src/index.cjs"
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.cjs"
     }
   },
   "files": [
-    "src",
+    "dist",
     "README.md"
   ],
   "scripts": {
-    "build": "echo \"No compile step required\"",
+    "build": "node ./scripts/build.mjs",
+    "postinstall": "pnpm build",
+    "prepack": "pnpm build",
     "lint": "echo \"No lint script yet\"",
-    "test": "node --test tests/**/*.test.cjs"
+    "test": "pnpm build && node --test tests/**/*.test.cjs"
   },
   "dependencies": {
     "@veebox/core": "^1.1.1",

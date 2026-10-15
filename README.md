@@ -101,12 +101,12 @@ pnpm add @veebox/unplugin
 // vite.config.ts
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
-import { vboxNativePlugin } from '@veebox/unplugin/vite';
+import { vboxVitePlugin } from '@veebox/unplugin/vite';
 import vboxConfig from './vbox.config';
 
 export default defineConfig({
   plugins: [
-    vboxNativePlugin({
+    vboxVitePlugin({
       aliases: Object.keys(vboxConfig.aliases?.values ?? {}),
       // Optional edge-case overrides:
       // forceSemanticAttrs: ['src'],
@@ -121,11 +121,11 @@ export default defineConfig({
 
 ```ts
 // nuxt.config.ts
-import { vboxNativePlugin } from '@veebox/unplugin/vite';
+import { vboxVitePlugin } from '@veebox/unplugin/vite';
 
 export default defineNuxtConfig({
   vite: {
-    plugins: [vboxNativePlugin()],
+    plugins: [vboxVitePlugin()],
   },
 });
 ```
@@ -154,11 +154,11 @@ Rules:
 1. Native HTML tags are parsed globally in Vue templates.
 2. Object style props must use bound syntax, e.g. `:hover`, `:mq`, `:cq`.
 3. String object literals are rejected, e.g. `hover="{ ... }"` is invalid.
-4. `router-link` and `nuxt-link` are parsed by default.
-5. Other custom components are parsed only when marked with `vbox`.
-6. Set `parseAllComponents: true` to parse all custom components globally.
-7. Use `vbox-ignore` on any element to skip transform for that subtree.
-8. If you use custom aliases in `vbox.config.ts`, pass them to the plugin via `aliases`.
+4. `router-link`, `nuxt-link`, and other custom components are parsed by default.
+5. Set `parseAllComponents: false` if you want custom components opt-in via `vbox`.
+6. Use `vbox-ignore` on any element to skip transform for that subtree.
+7. Custom aliases are auto-loaded from nearest `vbox.config.*` by default.
+8. You can still pass `aliases` as explicit fallback (for example if you use a non-standard config path).
 
 Legacy per-element mode is still supported:
 
@@ -185,3 +185,9 @@ pnpm add -D @veebox/volar
   }
 }
 ```
+
+Hover preview behavior:
+
+1. Works for static token literals in template attributes.
+2. Works on native tags and custom component instances.
+3. For custom components, token hovers are shown even when `parseAllComponents: false` or the instance has `vbox-ignore`.

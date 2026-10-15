@@ -1,4 +1,7 @@
 import * as knownCssPropertiesModule from 'known-css-properties';
+import fs from 'node:fs';
+import path from 'node:path';
+import { createJiti } from 'jiti';
 import { kebabToCamelCase, toKebabCase } from '@veebox/core';
 import { ExplicitStyleKeys, ObjectStyleKeys } from './constants.js';
 import { isSemanticAttributeForTag } from './semantic.js';
@@ -6,6 +9,8 @@ import type {
   VBoxNativePluginOptions,
   VBoxSfcTransformResult,
 } from './types.js';
+
+const importWithJiti = createJiti(import.meta.url, { interopDefault: true });
 
 const resolveKnownCssProperties = () => {
   const moduleAsRecord = knownCssPropertiesModule as Record<string, unknown>;
@@ -28,6 +33,61 @@ const KnownCssPropertySet = new Set(
     .map((item) => String(item).toLowerCase())
     .filter(Boolean),
 );
+
+const VBOX_CONFIG_FILES = [
+  'vbox.config.ts',
+  'vbox.config.js',
+  'vbox.config.cjs',
+  'vbox.config.mjs',
+];
+
+const AliasConfigCache = new Map<string, string[]>();
+
+const normalizeIdPath = (id: string) => id.split('?')[0];
+
+const findNearestVBoxConfig = (startDir: string): string | null => {
+  let current = path.resolve(startDir);
+  let previous = '';
+
+  while (current !== previous) {
+    for (const candidate of VBOX_CONFIG_FILES) {
+      const fullPath = path.join(current, candidate);
+      if (fs.existsSync(fullPath)) return fullPath;
+    }
+    previous = current;
+    current = path.dirname(current);
+  }
+
+  return null;
+};
+
+const loadAliasKeysFromConfig = (
+  options: VBoxNativePluginOptions,
+  id: string,
+): string[] => {
+  const explicitPath =
+    typeof options.configPath === 'string' && options.configPath.length > 0
+      ? path.resolve(options.rootDir ?? process.cwd(), options.configPath)
+      : null;
+  const idPath = normalizeIdPath(id);
+  const configPath =
+    explicitPath ??
+    findNearestVBoxConfig(path.dirname(idPath || process.cwd()));
+
+  if (!configPath) return [];
+  if (AliasConfigCache.has(configPath)) return AliasConfigCache.get(configPath)!;
+
+  try {
+    const mod = importWithJiti(configPath);
+    const config = mod?.default ?? mod;
+    const aliases = Object.keys(config?.aliases?.values ?? {});
+    AliasConfigCache.set(configPath, aliases);
+    return aliases;
+  } catch {
+    AliasConfigCache.set(configPath, []);
+    return [];
+  }
+};
 
 const isWhitespace = (ch) => /\s/.test(ch);
 
@@ -89,10 +149,11 @@ const isLikelyCssProperty = (name) => {
   return KnownCssPropertySet.has(normalized);
 };
 
-const createStyleKeyMatcher = (options: VBoxNativePluginOptions = {}) => {
-  const userAliases = new Set(
-    Array.isArray(options.aliases) ? options.aliases : [],
-  );
+const createStyleKeyMatcher = (
+  options: VBoxNativePluginOptions = {},
+  userAliasKeys: string[] = [],
+) => {
+  const userAliases = new Set(userAliasKeys);
   const forceStyleAttrs = new Set(
     Array.isArray(options.forceStyleAttrs) ? options.forceStyleAttrs : [],
   );
@@ -408,7 +469,7 @@ const transformTemplateContent = (
     const shouldTransformAllCustomComponents =
       !hasIgnoreMarker &&
       ignoreDepth === 0 &&
-      options?.parseAllComponents === true &&
+      options?.parseAllComponents !== false &&
       isCustomComponent;
 
     const shouldTransform =
@@ -467,14 +528,20 @@ export const transformVueSfc = (
   id: string,
   options: VBoxNativePluginOptions = {},
 ): VBoxSfcTransformResult => {
-  // only run on .vue files
-  if (!id.endsWith('.vue')) return null;
+  const normalizedId = normalizeIdPath(id);
+
+  // only run on project .vue files
+  if (!normalizedId.endsWith('.vue')) return null;
+  if (/[\\/]+node_modules[\\/]+/.test(normalizedId)) return null;
 
   // extract template and its content
   const match = code.match(TemplateRegex);
   if (!match || match.index == null) return null;
 
-  const isStyleKey = createStyleKeyMatcher(options);
+  const resolvedAliases = Array.isArray(options.aliases)
+    ? options.aliases
+    : loadAliasKeysFromConfig(options, normalizedId);
+  const isStyleKey = createStyleKeyMatcher(options, resolvedAliases);
   const originalTemplate = match[1];
   const transformedTemplate = transformTemplateContent(
     originalTemplate,

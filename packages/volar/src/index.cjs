@@ -6,6 +6,24 @@ const knownCssPropertiesModule = require('known-css-properties');
 
 const importWithJiti = createJiti(__filename, { interopDefault: true });
 const requireFromHere = createRequire(__filename);
+const DEFAULT_OBJECT_STYLE_KEYS = [
+  'mq',
+  'cq',
+  'dark',
+  'declarations',
+  'pseudos',
+  'hover',
+  'focus',
+  'focusVisible',
+  'focusWithin',
+  'active',
+  '_disabled',
+  'sm',
+  'md',
+  'lg',
+  'xl',
+  '_2xl',
+];
 
 const loadCoreExports = (rootDir) => {
   const loadCoreModule = (specifier) => {
@@ -28,7 +46,7 @@ const loadCoreExports = (rootDir) => {
           ((theme) => ({ normalized: theme ?? {}, colorDarkMap: {} })),
         ObjectStyleKeys: Array.isArray(core?.ObjectStyleKeys)
           ? core.ObjectStyleKeys
-          : [],
+          : DEFAULT_OBJECT_STYLE_KEYS,
       };
     }
   } catch {
@@ -63,13 +81,14 @@ const loadCoreExports = (rootDir) => {
       return {
         DefaultTheme: core?.DefaultTheme ?? {},
         deepMerge:
-          core?.deepMerge ?? ((baseValue, extra) => ({ ...baseValue, ...extra })),
+          core?.deepMerge ??
+          ((baseValue, extra) => ({ ...baseValue, ...extra })),
         normalizeTheme:
           core?.normalizeTheme ??
           ((theme) => ({ normalized: theme ?? {}, colorDarkMap: {} })),
         ObjectStyleKeys: Array.isArray(core?.ObjectStyleKeys)
           ? core.ObjectStyleKeys
-          : [],
+          : DEFAULT_OBJECT_STYLE_KEYS,
       };
     } catch {
       // continue
@@ -83,7 +102,7 @@ const loadCoreExports = (rootDir) => {
       normalized: theme ?? {},
       colorDarkMap: {},
     }),
-    ObjectStyleKeys: [],
+    ObjectStyleKeys: DEFAULT_OBJECT_STYLE_KEYS,
   };
 };
 
@@ -135,12 +154,52 @@ const GLOBAL_SEMANTIC_ATTRIBUTES = new Set([
 ]);
 
 const SEMANTIC_ATTRIBUTES_BY_TAG = {
-  a: ['download', 'href', 'hreflang', 'ping', 'referrerpolicy', 'rel', 'target', 'type'],
-  area: ['alt', 'coords', 'download', 'href', 'ping', 'referrerpolicy', 'rel', 'shape', 'target'],
-  audio: ['autoplay', 'controls', 'crossorigin', 'loop', 'muted', 'preload', 'src'],
+  a: [
+    'download',
+    'href',
+    'hreflang',
+    'ping',
+    'referrerpolicy',
+    'rel',
+    'target',
+    'type',
+  ],
+  area: [
+    'alt',
+    'coords',
+    'download',
+    'href',
+    'ping',
+    'referrerpolicy',
+    'rel',
+    'shape',
+    'target',
+  ],
+  audio: [
+    'autoplay',
+    'controls',
+    'crossorigin',
+    'loop',
+    'muted',
+    'preload',
+    'src',
+  ],
   base: ['href', 'target'],
   blockquote: ['cite'],
-  button: ['disabled', 'form', 'formaction', 'formenctype', 'formmethod', 'formnovalidate', 'formtarget', 'name', 'popovertarget', 'popovertargetaction', 'type', 'value'],
+  button: [
+    'disabled',
+    'form',
+    'formaction',
+    'formenctype',
+    'formmethod',
+    'formnovalidate',
+    'formtarget',
+    'name',
+    'popovertarget',
+    'popovertargetaction',
+    'type',
+    'value',
+  ],
   canvas: [],
   col: ['span'],
   colgroup: ['span'],
@@ -149,14 +208,90 @@ const SEMANTIC_ATTRIBUTES_BY_TAG = {
   details: ['name', 'open'],
   embed: ['src', 'type'],
   fieldset: ['disabled', 'form', 'name'],
-  form: ['accept-charset', 'action', 'autocomplete', 'enctype', 'method', 'name', 'novalidate', 'rel', 'target'],
-  iframe: ['allow', 'allowfullscreen', 'loading', 'name', 'referrerpolicy', 'sandbox', 'src', 'srcdoc'],
-  img: ['alt', 'crossorigin', 'decoding', 'fetchpriority', 'ismap', 'loading', 'referrerpolicy', 'sizes', 'src', 'srcset', 'usemap'],
-  input: ['accept', 'alt', 'autocomplete', 'autofocus', 'capture', 'checked', 'dirname', 'disabled', 'form', 'formaction', 'formenctype', 'formmethod', 'formnovalidate', 'formtarget', 'list', 'max', 'maxlength', 'min', 'minlength', 'multiple', 'name', 'pattern', 'placeholder', 'readonly', 'required', 'src', 'step', 'type', 'value'],
+  form: [
+    'accept-charset',
+    'action',
+    'autocomplete',
+    'enctype',
+    'method',
+    'name',
+    'novalidate',
+    'rel',
+    'target',
+  ],
+  iframe: [
+    'allow',
+    'allowfullscreen',
+    'loading',
+    'name',
+    'referrerpolicy',
+    'sandbox',
+    'src',
+    'srcdoc',
+  ],
+  img: [
+    'alt',
+    'crossorigin',
+    'decoding',
+    'fetchpriority',
+    'ismap',
+    'loading',
+    'referrerpolicy',
+    'sizes',
+    'src',
+    'srcset',
+    'usemap',
+  ],
+  input: [
+    'accept',
+    'alt',
+    'autocomplete',
+    'autofocus',
+    'capture',
+    'checked',
+    'dirname',
+    'disabled',
+    'form',
+    'formaction',
+    'formenctype',
+    'formmethod',
+    'formnovalidate',
+    'formtarget',
+    'list',
+    'max',
+    'maxlength',
+    'min',
+    'minlength',
+    'multiple',
+    'name',
+    'pattern',
+    'placeholder',
+    'readonly',
+    'required',
+    'src',
+    'step',
+    'type',
+    'value',
+  ],
   ins: ['cite', 'datetime'],
   label: ['for', 'form'],
   li: ['value'],
-  link: ['as', 'crossorigin', 'disabled', 'fetchpriority', 'href', 'hreflang', 'imagesizes', 'imagesrcset', 'integrity', 'media', 'referrerpolicy', 'rel', 'sizes', 'type'],
+  link: [
+    'as',
+    'crossorigin',
+    'disabled',
+    'fetchpriority',
+    'href',
+    'hreflang',
+    'imagesizes',
+    'imagesrcset',
+    'integrity',
+    'media',
+    'referrerpolicy',
+    'rel',
+    'sizes',
+    'type',
+  ],
   map: ['name'],
   meter: ['form', 'high', 'low', 'max', 'min', 'optimum', 'value'],
   object: ['data', 'form', 'name', 'type', 'usemap'],
@@ -166,17 +301,55 @@ const SEMANTIC_ATTRIBUTES_BY_TAG = {
   output: ['for', 'form', 'name'],
   progress: ['max', 'value'],
   q: ['cite'],
-  script: ['async', 'blocking', 'crossorigin', 'defer', 'fetchpriority', 'integrity', 'nomodule', 'nonce', 'referrerpolicy', 'src', 'type'],
+  script: [
+    'async',
+    'blocking',
+    'crossorigin',
+    'defer',
+    'fetchpriority',
+    'integrity',
+    'nomodule',
+    'nonce',
+    'referrerpolicy',
+    'src',
+    'type',
+  ],
   select: ['autocomplete', 'disabled', 'form', 'multiple', 'name', 'required'],
   slot: ['name'],
   source: ['media', 'src', 'srcset', 'type'],
   style: ['blocking', 'media', 'nonce', 'title'],
   td: ['colspan', 'headers', 'rowspan'],
-  textarea: ['autocomplete', 'autocorrect', 'autofocus', 'cols', 'dirname', 'disabled', 'form', 'maxlength', 'minlength', 'name', 'placeholder', 'readonly', 'required', 'rows', 'wrap'],
+  textarea: [
+    'autocomplete',
+    'autocorrect',
+    'autofocus',
+    'cols',
+    'dirname',
+    'disabled',
+    'form',
+    'maxlength',
+    'minlength',
+    'name',
+    'placeholder',
+    'readonly',
+    'required',
+    'rows',
+    'wrap',
+  ],
   th: ['abbr', 'colspan', 'headers', 'rowspan', 'scope'],
   time: ['datetime'],
   track: ['default', 'kind', 'label', 'src', 'srclang'],
-  video: ['autoplay', 'controls', 'crossorigin', 'loop', 'muted', 'playsinline', 'poster', 'preload', 'src'],
+  video: [
+    'autoplay',
+    'controls',
+    'crossorigin',
+    'loop',
+    'muted',
+    'playsinline',
+    'poster',
+    'preload',
+    'src',
+  ],
   svg: ['viewBox', 'preserveAspectRatio', 'xmlns'],
   path: ['d', 'pathLength'],
   use: ['href', 'xlink:href'],
@@ -291,7 +464,9 @@ const toVariantSet = (list) => {
   return set;
 };
 
-const GLOBAL_SEMANTIC_SET = toVariantSet(Array.from(GLOBAL_SEMANTIC_ATTRIBUTES));
+const GLOBAL_SEMANTIC_SET = toVariantSet(
+  Array.from(GLOBAL_SEMANTIC_ATTRIBUTES),
+);
 const TAG_SEMANTIC_SET_MAP = new Map(
   Object.entries(SEMANTIC_ATTRIBUTES_BY_TAG).map(([tag, attrs]) => [
     String(tag).toLowerCase(),
@@ -389,8 +564,13 @@ const buildTokenResolutionMap = (vboxConfig, rootDir) => {
   return resolved;
 };
 
+const resolveAliasKeys = (vboxConfig = {}, pluginConfig = {}) =>
+  Array.isArray(pluginConfig?.aliases)
+    ? pluginConfig.aliases
+    : Object.keys(vboxConfig?.aliases?.values ?? {});
+
 const createStyleKeyMatcher = (vboxConfig = {}, pluginConfig = {}) => {
-  const userAliases = new Set(Object.keys(vboxConfig?.aliases?.values ?? {}));
+  const userAliases = new Set(resolveAliasKeys(vboxConfig, pluginConfig));
   const forceStyleAttrs = new Set([
     ...(vboxConfig?.compiler?.forceStyleAttrs ?? []),
     ...(pluginConfig?.forceStyleAttrs ?? []),
@@ -415,11 +595,16 @@ const createStyleKeyMatcher = (vboxConfig = {}, pluginConfig = {}) => {
   };
 };
 
-const buildTokenPrefixByProperty = (vboxConfig = {}) => {
+const buildTokenPrefixByProperty = (vboxConfig = {}, pluginConfig = {}) => {
   const base = new Map([
     ['color', 'cl'],
     ['background', 'cl'],
     ['background-color', 'cl'],
+    ['border-color', 'cl'],
+    ['outline-color', 'cl'],
+    ['text-decoration-color', 'cl'],
+    ['caret-color', 'cl'],
+    ['accent-color', 'cl'],
     ['fill', 'cl'],
     ['stroke', 'cl'],
     ['font-size', 'fs'],
@@ -493,7 +678,12 @@ const buildTokenPrefixByProperty = (vboxConfig = {}) => {
     }
   }
 
-  for (const [alias, cssProp] of Object.entries(vboxConfig?.aliases?.values ?? {})) {
+  const configuredAliasMap = vboxConfig?.aliases?.values ?? {};
+  const aliasKeys = resolveAliasKeys(vboxConfig, pluginConfig);
+
+  for (const alias of aliasKeys) {
+    const cssProp = configuredAliasMap?.[alias];
+    if (!cssProp) continue;
     const cssPrefix = base.get(normalizeCssPropertyKey(cssProp));
     if (!cssPrefix) continue;
     for (const variant of getKeyVariants(alias)) {
@@ -504,38 +694,54 @@ const buildTokenPrefixByProperty = (vboxConfig = {}) => {
   return base;
 };
 
+const extractTokenPrefix = (value) => {
+  const match = String(value || '')
+    .trim()
+    .match(/^([a-z]{1,3})-[A-Za-z0-9_-]*$/);
+  return match ? match[1] : '';
+};
+
 const getTokenCandidatesForKey = (
   key,
   tokenMap,
   tokenPrefixByProperty,
   cache,
+  typedPrefix = '',
 ) => {
   if (!key) return [];
   const normalized = normalizeCssPropertyKey(key);
+  const prefixHint = String(typedPrefix || '');
+  const cacheKey = `${normalized}::${prefixHint}`;
 
-  if (cache.has(normalized)) {
-    return cache.get(normalized);
+  if (cache.has(cacheKey)) {
+    return cache.get(cacheKey);
   }
 
-  const prefix = tokenPrefixByProperty.get(normalized);
-  if (!prefix) {
-    cache.set(normalized, []);
-    return [];
-  }
+  const propertyPrefix = tokenPrefixByProperty.get(normalized);
+  const effectivePrefix = prefixHint || propertyPrefix || '';
 
-  const candidates = [];
-  for (const token of tokenMap.keys()) {
-    if (token.startsWith(`${prefix}-`)) {
-      candidates.push(token);
+  if (effectivePrefix) {
+    const narrowed = [];
+    for (const token of tokenMap.keys()) {
+      if (token.startsWith(`${effectivePrefix}-`)) {
+        narrowed.push(token);
+      }
     }
+    narrowed.sort();
+    cache.set(cacheKey, narrowed);
+    return narrowed;
   }
 
-  candidates.sort();
-  cache.set(normalized, candidates);
-  return candidates;
+  const all = Array.from(tokenMap.keys()).sort();
+  cache.set(cacheKey, all);
+  return all;
 };
 
-const buildAttrCompletionKeys = (vboxConfig = {}, objectStyleKeys = []) => {
+const buildAttrCompletionKeys = (
+  vboxConfig = {},
+  objectStyleKeys = [],
+  pluginConfig = {},
+) => {
   const out = new Set();
 
   for (const key of VBOX_DEFAULT_ALIAS_KEYS) {
@@ -550,22 +756,21 @@ const buildAttrCompletionKeys = (vboxConfig = {}, objectStyleKeys = []) => {
     }
   }
 
-  for (const key of Object.keys(vboxConfig?.aliases?.values ?? {})) {
+  for (const key of resolveAliasKeys(vboxConfig, pluginConfig)) {
     for (const variant of getKeyVariants(key)) {
       out.add(variant);
     }
   }
 
-  const knownCssProperties =
-    Array.isArray(knownCssPropertiesModule)
-      ? knownCssPropertiesModule
-      : Array.isArray(knownCssPropertiesModule?.all)
-        ? knownCssPropertiesModule.all
-        : Array.isArray(knownCssPropertiesModule?.default)
-          ? knownCssPropertiesModule.default
-          : Array.isArray(knownCssPropertiesModule?.default?.all)
-            ? knownCssPropertiesModule.default.all
-            : [];
+  const knownCssProperties = Array.isArray(knownCssPropertiesModule)
+    ? knownCssPropertiesModule
+    : Array.isArray(knownCssPropertiesModule?.all)
+      ? knownCssPropertiesModule.all
+      : Array.isArray(knownCssPropertiesModule?.default)
+        ? knownCssPropertiesModule.default
+        : Array.isArray(knownCssPropertiesModule?.default?.all)
+          ? knownCssPropertiesModule.default.all
+          : [];
 
   for (const key of knownCssProperties) {
     const str = String(key || '').trim();
@@ -579,11 +784,14 @@ const buildAttrCompletionKeys = (vboxConfig = {}, objectStyleKeys = []) => {
 };
 
 const escapeTsString = (value) =>
-  String(value)
-    .replace(/\\/g, '\\\\')
-    .replace(/'/g, "\\'");
+  String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 
-const collectTokenHints = (templateAst, resolveTokenValue, isStyleKey, options = {}) => {
+const collectTokenHints = (
+  templateAst,
+  resolveTokenValue,
+  isStyleKey,
+  options = {},
+) => {
   const hints = [];
   const pushTokensFromValue = (value, offset) => {
     let match;
@@ -638,6 +846,7 @@ const collectTokenHints = (templateAst, resolveTokenValue, isStyleKey, options =
     if (node.type !== 1 /* ELEMENT */) return;
 
     const tag = node.tag;
+    const isCustomComponent = !isNativeHtmlTag(tag) && !isVBoxComponentTag(tag);
     let hasVBoxMarker = false;
     let hasIgnoreMarker = false;
 
@@ -649,41 +858,33 @@ const collectTokenHints = (templateAst, resolveTokenValue, isStyleKey, options =
     }
 
     const nativeAutoEligible =
-      !ignored &&
-      isNativeHtmlTag(tag) &&
-      canProcessNativeTag(tag);
-    const isCustomComponent = !isNativeHtmlTag(tag) && !isVBoxComponentTag(tag);
+      !ignored && isNativeHtmlTag(tag) && canProcessNativeTag(tag);
     const frameworkLinkAutoEligible =
-      !ignored &&
-      isCustomComponent &&
-      isFrameworkLinkTag(tag);
+      !ignored && isCustomComponent && isFrameworkLinkTag(tag);
     const vboxComponentEligible = !ignored && isVBoxComponentTag(tag);
     const markedCustomComponentEligible =
-      !ignored &&
-      hasVBoxMarker &&
-      isCustomComponent;
+      !ignored && hasVBoxMarker && isCustomComponent;
     const globalCustomComponentEligible =
-      !ignored &&
-      options.parseAllComponents === true &&
-      isCustomComponent;
+      !ignored && options.parseAllComponents !== false && isCustomComponent;
+
+    const shouldProcessHoverCustomComponent = isCustomComponent;
 
     const shouldProcessElement =
-      !ignored &&
-      !hasIgnoreMarker &&
-      (
-        nativeAutoEligible ||
-        frameworkLinkAutoEligible ||
-        markedCustomComponentEligible ||
-        globalCustomComponentEligible ||
-        vboxComponentEligible
-      );
+      shouldProcessHoverCustomComponent ||
+      (!ignored &&
+        !hasIgnoreMarker &&
+        (nativeAutoEligible ||
+          frameworkLinkAutoEligible ||
+          markedCustomComponentEligible ||
+          globalCustomComponentEligible ||
+          vboxComponentEligible));
 
     if (shouldProcessElement) {
       for (const prop of node.props) {
         if (prop.type === 6 /* ATTRIBUTE */) {
           if (!prop.value) continue;
           if (prop.name === 'vbox' || prop.name === 'vbox-ignore') continue;
-          if (!isStyleKey(tag, prop.name)) continue;
+          if (!isCustomComponent && !isStyleKey(tag, prop.name)) continue;
 
           const { content, offset } = getAttrValueContentAndOffset(prop.value);
           pushTokensFromValue(String(content || ''), offset);
@@ -696,9 +897,12 @@ const collectTokenHints = (templateAst, resolveTokenValue, isStyleKey, options =
         if (!prop.exp || prop.exp.type !== 4) continue;
 
         const boundKey = prop.arg.content;
-        if (!isStyleKey(tag, boundKey)) continue;
+        if (!isCustomComponent && !isStyleKey(tag, boundKey)) continue;
 
-        pushTokensFromValue(String(prop.exp.content || ''), prop.exp.loc.start.offset);
+        pushTokensFromValue(
+          String(prop.exp.content || ''),
+          prop.exp.loc.start.offset,
+        );
       }
     }
 
@@ -731,15 +935,16 @@ const collectCompletionHints = (
     attrHints.push({ value, offset, length });
   };
 
-  const pushValueHint = (value, offset, length, candidates) => {
-    if (!value || !length || !Array.isArray(candidates) || candidates.length === 0) return;
-    const dedupeKey = `${offset}:${length}:${value}`;
+  const pushValueHint = (typedValue, mappedValue, offset, candidates) => {
+    if (!Array.isArray(candidates) || candidates.length === 0) return;
+    if (typeof mappedValue !== 'string' || mappedValue.length === 0) return;
+    const dedupeKey = `${offset}:${mappedValue.length}:${typedValue}`;
     if (valueHintSeen.has(dedupeKey)) return;
     valueHintSeen.add(dedupeKey);
     valueHints.push({
-      value,
+      typedValue,
+      mappedValue,
       offset,
-      length,
       candidates,
     });
   };
@@ -789,34 +994,24 @@ const collectCompletionHints = (
     }
 
     const nativeAutoEligible =
-      !ignored &&
-      isNativeHtmlTag(tag) &&
-      canProcessNativeTag(tag);
+      !ignored && isNativeHtmlTag(tag) && canProcessNativeTag(tag);
     const isCustomComponent = !isNativeHtmlTag(tag) && !isVBoxComponentTag(tag);
     const frameworkLinkAutoEligible =
-      !ignored &&
-      isCustomComponent &&
-      isFrameworkLinkTag(tag);
+      !ignored && isCustomComponent && isFrameworkLinkTag(tag);
     const vboxComponentEligible = !ignored && isVBoxComponentTag(tag);
     const markedCustomComponentEligible =
-      !ignored &&
-      hasVBoxMarker &&
-      isCustomComponent;
+      !ignored && hasVBoxMarker && isCustomComponent;
     const globalCustomComponentEligible =
-      !ignored &&
-      options.parseAllComponents === true &&
-      isCustomComponent;
+      !ignored && options.parseAllComponents !== false && isCustomComponent;
 
     const shouldProcessElement =
       !ignored &&
       !hasIgnoreMarker &&
-      (
-        nativeAutoEligible ||
+      (nativeAutoEligible ||
         frameworkLinkAutoEligible ||
         markedCustomComponentEligible ||
         globalCustomComponentEligible ||
-        vboxComponentEligible
-      );
+        vboxComponentEligible);
 
     if (shouldProcessElement) {
       for (const prop of node.props) {
@@ -824,28 +1019,40 @@ const collectCompletionHints = (
           if (prop.name === 'vbox' || prop.name === 'vbox-ignore') continue;
           if (!isStyleKey(tag, prop.name)) continue;
 
-          pushAttrHint(
-            prop.name,
-            prop.loc.start.offset,
-            prop.name.length,
-          );
+          pushAttrHint(prop.name, prop.loc.start.offset, prop.name.length);
 
           if (!prop.value) continue;
 
           const { content, offset } = getAttrValueContentAndOffset(prop.value);
           const value = String(content || '');
-          const candidates = getTokenCandidates(prop.name);
+          const fullValuePrefix = extractTokenPrefix(value);
+          const candidates = getTokenCandidates(prop.name, fullValuePrefix);
 
           let match;
           TOKEN_IN_VALUE_REGEX.lastIndex = 0;
           while ((match = TOKEN_IN_VALUE_REGEX.exec(value)) != null) {
             const token = match[1];
             if (!token) continue;
-            pushValueHint(token, offset + match.index, token.length, candidates);
+            pushValueHint(
+              token,
+              token,
+              offset + match.index,
+              getTokenCandidates(prop.name, extractTokenPrefix(token)),
+            );
           }
 
-          if (!/\s/.test(value) && !value.includes('{') && !value.includes('}')) {
-            pushValueHint(value, offset, value.length, candidates);
+          if (
+            !/\s/.test(value) &&
+            !value.includes('{') &&
+            !value.includes('}')
+          ) {
+            if (value.length > 0) {
+              pushValueHint(value, value, offset, candidates);
+            } else {
+              // For empty quoted values (e.g. font-size=""), map both quotes so
+              // completions trigger when cursor is between them.
+              pushValueHint('', '""', prop.value.loc.start.offset, candidates);
+            }
           }
           continue;
         }
@@ -861,7 +1068,10 @@ const collectCompletionHints = (
 
         if (!prop.exp || prop.exp.type !== 4) continue;
         const exp = String(prop.exp.content || '');
-        const candidates = getTokenCandidates(boundKey);
+        const candidates = getTokenCandidates(
+          boundKey,
+          extractTokenPrefix(exp),
+        );
 
         let match;
         TOKEN_IN_VALUE_REGEX.lastIndex = 0;
@@ -870,9 +1080,9 @@ const collectCompletionHints = (
           if (!token) continue;
           pushValueHint(
             token,
+            token,
             prop.exp.loc.start.offset + match.index,
-            token.length,
-            candidates,
+            getTokenCandidates(boundKey, extractTokenPrefix(token)),
           );
         }
       }
@@ -923,41 +1133,33 @@ const buildCompletionCode = (
   const attrUnionKeys = Array.isArray(attrCompletionKeys)
     ? attrCompletionKeys
     : [];
-  const attrUnionType = attrUnionKeys.length > 0
-    ? attrUnionKeys.map((key) => `'${escapeTsString(key)}'`).join(' | ')
-    : 'string';
+  const attrUnionType =
+    attrUnionKeys.length > 0
+      ? attrUnionKeys.map((key) => `'${escapeTsString(key)}'`).join(' | ')
+      : 'string';
 
   const limitedAttrHints = attrHints.slice(0, maxCompletionItems);
   const limitedValueHints = valueHints.slice(0, maxCompletionItems);
 
   limitedAttrHints.forEach((hint, index) => {
     out.push(`const __vboxAttrCompletion${index}: ${attrUnionType} = '`);
-    out.push([
-      hint.value,
-      'template',
-      hint.offset,
-      COMPLETION_FEATURES,
-    ]);
+    out.push([hint.value, 'template', hint.offset, COMPLETION_FEATURES]);
     out.push(`';\n`);
   });
 
   limitedValueHints.forEach((hint, index) => {
     const candidates = hint.candidates
       .slice(0, maxCompletionItems)
-      .concat(hint.value)
+      .concat(hint.typedValue)
       .filter(Boolean);
     const deduped = Array.from(new Set(candidates));
-    const valueUnionType = deduped.length > 0
-      ? deduped.map((token) => `'${escapeTsString(token)}'`).join(' | ')
-      : 'string';
+    const valueUnionType =
+      deduped.length > 0
+        ? deduped.map((token) => `'${escapeTsString(token)}'`).join(' | ')
+        : 'string';
 
     out.push(`const __vboxTokenCompletion${index}: ${valueUnionType} = '`);
-    out.push([
-      hint.value,
-      'template',
-      hint.offset,
-      COMPLETION_FEATURES,
-    ]);
+    out.push([hint.mappedValue, 'template', hint.offset, COMPLETION_FEATURES]);
     out.push(`';\n`);
   });
 
@@ -971,15 +1173,23 @@ const createPlugin = (ctx) => {
   const vboxConfig = loadVBoxConfig(rootDir, userConfig) ?? {};
   const tokenMap = buildTokenResolutionMap(vboxConfig, rootDir);
   const isStyleKey = createStyleKeyMatcher(vboxConfig, userConfig);
-  const tokenPrefixByProperty = buildTokenPrefixByProperty(vboxConfig);
-  const attrCompletionKeys = buildAttrCompletionKeys(vboxConfig, ObjectStyleKeys);
+  const tokenPrefixByProperty = buildTokenPrefixByProperty(
+    vboxConfig,
+    userConfig,
+  );
+  const attrCompletionKeys = buildAttrCompletionKeys(
+    vboxConfig,
+    ObjectStyleKeys,
+    userConfig,
+  );
   const tokenCandidatesCache = new Map();
-  const getTokenCandidates = (key) =>
+  const getTokenCandidates = (key, typedPrefix = '') =>
     getTokenCandidatesForKey(
       key,
       tokenMap,
       tokenPrefixByProperty,
       tokenCandidatesCache,
+      typedPrefix,
     );
   const maxCompletionItems = 200;
 
@@ -1000,13 +1210,13 @@ const createPlugin = (ctx) => {
         sfc.template.ast,
         resolveTokenValue,
         isStyleKey,
-        { parseAllComponents: userConfig.parseAllComponents === true },
+        { parseAllComponents: userConfig.parseAllComponents !== false },
       );
       const completionHints = collectCompletionHints(
         sfc.template.ast,
         isStyleKey,
         getTokenCandidates,
-        { parseAllComponents: userConfig.parseAllComponents === true },
+        { parseAllComponents: userConfig.parseAllComponents !== false },
       );
 
       if (

@@ -1,8 +1,7 @@
 <template>
-  <v-box display="flex" gap="1rem">
+  <div display="flex" gap="1rem">
     <!-- prefixing the token with br -->
-    <v-box
-      is="img"
+    <img
       src="/victor-osimhen.jpg"
       alt="Victor Osimhen"
       title="Victor Osimhen"
@@ -13,8 +12,7 @@
     />
 
     <!-- or via CSS custom properties -->
-    <v-box
-      is="img"
+    <img
       src="/victor-osimhen.jpg"
       alt="Victor Osimhen"
       title="Victor Osimhen"
@@ -23,5 +21,5 @@
       object-fit="cover"
       border-radius="var(--border-radius-md)"
     />
-  </v-box>
+  </div>
 </template>

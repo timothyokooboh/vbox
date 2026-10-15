@@ -1,7 +1,6 @@
 <template>
-  <v-box
+  <button
     data-scope="add-to-cart-btn"
-    is="button"
     cursor="pointer"
     border="none"
     bg="cl-primary"
@@ -30,8 +29,7 @@
       scale: 0.95,
     }"
   >
-    <v-box
-      is="span"
+    <span
       position="relative"
       z="10"
       display="flex"
@@ -41,9 +39,8 @@
         gap: '0.5rem',
       }"
     >
-      <v-box
+      <span
         data-scope="icon"
-        is="span"
         color="#1c1c0d"
         class="material-symbols-outlined"
         transition="transform 0.2s ease-in-out"
@@ -53,9 +50,8 @@
         }"
       >
         shopping_cart
-      </v-box>
-      <v-box
-        is="span"
+      </span>
+      <span
         fs="fs-sm"
         fw="fw-bold"
         color="#1c1c0d"
@@ -64,10 +60,10 @@
         }"
       >
         Add to cart
-      </v-box>
-    </v-box>
+      </span>
+    </span>
 
-    <v-box
+    <div
       data-scope="empty-div"
       position="absolute"
       top="0"
@@ -78,10 +74,9 @@
       opacity="0"
       transition="opacity 0.2s ease-in-out"
     />
-  </v-box>
+  </button>
 </template>
 
 <script lang="ts" setup>
-import { VBox } from '@veebox/vue';
 import { outlineStyles } from '../style-utils';
 </script>

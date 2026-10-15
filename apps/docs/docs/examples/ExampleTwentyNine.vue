@@ -1,5 +1,5 @@
 <template>
-  <v-box
+  <div
     :declarations="{
       color: 'tomato',
       padding: '0.5rem',
@@ -9,5 +9,5 @@
     }"
   >
     <p>Just for convenience</p>
-  </v-box>
+  </div>
 </template>

@@ -1,5 +1,5 @@
 <template>
-  <v-box
+  <div
     data-scope="product-details"
     position="relative"
     z="10"
@@ -22,5 +22,5 @@
     }"
   >
     <slot />
-  </v-box>
+  </div>
 </template>

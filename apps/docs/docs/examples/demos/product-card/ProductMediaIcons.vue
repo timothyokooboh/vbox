@@ -1,7 +1,6 @@
 <template>
-  <v-box
+  <button
     data-scope="product-media-icons"
-    is="button"
     display="flex"
     justify-content="center"
     align-items="center"
@@ -19,7 +18,7 @@
     v-bind="outlineStyles"
   >
     <slot />
-  </v-box>
+  </button>
 </template>
 
 <script setup lang="ts">

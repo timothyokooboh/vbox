@@ -1,11 +1,11 @@
 <template>
-  <v-box
+  <div
     container-name="responsive-box"
     container-type="inline-size"
     border="2px dashed gray"
     padding="1rem"
   >
-    <v-box
+    <div
       w="100%"
       max-w="400px"
       border="1px solid black"
@@ -19,6 +19,6 @@
       }"
     >
       Resize to see background color change.
-    </v-box>
-  </v-box>
+    </div>
+  </div>
 </template>

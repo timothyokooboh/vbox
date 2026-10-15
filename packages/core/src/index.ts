@@ -27,7 +27,6 @@ export {
 export type {
   VBoxProps,
   VBoxStyleProps,
-  VBoxNativeStyleProps,
   VBoxNativeTemplateProps,
   VBoxPluginOptions,
   AliasStrategy,

@@ -1,5 +1,5 @@
 <template>
-  <v-box
+  <div
     data-scope="carousel-indicators"
     position="absolute"
     left="0"
@@ -9,8 +9,8 @@
     justify-content="center"
     gap="sp-2"
   >
-    <v-box h="0.25rem" w="1.5rem" radius="br-full" bg="cl-primary" />
-    <v-box
+    <div h="0.25rem" w="1.5rem" radius="br-full" bg="cl-primary" />
+    <div
       v-for="n in 3"
       :key="n"
       h="0.25rem"
@@ -18,5 +18,5 @@
       radius="br-full"
       bg="rgba(255,255,255,0.4)"
     />
-  </v-box>
+  </div>
 </template>

@@ -1,7 +1,6 @@
 <template>
-  <v-box is="section" data-scope="product-description" flex-grow="1">
-    <v-box
-      is="h2"
+  <section data-scope="product-description" flex-grow="1">
+    <h2
       my="0"
       mb="0.5rem"
       fs="fs-sm"
@@ -10,9 +9,8 @@
       class="vp-raw"
     >
       Description
-    </v-box>
-    <v-box
-      is="p"
+    </h2>
+    <p
       my="0"
       fs="fs-sm"
       lh="lh-relaxed"
@@ -24,6 +22,6 @@
       High-performance running shoes designed for the urban environment.
       Features breathable mesh and superior cushioning for maximum comfort
       during your daily run.
-    </v-box>
-  </v-box>
+    </p>
+  </section>
 </template>

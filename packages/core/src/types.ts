@@ -192,67 +192,12 @@ export type VBoxProps = PseudoProps &
     asChild?: boolean;
   };
 
-export type VBoxStyleProps = Omit<VBoxProps, 'is'>;
-export type VBoxNativeStyleProps = Omit<VBoxProps, 'is' | 'asChild'>;
+export type VBoxStyleProps = Omit<VBoxProps, 'is' | 'asChild'>;
 
-type NativeStyleValue = string | number | DesignTokens;
-
-/**
- * Performance-oriented native attribute typing for template IntelliSense.
- * This intentionally covers common style props and aliases without materializing
- * the full CSS property surface on every HTML/SVG element.
- * @veebox/volar fills the gap by adding a “broad + smart” completion layer on top.
- */
 export type VBoxNativeTemplateProps = CommonPseudoProps &
   PseudoProps &
   BreakpointProps &
-  AliasProps &
-  CSSCustomProperties & {
-    color?: NativeStyleValue;
-    background?: NativeStyleValue;
-    backgroundColor?: NativeStyleValue;
-    border?: NativeStyleValue;
-    borderColor?: NativeStyleValue;
-    borderRadius?: NativeStyleValue;
-    display?: NativeStyleValue;
-    position?: NativeStyleValue;
-    top?: NativeStyleValue;
-    right?: NativeStyleValue;
-    bottom?: NativeStyleValue;
-    left?: NativeStyleValue;
-    width?: NativeStyleValue;
-    height?: NativeStyleValue;
-    maxWidth?: NativeStyleValue;
-    minWidth?: NativeStyleValue;
-    maxHeight?: NativeStyleValue;
-    minHeight?: NativeStyleValue;
-    margin?: NativeStyleValue;
-    marginTop?: NativeStyleValue;
-    marginRight?: NativeStyleValue;
-    marginBottom?: NativeStyleValue;
-    marginLeft?: NativeStyleValue;
-    padding?: NativeStyleValue;
-    paddingTop?: NativeStyleValue;
-    paddingRight?: NativeStyleValue;
-    paddingBottom?: NativeStyleValue;
-    paddingLeft?: NativeStyleValue;
-    gap?: NativeStyleValue;
-    rowGap?: NativeStyleValue;
-    columnGap?: NativeStyleValue;
-    fontSize?: NativeStyleValue;
-    fontWeight?: NativeStyleValue;
-    fontFamily?: NativeStyleValue;
-    lineHeight?: NativeStyleValue;
-    letterSpacing?: NativeStyleValue;
-    zIndex?: NativeStyleValue;
-    transform?: NativeStyleValue;
-    opacity?: NativeStyleValue;
-    overflow?: NativeStyleValue;
-    textDecoration?: NativeStyleValue;
-    whiteSpace?: NativeStyleValue;
-    objectFit?: NativeStyleValue;
-    objectPosition?: NativeStyleValue;
-    boxShadow?: NativeStyleValue;
+  AliasProps & {
     mq?: Record<`@media ${string}`, PropertiesAndSelectors>;
     cq?: Record<`@container ${string}`, PropertiesAndSelectors>;
     declarations?: PropertiesAndSelectors;

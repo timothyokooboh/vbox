@@ -1,6 +1,5 @@
 <template>
-  <v-box
-    is="img"
+  <img
     src="/victor-osimhen.jpg"
     alt="Victor Osimhen"
     title="Victor Osimhen"

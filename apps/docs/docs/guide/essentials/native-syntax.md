@@ -22,12 +22,12 @@ Enable it in Vite:
 ```ts
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
-import { vboxNativePlugin } from '@veebox/unplugin/vite';
+import { vboxVitePlugin } from '@veebox/unplugin/vite';
 import vboxConfig from './vbox.config';
 
 export default defineConfig({
   plugins: [
-    vboxNativePlugin({
+    vboxVitePlugin({
       aliases: Object.keys(vboxConfig.aliases?.values ?? {}),
     }),
     vue(),
@@ -38,11 +38,11 @@ export default defineConfig({
 Enable it in Nuxt:
 
 ```ts
-import { vboxNativePlugin } from '@veebox/unplugin/vite';
+import { vboxVitePlugin } from '@veebox/unplugin/vite';
 
 export default defineNuxtConfig({
   vite: {
-    plugins: [vboxNativePlugin()],
+    plugins: [vboxVitePlugin()],
   },
 });
 ```
@@ -75,7 +75,15 @@ Framework link components are parsed by default:
 </template>
 ```
 
-Other custom components are parsed only when explicitly marked:
+By default, all custom components are parsed:
+
+```vue
+<template>
+  <BaseButton color="blue" fs="fs-lg">Parsed</BaseButton>
+</template>
+```
+
+If you set `parseAllComponents: false`, custom components become opt-in via `vbox`:
 
 ```vue
 <template>
@@ -90,16 +98,18 @@ Other custom components are parsed only when explicitly marked:
 2. Object style props must use bound expressions.
 3. Invalid: `hover="{ color: 'red' }"`.
 4. Valid: `:hover="{ color: 'red' }"`.
-5. `router-link` and `nuxt-link` are parsed by default.
-6. Other custom components are parsed only when they include the `vbox` marker.
+5. `router-link`, `nuxt-link`, and other custom components are parsed by default.
+6. Set `parseAllComponents: false` if you want custom components to require the `vbox` marker.
 7. Use `vbox-ignore` to skip transform on an element subtree.
-8. Set `parseAllComponents: true` if you intentionally want all custom components parsed.
-9. If you define custom aliases in `vbox.config.ts`, pass their keys to the plugin:
+8. `vbox-ignore` prevents transform, but Volar token hover hints still appear on custom component token literals.
+9. Custom aliases are auto-loaded from nearest `vbox.config.*`. Use explicit `aliases`/`configPath` only as fallback:
 
 ```ts
-vboxNativePlugin({
-  aliases: Object.keys(vboxConfig.aliases?.values ?? {}),
-  parseAllComponents: false, // set true only if you want global custom-component parsing
+vboxVitePlugin({
+  // Optional fallback for non-standard config location:
+  // aliases: Object.keys(vboxConfig.aliases?.values ?? {}),
+  // configPath: './config/vbox.config.ts',
+  parseAllComponents: false, // optional: make custom components opt-in via `vbox`
   forceStyleAttrs: ['src'],
   forceSemanticAttrs: ['width'],
 });

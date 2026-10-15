@@ -21,7 +21,6 @@
     "@veebox/unplugin": "workspace:*",
     "@veebox/vue": "workspace:*",
     "@vueuse/core": "^14.0.0",
-    "class-variance-authority": "^0.7.1",
     "gsap": "^3.13.0",
     "lodash-es": "^4.17.21",
     "pinia": "^3.0.4",

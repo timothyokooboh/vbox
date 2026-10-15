@@ -58,14 +58,12 @@ const trailerEmbedUrl = computed(() =>
 
     <DialogPortal>
       <DialogOverlay
-        vbox
         position="fixed"
         inset="0"
         bg="color-mix(in oklab, black 68%, transparent)"
         z-index="z-modalOverlay"
       />
       <DialogContent
-        vbox
         pos="fixed"
         z-index="z-modalContent"
         top="50%"
@@ -82,11 +80,10 @@ const trailerEmbedUrl = computed(() =>
         shadow="bs-card"
         z="1101"
       >
-        <DialogTitle vbox m="0" fs="fs-xl" color="cl-ink">
+        <DialogTitle m="0" fs="fs-xl" color="cl-ink">
           {{ movieTitle }} Trailer
         </DialogTitle>
         <DialogDescription
-          vbox
           mt="sp-2"
           mb="sp-4"
           color="color-mix(in oklab, var(--color-ink) 72%, transparent)"

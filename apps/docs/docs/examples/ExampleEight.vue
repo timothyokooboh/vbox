@@ -1,5 +1,5 @@
 <template>
-  <v-box
+  <div
     w="250px"
     bg="tomato"
     p="1rem"
@@ -12,5 +12,5 @@
     }"
   >
     Hover on this box
-  </v-box>
+  </div>
 </template>

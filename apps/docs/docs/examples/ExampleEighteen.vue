@@ -1,7 +1,7 @@
 <template>
-  <v-box is="p" color="tomato" :animation="`${slideFromTop} 0.5s ease-in-out`">
+  <p color="tomato" :animation="`${slideFromTop} 0.5s ease-in-out`">
     VBox is cool
-  </v-box>
+  </p>
 </template>
 
 <script setup lang="ts">

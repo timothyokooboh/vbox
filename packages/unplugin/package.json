@@ -22,6 +22,11 @@
       "import": "./dist/vite.js",
       "require": "./dist/vite.js"
     },
+    "./webpack": {
+      "types": "./dist/webpack.d.ts",
+      "import": "./dist/webpack.js",
+      "require": "./dist/webpack.js"
+    },
     "./transform": {
       "types": "./dist/transform.d.ts",
       "import": "./dist/transform.js",
@@ -39,9 +44,11 @@
   },
   "dependencies": {
     "@veebox/core": "workspace:*",
+    "jiti": "^2.6.1",
     "known-css-properties": "^0.37.0"
   },
   "devDependencies": {
+    "@types/node": "^24.10.1",
     "typescript": "~5.9.3"
   }
 }
