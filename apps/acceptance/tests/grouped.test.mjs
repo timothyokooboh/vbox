@@ -60,7 +60,7 @@ test('selector names are not template prefixes and clean conditions retain their
     '2xl': { opacity: 0.5 },
   });
   assert.match(css, /vb-card\s*\{[^}]*color:red/);
-  assert.match(css, /:disabled\s*\{[^}]*color:blue/);
+  assert.match(css, /:disabled[^{}]*\{[^}]*color:blue/);
   assert.match(css, /@media.*96rem.*opacity:0.5/);
 });
 

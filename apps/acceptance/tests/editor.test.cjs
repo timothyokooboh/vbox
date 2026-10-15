@@ -71,7 +71,15 @@ function createEditor(source, root = path.resolve(__dirname, '..')) {
         ?.entries.map((entry) => entry.name.replace(/^["']|["']$/g, '')) ?? [],
     hover: (token) =>
       proxy.getQuickInfoAtPosition(file, source.indexOf(token) + 1),
-    diagnostics: () => proxy.getSemanticDiagnostics(file),
+    diagnostics: () =>
+      proxy
+        .getSemanticDiagnostics(file)
+        .map(({ code, start, length, messageText }) => ({
+          code,
+          start,
+          length,
+          messageText: ts.flattenDiagnosticMessageText(messageText, '\n'),
+        })),
     update: (next) => {
       source = next;
       version++;
@@ -264,4 +272,19 @@ const styles: VBoxStyleInput = [base, false, null, undefined, { hover: { color: 
 </script><template><button translate="no" :vb="styles">Save</button></template>`);
   t.after(() => editor.dispose());
   assert.deepEqual(editor.diagnostics(), []);
+});
+
+test('recursive style-only groups typecheck without changing semantic disabled', (t) => {
+  const script = `<script setup lang="ts">import '@veebox/vue'; import type { VBoxStyles } from '@veebox/core';
+const styles: VBoxStyles = { hover: { focus: { active: { color: 'red' } } }, disabled: { hover: { opacity: null } } };
+</script>`;
+  const editor = createEditor(
+    `${script}<template><button disabled :vb="styles">Nested states</button></template>`,
+  );
+  t.after(() => editor.dispose());
+  assert.deepEqual(editor.diagnostics(), []);
+  editor.update(
+    `${script}<template><button :disabled="{ color: 'red' }" :vb="styles">Wrong semantic value</button></template>`,
+  );
+  assert.ok(editor.diagnostics().length > 0);
 });

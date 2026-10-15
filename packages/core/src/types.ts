@@ -4,7 +4,7 @@ import type {
   VendorPropertiesHyphen,
   Pseudos,
 } from 'csstype';
-import { type DefaultAliases } from './constants';
+import type { DefaultAliases, ObjectStyleKeys } from './constants';
 
 export type CSSCustomProperties = { [index: `--${string}`]: unknown };
 export type CssProperties = StandardProperties &
@@ -199,8 +199,18 @@ type NullableStyleValues<T> = T extends object
   : T;
 
 /** Style-only object boundary; template prefixes never belong in these keys. */
-export type VBoxStyles = NullableStyleValues<VBoxStyleProps> &
-  Record<string, unknown>;
+type RecursiveConditionKey =
+  | Exclude<(typeof ObjectStyleKeys)[number], 'mq' | 'cq' | 'pseudos'>
+  | 'disabled'
+  | '2xl';
+
+export type VBoxStyles = NullableStyleValues<CSSStyleProps> & {
+  [Key in AliasKeyVariants<RecursiveConditionKey>]?: VBoxStyles | null;
+} & {
+  mq?: Record<`@media ${string}`, VBoxStyles | null> | null;
+  cq?: Record<`@container ${string}`, VBoxStyles | null> | null;
+  pseudos?: { [Key in Pseudos]?: VBoxStyles | null } | null;
+} & Record<string, unknown>;
 export type VBoxStyleInput =
   | VBoxStyles
   | readonly (VBoxStyles | null | undefined | false)[]

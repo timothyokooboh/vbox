@@ -1,3 +1,4 @@
+import { compareStyleContexts } from './contexts.js';
 import type { Breakpoints } from '../types.js';
 import type { StyleContext, StyleDeclaration } from './types.js';
 
@@ -7,10 +8,8 @@ export const renderStyleDeclarations = (
   className: string,
   breakpoints: Breakpoints,
 ) => {
-  const conditional = (context: StyleContext) =>
-    context.some((step) => step.kind !== 'selector');
-  const ordered = [...declarations].sort(
-    (a, b) => Number(conditional(a.context)) - Number(conditional(b.context)),
+  const ordered = [...declarations].sort((a, b) =>
+    compareStyleContexts(a.context, b.context),
   );
   const blocks: Array<{ key: string; context: StyleContext; css: string }> = [];
   for (const declaration of ordered) {
@@ -28,7 +27,7 @@ export const renderStyleDeclarations = (
       for (const step of [...context].reverse()) {
         const wrapper =
           step.kind === 'state'
-            ? `&:${step.value}`
+            ? `&:where(:${step.value})`
             : step.kind === 'theme'
               ? ':where(html.dark) &'
               : step.kind === 'breakpoint'
