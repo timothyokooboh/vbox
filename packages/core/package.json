@@ -27,7 +27,12 @@
       "import": "./dist/index.es.js",
       "require": "./dist/index.cjs"
     },
-    "./styles/resets.css": "./dist/styles/resets.css"
+    "./styles/resets.css": "./dist/styles/resets.css",
+    "./config": {
+      "types": "./dist/types/config.d.ts",
+      "import": "./dist/cli/config.js",
+      "default": "./dist/cli/config.js"
+    }
   },
   "bin": {
     "vbox-type-gen": "dist/cli/cli/generate-types.js"

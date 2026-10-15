@@ -13,6 +13,20 @@ export const ThemeCategories: readonly ThemeKeys[] = [
   'zIndex',
 ];
 
+/** Token prefixes map to the same categories in runtime, editor and type generation. */
+export const TokenCategories = {
+  cl: 'color',
+  fs: 'fontSize',
+  fw: 'fontWeight',
+  ff: 'fontFamily',
+  lh: 'lineHeight',
+  ls: 'letterSpacing',
+  sp: 'spacing',
+  br: 'borderRadius',
+  bs: 'boxShadow',
+  z: 'zIndex',
+} as const;
+
 export const DefaultAliases = {
   w: 'width',
   maxW: 'maxWidth',

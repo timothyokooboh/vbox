@@ -1,9 +1,6 @@
 import { transformExplicitStyles } from './explicit.js';
 import * as knownCssPropertiesModule from 'known-css-properties';
-import fs from 'node:fs';
-import path from 'node:path';
-import { createJiti } from 'jiti';
-import { kebabToCamelCase, toKebabCase } from '@veebox/core';
+import { kebabToCamelCase, toKebabCase, validateAliasKeys } from '@veebox/core';
 import { ExplicitStyleKeys, ObjectStyleKeys } from './constants.js';
 import { isSemanticAttributeForTag } from './semantic.js';
 import type {
@@ -11,7 +8,7 @@ import type {
   VBoxSfcTransformResult,
 } from './types.js';
 
-const importWithJiti = createJiti(import.meta.url, { interopDefault: true });
+import { loadVBoxConfig, findVBoxConfig } from '@veebox/core/config';
 
 const resolveKnownCssProperties = () => {
   const moduleAsRecord = knownCssPropertiesModule as Record<string, unknown>;
@@ -35,60 +32,7 @@ const KnownCssPropertySet = new Set(
     .filter(Boolean),
 );
 
-const VBOX_CONFIG_FILES = [
-  'vbox.config.ts',
-  'vbox.config.js',
-  'vbox.config.cjs',
-  'vbox.config.mjs',
-];
-
-const AliasConfigCache = new Map<string, string[]>();
-
 const normalizeIdPath = (id: string) => id.split('?')[0];
-
-const findNearestVBoxConfig = (startDir: string): string | null => {
-  let current = path.resolve(startDir);
-  let previous = '';
-
-  while (current !== previous) {
-    for (const candidate of VBOX_CONFIG_FILES) {
-      const fullPath = path.join(current, candidate);
-      if (fs.existsSync(fullPath)) return fullPath;
-    }
-    previous = current;
-    current = path.dirname(current);
-  }
-
-  return null;
-};
-
-const loadAliasKeysFromConfig = (
-  options: VBoxNativePluginOptions,
-  id: string,
-): string[] => {
-  const explicitPath =
-    typeof options.configPath === 'string' && options.configPath.length > 0
-      ? path.resolve(options.rootDir ?? process.cwd(), options.configPath)
-      : null;
-  const idPath = normalizeIdPath(id);
-  const configPath =
-    explicitPath ??
-    findNearestVBoxConfig(path.dirname(idPath || process.cwd()));
-
-  if (!configPath) return [];
-  if (AliasConfigCache.has(configPath)) return AliasConfigCache.get(configPath)!;
-
-  try {
-    const mod = importWithJiti(configPath);
-    const config = mod?.default ?? mod;
-    const aliases = Object.keys(config?.aliases?.values ?? {});
-    AliasConfigCache.set(configPath, aliases);
-    return aliases;
-  } catch {
-    AliasConfigCache.set(configPath, []);
-    return [];
-  }
-};
 
 const isWhitespace = (ch) => /\s/.test(ch);
 
@@ -538,16 +482,20 @@ export const transformVueSfc = (
 
   // Internal expansion seam. Explicit files never enter the unpublished inference path.
   // The integration cutover removes that fallback after consumers are migrated.
+  const loaded = Array.isArray(options.aliases)
+    ? { file: findVBoxConfig(options, normalizedId), config: {} }
+    : loadVBoxConfig(options, normalizedId);
+  const resolvedAliases =
+    options.aliases ?? Object.keys(loaded.config.aliases?.values ?? {});
+  validateAliasKeys(resolvedAliases, loaded.file ?? 'compiler aliases');
+  const dependencies = loaded.file ? [loaded.file] : [];
   const explicit = transformExplicitStyles(code, normalizedId);
-  if (explicit) return explicit;
+  if (explicit) return { ...explicit, dependencies };
 
   // extract template and its content
   const match = code.match(TemplateRegex);
   if (!match || match.index == null) return null;
 
-  const resolvedAliases = Array.isArray(options.aliases)
-    ? options.aliases
-    : loadAliasKeysFromConfig(options, normalizedId);
   const isStyleKey = createStyleKeyMatcher(options, resolvedAliases);
   const originalTemplate = match[1];
   const transformedTemplate = transformTemplateContent(
@@ -567,6 +515,7 @@ export const transformVueSfc = (
 
   return {
     code: updated,
+    dependencies,
     map: null,
   };
 };

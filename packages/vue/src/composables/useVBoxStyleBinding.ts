@@ -4,7 +4,6 @@ import {
   DefaultAliases,
   DefaultBreakpoints,
   createDjb2Hash,
-  stableStringify,
   injectCSS,
 } from '@veebox/core';
 import {
@@ -28,7 +27,7 @@ export const useVBoxStyleBinding = () => {
     styles: Record<string, unknown>,
     semanticProps?: Record<string, unknown> | null,
   ) => {
-    const hash = createDjb2Hash(stableStringify(styles));
+    const hash = createDjb2Hash(JSON.stringify([styles, aliases, breakpoints]));
     const className = `${prefix ? `${prefix}-` : ''}css-${hash}`;
     const css = resolveVBoxCss({ styles, className, aliases, breakpoints });
     if (context) getSSRCollector(context).collect(css);
