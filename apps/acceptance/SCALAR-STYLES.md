@@ -31,7 +31,8 @@ pnpm --filter @veebox/unplugin test
   validation can ignore declarations the browser does not implement.
 - Object-group strings are rejected with guidance to expression bindings.
   Built-in groups come from core metadata, including compatibility spellings.
-  Recursive composition and grouped `:vb` attach in subsequent slices.
+  Recursive composition and grouped `:vb` attach in subsequent slices. Until
+  then, reserved grouped bindings fail explicitly rather than entering inference.
 - Empty/malformed names, duplicate normalized names, style binding modifiers,
   and non-rendering template/slot targets receive compiler errors. Prefer the
   explicit camel spelling over `.camel`; `.prop`/`.attr` do not apply to CSS.
@@ -44,7 +45,9 @@ pnpm --filter @veebox/unplugin test
   class without feeding the semantic properties into the style engine.
 - Generated setup imports/bindings avoid consumer identifiers. Authored script
   statements, style blocks and custom-block contents are preserved; an internal
-  setup prelude is added. A normal Options API script keeps its default export.
+  setup prelude is added. Normal scripts receive a local Options API mixin rather
+  than a second setup block: authored setup state, lifecycle hooks, options and
+  events remain intact (verified in CSR and SSR/hydration).
 - External `script src` integration currently receives an explicit limitation
   error; ticket #9 owns wider build/edit integration. This stack is unreleased.
 

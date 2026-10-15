@@ -101,10 +101,9 @@ test('ordinary Options API scripts retain their own default export and TypeScrip
   const source = `<script lang="ts">export default { data: () => ({ color: 'red' }) };</script><template><p :vb-color="color">Options API</p></template>`;
   const out = transformVueSfc(source, '/project/Example.vue');
   assertVueCompiles(out.code);
-  assert.equal(
-    parse(out.code).descriptor.script.content,
-    parse(source).descriptor.script.content,
-  );
+  assert.equal(parse(out.code).descriptor.script.lang, 'ts');
+  assert.equal(parse(out.code).descriptor.scriptSetup, null);
+  assert.ok(out.code.includes("data: () => ({ color: 'red' })"));
 });
 
 test('exact prefix recognition preserves similar semantic names and future CSS intent', () => {
@@ -158,4 +157,13 @@ test('v-pre detection does not mistake attribute values or text for directive bo
   const attrs = parse(out.code).descriptor.template.ast.children[0].props;
   assert.ok(!attrs.some((prop) => prop.name === 'vb-color'));
   assert.ok(attrs.some((prop) => prop.name === 'title'));
+});
+
+test('reserved grouped bindings never enter inference while composition is unavailable', () => {
+  for (const attr of [':vb="styles"', 'vb="styles"']) {
+    assert.throws(
+      () => transform(`<Widget ${attr} color="tomato" size="lg" />`),
+      /grouped.*not.*supported/i,
+    );
+  }
 });

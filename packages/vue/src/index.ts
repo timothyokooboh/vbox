@@ -22,4 +22,7 @@ declare module 'vue' {
   }
 }
 
-export { useVBoxStyleBinding } from './composables/useVBoxStyleBinding';
+export {
+  useVBoxStyleBinding,
+  withVBoxStyleBinding,
+} from './composables/useVBoxStyleBinding';
