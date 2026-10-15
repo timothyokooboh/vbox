@@ -1,0 +1,38 @@
+{
+  "name": "@vbox/acceptance",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build && webpack --config webpack.config.mjs && vite build --ssr src/entry-server.ts --outDir dist/server",
+    "test": "pnpm build && playwright test",
+    "type-check": "vue-tsc --noEmit -p tsconfig.json",
+    "test:editor": "node --test tests/editor.test.cjs",
+    "test:browser": "playwright test",
+    "benchmark": "node benchmark.mjs"
+  },
+  "dependencies": {
+    "@veebox/core": "workspace:*",
+    "@veebox/vue": "workspace:*",
+    "@veebox/property-variance-authority": "workspace:*",
+    "vue": "^3.5.24"
+  },
+  "devDependencies": {
+    "@veebox/unplugin": "workspace:*",
+    "@veebox/volar": "workspace:*",
+    "@playwright/test": "^1.51.1",
+    "@vitejs/plugin-vue": "^6.0.3",
+    "@vue/compiler-sfc": "^3.5.24",
+    "@vue/server-renderer": "^3.5.24",
+    "@vue/language-core": "3.2.5",
+    "@volar/typescript": "2.4.28",
+    "@types/node": "^24.10.1",
+    "typescript": "~5.9.3",
+    "vite": "^7.2.4",
+    "vue-tsc": "3.2.5",
+    "webpack": "^5.102.1",
+    "webpack-cli": "^6.0.1",
+    "vue-loader": "^17.4.2",
+    "ts-loader": "^9.5.4",
+    "html-webpack-plugin": "^5.6.4"
+  }
+}

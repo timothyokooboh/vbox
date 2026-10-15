@@ -108,9 +108,9 @@ describe('native vbox template transform', () => {
     expect(out?.code).toContain(`'color': 'red'`);
   });
 
-  test('does not transform custom components inside scope', () => {
+  test('does not transform custom components inside scope when global component parsing is disabled', () => {
     const source = `<template><v-box><MyCard color="red" /></v-box></template>`;
-    const out = transformVueSfc(source, '/tmp/example.vue');
+    const out = transformVueSfc(source, '/tmp/example.vue', { parseAllComponents: false });
 
     expect(out).toBeNull();
   });
@@ -300,9 +300,9 @@ describe('native vbox template transform', () => {
     expect(out?.code).toContain(`<p v-vbox-runtime="{ 'color': 'red' }">Hello</p>`);
   });
 
-  test('keeps unmarked custom components untouched', () => {
+  test('keeps unmarked custom components untouched when global component parsing is disabled', () => {
     const source = `<template><BaseButton color="blue">Sign in</BaseButton></template>`;
-    const out = transformVueSfc(source, '/tmp/example.vue');
+    const out = transformVueSfc(source, '/tmp/example.vue', { parseAllComponents: false });
     expect(out).toBeNull();
   });
 
