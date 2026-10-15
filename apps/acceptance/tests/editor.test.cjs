@@ -246,3 +246,12 @@ test('grouped styles are typed separately from native semantic translate and ord
       ),
   );
 });
+
+test('style-only types permit withdrawal inside existing condition and selector groups', (t) => {
+  const editor = createEditor(`<script setup lang="ts">
+import '@veebox/vue'; import type { VBoxStyles } from '@veebox/core';
+const styles: VBoxStyles = { hover: { color: null }, _disabled: { opacity: null }, declarations: { '&::before': { content: null } } };
+</script><template><button :vb="styles">Save</button></template>`);
+  t.after(() => editor.dispose());
+  assert.deepEqual(editor.diagnostics(), []);
+});

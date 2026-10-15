@@ -59,3 +59,17 @@ test('grouped objects survive hydration and support undefined and explicit reset
   await page.getByRole('button', { name: 'Reset grouped' }).click();
   await expect(target).toHaveCSS('opacity', '1');
 });
+
+test('clean and compatibility condition spellings style the same state', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await expect(page.getByTestId('clean-disabled')).toHaveCSS(
+    'color',
+    'rgb(255, 0, 0)',
+  );
+  await expect(page.getByTestId('legacy-disabled')).toHaveCSS(
+    'color',
+    'rgb(255, 0, 0)',
+  );
+});

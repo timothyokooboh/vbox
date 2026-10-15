@@ -160,11 +160,12 @@ export const transformExplicitStyles = (
           `[VBox] ${id}:${prop.loc.start.line}:${prop.loc.start.column} Invalid style property name ${JSON.stringify(name)}.`,
         );
       }
-      if (seen.has(key))
+      const identity = name === 'vb' ? ':vb' : key;
+      if (seen.has(identity))
         throw new SyntaxError(
           `[VBox] Duplicate style binding for ${key}; keep one spelling.`,
         );
-      seen.add(key);
+      seen.add(identity);
       if (prop.type === 7 && prop.modifiers.length) {
         throw new SyntaxError(
           `[VBox] ${id}:${prop.loc.start.line}:${prop.loc.start.column} Style binding modifiers are not supported; remove the modifier from ${name}.`,

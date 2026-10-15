@@ -1,4 +1,4 @@
-import { isConditionKey } from './resolveConfig.js';
+import { getConditionKey } from './resolveConfig.js';
 import { getStyleBindingKey } from './styleBindingName.js';
 import { toKebabCase } from './toKebabCase.js';
 
@@ -32,24 +32,27 @@ export const readStyleObject = (
     for (const [key, entry] of Object.entries(value)) {
       if (entry == null) continue;
       const at = `${location}.${key}`;
-      if (
-        source === 'grouped' &&
-        !onlySelectors &&
-        getStyleBindingKey(key) !== null
-      )
+      const condition = getConditionKey(key);
+      const selector =
+        onlySelectors ||
+        (selectors &&
+          !condition &&
+          !key.startsWith('--') &&
+          isPlainObject(entry));
+      if (source === 'grouped' && !selector && getStyleBindingKey(key) !== null)
         throw new TypeError(
           `[VBox] ${at}: use unprefixed style keys inside :vb objects.`,
         );
-      if (onlySelectors || isConditionKey(key)) {
-        const name = toKebabCase(key);
+      if (selector) {
+        result.push([key, read(entry, at, onlySelectors)]);
+      } else if (condition) {
+        const name = toKebabCase(condition);
         result.push([
-          key,
+          condition,
           read(entry, at, true, ['mq', 'cq', 'pseudos'].includes(name)),
         ]);
       } else if (typeof entry === 'string' || typeof entry === 'number') {
         result.push([key, entry]);
-      } else if (selectors && isPlainObject(entry)) {
-        result.push([key, read(entry, at, true)]);
       } else {
         throw new TypeError(
           `[VBox] ${at} expects a scalar string/number or a known condition-group object.`,
