@@ -15,7 +15,7 @@
     "url": "git+https://github.com/timothyokooboh/vbox.git"
   },
   "type": "module",
-  "main": "dist/index.umd.js",
+  "main": "dist/index.cjs",
   "module": "dist/index.es.js",
   "types": "dist/types/index.d.ts",
   "files": [
@@ -25,7 +25,7 @@
     ".": {
       "types": "./dist/types/index.d.ts",
       "import": "./dist/index.es.js",
-      "require": "./dist/index.umd.js"
+      "require": "./dist/index.cjs"
     },
     "./styles/resets.css": "./dist/styles/resets.css"
   },

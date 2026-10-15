@@ -1,5 +1,5 @@
 <template>
-  <v-box
+  <div
     fs="1rem"
     bg="tomato"
     py="2rem"
@@ -11,6 +11,7 @@
         backgroundColor: 'indigo',
       },
     }"
-    >Responsive font size</v-box
   >
+    Responsive font size
+  </div>
 </template>

@@ -1,5 +1,5 @@
 <template>
-  <v-box
+  <div
     display="grid"
     gap="1rem"
     :sm="{
@@ -12,6 +12,13 @@
       gridTemplateColumns: 'repeat(4, 1fr)',
     }"
   >
-    <v-box v-for="n in 8" :key="n" w="100%" h="150px" bg="tomato" :sm="{ width: '150px' }" />
-  </v-box>
+    <div
+      v-for="n in 8"
+      :key="n"
+      w="100%"
+      h="150px"
+      bg="tomato"
+      :sm="{ width: '150px' }"
+    />
+  </div>
 </template>

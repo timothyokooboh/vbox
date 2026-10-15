@@ -89,7 +89,7 @@ test('collectTokenHints supports framework links without marker', () => {
   assert.equal(hints[0].token, 'cl-brand');
 });
 
-test('collectTokenHints ignores unmarked custom components', () => {
+test('collectTokenHints supports unmarked custom components by default', () => {
   const ast = baseParse(`<BaseButton color="cl-brand">Save</BaseButton>`);
   const hints = collectTokenHints(
     ast,
@@ -97,16 +97,30 @@ test('collectTokenHints ignores unmarked custom components', () => {
     () => true,
   );
 
-  assert.equal(hints.length, 0);
+  assert.equal(hints.length, 1);
+  assert.equal(hints[0].token, 'cl-brand');
 });
 
-test('collectTokenHints supports parseAllComponents option for custom components', () => {
+test('collectTokenHints supports custom component hovers when parseAllComponents is false', () => {
   const ast = baseParse(`<BaseButton color="cl-brand">Save</BaseButton>`);
   const hints = collectTokenHints(
     ast,
     (token) => (token === 'cl-brand' ? '#c52341' : null),
     () => true,
-    { parseAllComponents: true },
+    { parseAllComponents: false },
+  );
+
+  assert.equal(hints.length, 1);
+  assert.equal(hints[0].token, 'cl-brand');
+});
+
+test('collectTokenHints still shows custom component hovers with vbox-ignore', () => {
+  const ast = baseParse(`<BaseButton vbox-ignore color="cl-brand">Save</BaseButton>`);
+  const hints = collectTokenHints(
+    ast,
+    (token) => (token === 'cl-brand' ? '#c52341' : null),
+    () => true,
+    { parseAllComponents: false },
   );
 
   assert.equal(hints.length, 1);
@@ -214,6 +228,17 @@ test('style key matcher supports semantic/style overrides', () => {
   assert.equal(isStyleKey('img', 'width'), false);
 });
 
+test('buildAttrCompletionKeys explicit aliases replace config aliases', () => {
+  const keys = buildAttrCompletionKeys(
+    { aliases: { values: { glass: 'backdropFilter' } } },
+    [],
+    { aliases: ['borderR'] },
+  );
+
+  assert.equal(keys.includes('borderR'), true);
+  assert.equal(keys.includes('glass'), false);
+});
+
 test('collectCompletionHints returns style attr and token value hints', () => {
   const ast = baseParse(`<p color=\"cl-brand\" fs=\"fs-lg\">Hello</p>`);
   const tokenMap = new Map([
@@ -233,8 +258,8 @@ test('collectCompletionHints returns style attr and token value hints', () => {
 
   assert.equal(hints.attrHints.some((hint) => hint.value === 'color'), true);
   assert.equal(hints.attrHints.some((hint) => hint.value === 'fs'), true);
-  assert.equal(hints.valueHints.some((hint) => hint.value === 'cl-brand'), true);
-  assert.equal(hints.valueHints.some((hint) => hint.value === 'fs-lg'), true);
+  assert.equal(hints.valueHints.some((hint) => hint.typedValue === 'cl-brand'), true);
+  assert.equal(hints.valueHints.some((hint) => hint.typedValue === 'fs-lg'), true);
 });
 
 test('buildCompletionCode emits mapped completion segments', () => {
@@ -242,9 +267,9 @@ test('buildCompletionCode emits mapped completion segments', () => {
     [{ value: 'color', offset: 10, length: 5 }],
     [
       {
-        value: 'cl-brand',
+        typedValue: 'cl-brand',
+        mappedValue: 'cl-brand',
         offset: 20,
-        length: 8,
         candidates: ['cl-brand', 'cl-red-400'],
       },
     ],
@@ -261,4 +286,77 @@ test('buildAttrCompletionKeys includes broad css properties', () => {
   const keys = buildAttrCompletionKeys({});
   assert.equal(keys.includes('backdrop-filter'), true);
   assert.equal(keys.includes('text-transform'), true);
+});
+
+test('collectCompletionHints includes empty quoted value context for token completion', () => {
+  const ast = baseParse(`<h1 font-size=\"\">Hello</h1>`);
+  const tokenMap = new Map([
+    ['fs-lg', '1.125rem'],
+    ['fs-xl', '1.25rem'],
+    ['cl-brand', '#c52341'],
+  ]);
+  const prefixMap = buildTokenPrefixByProperty({});
+  const cache = new Map();
+  const hints = collectCompletionHints(
+    ast,
+    () => true,
+    (key, typedPrefix) =>
+      getTokenCandidatesForKey(key, tokenMap, prefixMap, cache, typedPrefix),
+    {},
+  );
+
+  assert.equal(hints.valueHints.length > 0, true);
+  const emptyHint = hints.valueHints[0];
+  assert.equal(emptyHint.typedValue, '');
+  assert.equal(emptyHint.mappedValue, '""');
+  assert.deepEqual(emptyHint.candidates, ['fs-lg', 'fs-xl']);
+});
+
+test('getTokenCandidatesForKey narrows tokens by property prefix mapping', () => {
+  const tokenMap = new Map([
+    ['cl-brand', '#c52341'],
+    ['cl-red-400', '#f87171'],
+    ['fs-lg', '1.125rem'],
+    ['fs-xl', '1.25rem'],
+    ['br-md', '0.5rem'],
+  ]);
+  const prefixMap = buildTokenPrefixByProperty({});
+  const cache = new Map();
+
+  const forFontSize = getTokenCandidatesForKey(
+    'font-size',
+    tokenMap,
+    prefixMap,
+    cache,
+  );
+  assert.deepEqual(forFontSize, ['fs-lg', 'fs-xl']);
+
+  const forBorderColor = getTokenCandidatesForKey(
+    'border-color',
+    tokenMap,
+    prefixMap,
+    cache,
+  );
+  assert.deepEqual(forBorderColor, ['cl-brand', 'cl-red-400']);
+});
+
+test('getTokenCandidatesForKey prefers typed token prefix over property fallback', () => {
+  const tokenMap = new Map([
+    ['cl-brand', '#c52341'],
+    ['cl-red-400', '#f87171'],
+    ['fs-lg', '1.125rem'],
+    ['fs-xl', '1.25rem'],
+  ]);
+  const prefixMap = buildTokenPrefixByProperty({});
+  const cache = new Map();
+
+  const fromTypedPrefix = getTokenCandidatesForKey(
+    'font-size',
+    tokenMap,
+    prefixMap,
+    cache,
+    'cl',
+  );
+
+  assert.deepEqual(fromTypedPrefix, ['cl-brand', 'cl-red-400']);
 });

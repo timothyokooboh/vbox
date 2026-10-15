@@ -1,6 +1,5 @@
 <template>
-  <v-box
-    is="section"
+  <section
     role="alert"
     data-scope="banner-root"
     display="flex"
@@ -18,7 +17,7 @@
     <BannerHeader />
     <BannerBody />
     <BannerFooter />
-  </v-box>
+  </section>
 </template>
 
 <script lang="ts" setup>

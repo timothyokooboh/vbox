@@ -1,7 +1,6 @@
 <template>
   <div data-scope="banner-body">
-    <v-box
-      is="p"
+    <p
       my="0"
       fs="fs-sm"
       display="flex"
@@ -13,6 +12,6 @@
     >
       You’ve used up your free quota. Upgrade to continue, or come back after
       3:00 PM when it resets.
-    </v-box>
+    </p>
   </div>
 </template>

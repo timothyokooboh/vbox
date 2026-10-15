@@ -1,23 +1,15 @@
 <template>
-  <v-box is="section" data-scope="product-size-selector">
-    <v-box
+  <section data-scope="product-size-selector">
+    <div
       display="flex"
       align-items="center"
       justify-content="space-between"
       mb="0.7rem"
     >
-      <v-box
-        is="h2"
-        my="0"
-        fs="fs-sm"
-        fw="fw-bold"
-        color="cl-text-product"
-        class="vp-raw"
-      >
+      <h2 my="0" fs="fs-sm" fw="fw-bold" color="cl-text-product" class="vp-raw">
         Select Size
-      </v-box>
-      <v-box
-        is="button"
+      </h2>
+      <button
         cursor="pointer"
         bg="transparent"
         fs="fs-xs"
@@ -31,10 +23,10 @@
         v-bind="outlineStyles"
       >
         Size Guide
-      </v-box>
-    </v-box>
+      </button>
+    </div>
 
-    <v-box
+    <div
       display="flex"
       gap="sp-3"
       py="sp-1"
@@ -47,10 +39,9 @@
         },
       }"
     >
-      <v-box is="button" v-bind="baseSizeSelectionStyles">39</v-box>
-      <v-box is="button" v-bind="baseSizeSelectionStyles">40</v-box>
-      <v-box
-        is="button"
+      <button v-bind="baseSizeSelectionStyles">39</button>
+      <button v-bind="baseSizeSelectionStyles">40</button>
+      <button
         v-bind="baseSizeSelectionStyles"
         bg="cl-primary"
         border="none"
@@ -60,13 +51,13 @@
         }"
       >
         41
-      </v-box>
-      <v-box is="button" v-bind="baseSizeSelectionStyles">42</v-box>
-      <v-box is="button" v-bind="baseSizeSelectionStyles">43</v-box>
-      <v-box is="button" v-bind="baseSizeSelectionStyles">44</v-box>
-      <v-box is="button" v-bind="baseSizeSelectionStyles">45</v-box>
-    </v-box>
-  </v-box>
+      </button>
+      <button v-bind="baseSizeSelectionStyles">42</button>
+      <button v-bind="baseSizeSelectionStyles">43</button>
+      <button v-bind="baseSizeSelectionStyles">44</button>
+      <button v-bind="baseSizeSelectionStyles">45</button>
+    </div>
+  </section>
 </template>
 
 <script setup lang="ts">

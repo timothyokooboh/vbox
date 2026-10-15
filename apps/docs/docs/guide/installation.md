@@ -62,15 +62,18 @@ pnpm add @veebox/unplugin
 // vite.config.ts
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
-import { vboxNativePlugin } from '@veebox/unplugin/vite';
+import { vboxVitePlugin } from '@veebox/unplugin/vite';
 import vboxConfig from './vbox.config';
 
 export default defineConfig({
   plugins: [
-    vboxNativePlugin({
-      aliases: Object.keys(vboxConfig.aliases?.values ?? {}),
-      // Optional: parse all custom components globally.
-      // parseAllComponents: true,
+    vboxVitePlugin({
+      // Optional fallback if config is in non-standard location:
+      // aliases: Object.keys(vboxConfig.aliases?.values ?? {}),
+      // configPath: './config/vbox.config.ts',
+      // Optional: custom components are parsed globally by default.
+      // Set false to require explicit `vbox` marker on custom component instances.
+      // parseAllComponents: false,
       // Optional safety overrides for edge-case attr collisions:
       // forceSemanticAttrs: ['src'],
       // forceStyleAttrs: ['myCustomStyleAttr'],
@@ -118,4 +121,6 @@ You can also pass options:
 Current behavior:
 
 1. Works for static token literals in template attributes (for example `color="cl-brand"`).
-2. Does not resolve dynamic expressions like `:color="tokenName"` at hover time.
+2. Works on both native tags and custom component instances.
+3. For custom components, token hover hints still show even when `parseAllComponents: false` or the instance has `vbox-ignore`.
+4. Does not resolve dynamic expressions like `:color="tokenName"` at hover time.

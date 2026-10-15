@@ -1,5 +1,5 @@
 <template>
-  <v-box
+  <div
     w="200px"
     p="1rem"
     color="white"
@@ -9,5 +9,5 @@
     }"
   >
     Responsive theme
-  </v-box>
+  </div>
 </template>

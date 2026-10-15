@@ -1,6 +1,5 @@
 <template>
-  <v-box
-    is="label"
+  <label
     position="relative"
     :pseudos="{
       '::after': {
@@ -14,5 +13,5 @@
     }"
   >
     Enter your username
-  </v-box>
+  </label>
 </template>

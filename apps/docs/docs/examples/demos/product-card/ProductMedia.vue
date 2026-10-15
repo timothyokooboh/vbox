@@ -1,5 +1,5 @@
 <template>
-  <v-box
+  <div
     data-scope="product-media"
     h="50vh"
     position="relative"
@@ -14,12 +14,12 @@
       px: '1.5rem',
     }"
   >
-    <v-box display="flex" justify-content="space-between" align-items="center">
+    <div display="flex" justify-content="space-between" align-items="center">
       <ProductMediaIcons>
         <span class="material-symbols-outlined">arrow_back</span>
       </ProductMediaIcons>
 
-      <v-box display="flex" gap="sp-2" align-items="center">
+      <div display="flex" gap="sp-2" align-items="center">
         <ProductMediaIcons>
           <span class="material-symbols-outlined">favorite</span>
         </ProductMediaIcons>
@@ -27,11 +27,11 @@
         <ProductMediaIcons>
           <span class="material-symbols-outlined">shopping_bag</span>
         </ProductMediaIcons>
-      </v-box>
-    </v-box>
+      </div>
+    </div>
 
     <CarouselIndicators />
-  </v-box>
+  </div>
 </template>
 
 <script lang="ts" setup>

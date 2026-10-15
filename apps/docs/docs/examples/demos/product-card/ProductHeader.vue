@@ -1,14 +1,13 @@
 <template>
-  <v-box is="section" data-scope="product-header" flex-grow="1">
-    <v-box display="flex" flex-direction="column" gap="0.25rem">
-      <v-box
+  <section data-scope="product-header" flex-grow="1">
+    <div display="flex" flex-direction="column" gap="0.25rem">
+      <div
         display="flex"
         justify-content="space-between"
         align-items="center"
         gap="0.25rem"
       >
-        <v-box
-          is="h2"
+        <h2
           fs="fs-3xl"
           fw="fw-bold"
           lh="lh-snug"
@@ -17,20 +16,13 @@
           class="vp-raw"
         >
           Urban Runner
-        </v-box>
+        </h2>
 
-        <v-box is="span" fs="fs-2xl" fw="fw-bold" color="cl-text-product">
-          $120.00
-        </v-box>
-      </v-box>
+        <span fs="fs-2xl" fw="fw-bold" color="cl-text-product"> $120.00 </span>
+      </div>
 
-      <v-box
-        display="flex"
-        justify-content="space-between"
-        align-items="center"
-      >
-        <v-box
-          is="p"
+      <div display="flex" justify-content="space-between" align-items="center">
+        <p
           my="0"
           fs="fs-sm"
           fw="fw-medium"
@@ -40,25 +32,21 @@
           }"
         >
           Men's Running Collection
-        </v-box>
+        </p>
 
-        <v-box display="flex" align-items="center" gap="0.25rem">
-          <v-box
-            is="span"
+        <div display="flex" align-items="center" gap="0.25rem">
+          <span
             color="cl-primary"
             fs="1rem"
             class="material-symbols-outlined"
             style="font-variation-settings: 'FILL' 1"
           >
             star
-          </v-box>
+          </span>
 
-          <v-box is="span" fs="fs-sm" fw="fw-bold" color="cl-text-product">
-            4.8
-          </v-box>
+          <span fs="fs-sm" fw="fw-bold" color="cl-text-product"> 4.8 </span>
 
-          <v-box
-            is="span"
+          <span
             fs="fs-xs"
             color="cl-gray-500"
             :dark="{
@@ -66,9 +54,9 @@
             }"
           >
             (120)
-          </v-box>
-        </v-box>
-      </v-box>
-    </v-box>
-  </v-box>
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
 </template>

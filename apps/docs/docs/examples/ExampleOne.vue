@@ -1,6 +1,5 @@
 <template>
-  <v-box
-    is="p"
+  <p
     text-align="center"
     padding="1rem"
     color="#fff"
@@ -9,6 +8,7 @@
       backgroundColor: '#fff',
       color: '#000',
     }"
-    >Hello world 🎉</v-box
   >
+    Hello world 🎉
+  </p>
 </template>

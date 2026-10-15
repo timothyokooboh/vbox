@@ -17,9 +17,11 @@
   "dependencies": {
     "@veebox/core": "workspace:*",
     "@veebox/vue": "workspace:*",
+    "@veebox/unplugin": "workspace:*",
     "vue": "^3.5.25"
   },
   "devDependencies": {
+    "@veebox/volar": "workspace:*",
     "@prettier/plugin-oxc": "^0.0.5",
     "@tsconfig/node24": "^24.0.3",
     "@types/node": "^24.10.1",

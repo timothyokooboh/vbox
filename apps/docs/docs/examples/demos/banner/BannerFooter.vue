@@ -1,7 +1,6 @@
 <template>
   <div data-scope="banner-footer">
-    <v-box
-      is="button"
+    <button
       w="fit-content"
       border="1px solid cl-gray-600"
       color="cl-gray-700"
@@ -24,7 +23,7 @@
       v-bind="outlineStyles"
     >
       Upgrade Plan
-    </v-box>
+    </button>
   </div>
 </template>
 

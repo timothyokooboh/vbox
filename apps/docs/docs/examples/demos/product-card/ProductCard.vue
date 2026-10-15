@@ -1,5 +1,5 @@
 <template>
-  <v-box
+  <div
     data-scope="product-card"
     bg="cl-bg-product"
     border-radius="br-lg"
@@ -14,12 +14,12 @@
       <ProductHeader />
       <ProductSizeSelector />
       <ProductDescription />
-      <v-box mt="auto" display="flex" align-items="center" gap="1rem">
+      <div mt="auto" display="flex" align-items="center" gap="1rem">
         <ProductQtySelector />
         <AddToCartBtn />
-      </v-box>
+      </div>
     </ProductDetails>
-  </v-box>
+  </div>
 </template>
 
 <script setup lang="ts">

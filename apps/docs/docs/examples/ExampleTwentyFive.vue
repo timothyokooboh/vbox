@@ -1,6 +1,6 @@
 <template>
   <!-- prefixing the token with sp -->
-  <v-box
+  <div
     w="250px"
     bg="tomato"
     color="#fff"
@@ -9,10 +9,10 @@
     mb="sp-3"
   >
     A box
-  </v-box>
+  </div>
 
   <!-- or via CSS custom properties -->
-  <v-box
+  <div
     w="250px"
     bg="tomato"
     color="#fff"
@@ -20,5 +20,5 @@
     padding="var(--spacing-6)"
   >
     A box
-  </v-box>
+  </div>
 </template>

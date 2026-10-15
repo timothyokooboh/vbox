@@ -1,11 +1,10 @@
 import { defineConfig } from 'vitepress';
+import { vboxVitePlugin } from '@veebox/unplugin/vite';
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   vite: {
-    ssr: {
-      noExternal: ['@veebox/core', '@veebox/vue'],
-    },
+    plugins: [vboxVitePlugin()],
   },
   title: 'VBox',
   head: [
@@ -18,8 +17,7 @@ export default defineConfig({
       },
     ],
   ],
-  description:
-    'A polymorphic Vue component with a lightweight runtime styling engine.',
+  description: 'The most intuitive styling framework for Vue.js Apps',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     logo: '/logo.png',

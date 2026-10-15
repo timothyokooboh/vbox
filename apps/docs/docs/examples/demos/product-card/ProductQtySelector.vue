@@ -1,5 +1,5 @@
 <template>
-  <v-box
+  <button
     data-scope="product-qty-selector"
     display="flex"
     h="3.5rem"
@@ -15,19 +15,15 @@
     }"
   >
     <!-- remove -->
-    <v-box
-      is="button"
+    <button
       v-bind="qtySelectorStyles"
       @click="updateQty('remove')"
       :disabled="qty <= 1"
     >
-      <v-box is="span" fs="1.25rem" class="material-symbols-outlined">
-        remove
-      </v-box>
-    </v-box>
+      <span fs="1.25rem" class="material-symbols-outlined"> remove </span>
+    </button>
 
-    <v-box
-      is="span"
+    <span
       w="1.5rem"
       text-align="center"
       fs="fs-base"
@@ -35,20 +31,17 @@
       color="cl-text-product"
     >
       {{ qty }}
-    </v-box>
+    </span>
 
     <!-- add -->
-    <v-box
-      is="button"
+    <button
       v-bind="qtySelectorStyles"
       @click="updateQty('add')"
       :disabled="qty >= 5"
     >
-      <v-box is="span" fs="1.25rem" class="material-symbols-outlined">
-        add
-      </v-box>
-    </v-box>
-  </v-box>
+      <span fs="1.25rem" class="material-symbols-outlined"> add </span>
+    </button>
+  </button>
 </template>
 
 <script setup lang="ts">
