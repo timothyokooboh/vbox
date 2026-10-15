@@ -37,6 +37,20 @@ const resetStyles: VBoxStyles = { color: null, opacity: 'initial' };
     <button data-testid="grouped" type="button" translate="no" :vb="styles">
       Grouped styles
     </button>
+    <button
+      data-testid="clean-disabled"
+      disabled
+      :vb="{ disabled: { color: 'red' } }"
+    >
+      Clean condition
+    </button>
+    <button
+      data-testid="legacy-disabled"
+      disabled
+      :vb="{ _disabled: { color: 'red' } }"
+    >
+      Compatibility condition
+    </button>
     <button @click="replace">Replace grouped</button>
     <button @click="styles = null">Clear grouped</button>
     <button @click="styles = undefined">Unset grouped</button>

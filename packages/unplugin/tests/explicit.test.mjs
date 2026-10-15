@@ -184,3 +184,7 @@ test('valid numeric and Unicode custom-property names retain their spelling', ()
   assert.ok(expression.includes('"--2"'));
   assert.ok(expression.includes('"--\u03a3"'));
 });
+
+test('grouped attachment is distinct from a once-stripped property named vb', () => {
+  assertVueCompiles(transform('<p :vb="styles" vb-vb="future-css" />').code);
+});

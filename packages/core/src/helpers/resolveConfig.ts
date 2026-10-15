@@ -10,12 +10,15 @@ import { toKebabCase } from './toKebabCase.js';
 import { deepMerge } from './mergeTheme.js';
 import { normalizeTheme, buildCSSVariables } from './themeConfigParser.js';
 
-export const isConditionKey = (key: string) => {
+export const getConditionKey = (key: string) => {
   const normalized = toKebabCase(key).replace(/^_/, '');
-  return ObjectStyleKeys.some(
+  return ObjectStyleKeys.find(
     (candidate) => toKebabCase(candidate).replace(/^_/, '') === normalized,
   );
 };
+
+export const isConditionKey = (key: string) =>
+  getConditionKey(key) !== undefined;
 
 export const validateAliasKeys = (
   keys: string[],
