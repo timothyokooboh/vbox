@@ -1,6 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
+const fs = require('node:fs');
 const ts = require('typescript');
 const {
   createLanguage,
@@ -13,8 +14,7 @@ const {
 } = require('@volar/typescript');
 
 // Exercise the same TypeScript service adapter used by Vue's editor plugin.
-function createEditor(source) {
-  const root = path.resolve(__dirname, '..');
+function createEditor(source, root = path.resolve(__dirname, '..')) {
   const file = path.join(root, 'src/EditorConsumer.vue');
   const config = createParsedCommandLine(
     ts,
@@ -135,5 +135,64 @@ test('namespaced token values retain their source-mapped hover preview', (t) => 
   assert.match(
     ts.displayPartsToString(editor.hover('cl-brand')?.documentation),
     /cl-brand.*#123456/,
+  );
+});
+
+test('editor vocabulary is config-specific and refreshes on the next document edit', (t) => {
+  const root = fs.mkdtempSync(path.resolve(__dirname, '../.editor-config-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  fs.writeFileSync(
+    path.join(root, 'tsconfig.json'),
+    JSON.stringify({
+      extends: '../tsconfig.json',
+      include: ['src/**/*.vue'],
+      vueCompilerOptions: { plugins: ['@veebox/volar'] },
+    }),
+  );
+  const config = path.join(root, 'vbox.config.ts');
+  fs.writeFileSync(
+    config,
+    'export default { enableDefaultTheme: false, theme: { color: { brand: "#654321" } } }',
+  );
+  const source = '<template><p vb-color="cl-brand">Hello</p></template>';
+  const local = createEditor(source, root);
+  const defaultEditor = createEditor(source);
+  t.after(() => {
+    local.dispose();
+    defaultEditor.dispose();
+  });
+  assert.match(
+    ts.displayPartsToString(local.hover('cl-brand')?.documentation),
+    /#654321/,
+  );
+  assert.match(
+    ts.displayPartsToString(defaultEditor.hover('cl-brand')?.documentation),
+    /#123456/,
+  );
+  fs.writeFileSync(
+    config,
+    'export default { enableDefaultTheme: false, theme: { color: { brand: "#abcdef" } } }',
+  );
+  local.update(source.replace('Hello', 'Hello again'));
+  assert.match(
+    ts.displayPartsToString(local.hover('cl-brand')?.documentation),
+    /#abcdef/,
+  );
+  const palette = path.join(root, 'palette.js');
+  fs.writeFileSync(palette, 'export default "#112233"');
+  fs.writeFileSync(
+    config,
+    'import brand from "./palette.js"; export default { enableDefaultTheme: false, theme: { color: { brand } } }',
+  );
+  local.update(source.replace('Hello', 'Imported color'));
+  assert.match(
+    ts.displayPartsToString(local.hover('cl-brand')?.documentation),
+    /#112233/,
+  );
+  fs.writeFileSync(palette, 'export default "#445566"');
+  local.update(source.replace('Hello', 'Imported color updated'));
+  assert.match(
+    ts.displayPartsToString(local.hover('cl-brand')?.documentation),
+    /#445566/,
   );
 });

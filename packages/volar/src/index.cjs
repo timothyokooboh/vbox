@@ -1,123 +1,11 @@
-const fs = require('node:fs');
 const path = require('node:path');
-const { createRequire } = require('node:module');
 const { createJiti } = require('jiti');
 const knownCssPropertiesModule = require('known-css-properties');
 
 const importWithJiti = createJiti(__filename, { interopDefault: true });
-const requireFromHere = createRequire(__filename);
-const DEFAULT_OBJECT_STYLE_KEYS = [
-  'mq',
-  'cq',
-  'dark',
-  'declarations',
-  'pseudos',
-  'hover',
-  'focus',
-  'focusVisible',
-  'focusWithin',
-  'active',
-  '_disabled',
-  'sm',
-  'md',
-  'lg',
-  'xl',
-  '_2xl',
-];
-
-const loadCoreExports = (rootDir) => {
-  const loadCoreModule = (specifier) => {
-    const mod = importWithJiti(specifier);
-    if (mod && (mod.DefaultTheme || mod.deepMerge || mod.normalizeTheme)) {
-      return mod;
-    }
-    return null;
-  };
-
-  try {
-    const core = loadCoreModule('@veebox/core');
-    if (core) {
-      return {
-        DefaultTheme: core?.DefaultTheme ?? {},
-        deepMerge:
-          core?.deepMerge ?? ((base, extra) => ({ ...base, ...extra })),
-        normalizeTheme:
-          core?.normalizeTheme ??
-          ((theme) => ({ normalized: theme ?? {}, colorDarkMap: {} })),
-        ObjectStyleKeys: Array.isArray(core?.ObjectStyleKeys)
-          ? core.ObjectStyleKeys
-          : DEFAULT_OBJECT_STYLE_KEYS,
-      };
-    }
-  } catch {
-    // fallback below
-  }
-
-  const base = rootDir || process.cwd();
-  const fallbacks = [];
-
-  try {
-    const resolved = requireFromHere.resolve('@veebox/core', {
-      paths: [base, process.cwd(), __dirname],
-    });
-    fallbacks.push(resolved);
-  } catch {
-    // ignore
-  }
-
-  fallbacks.push(
-    path.resolve(base, 'node_modules/@veebox/core/dist/index.es.js'),
-    path.resolve(base, 'node_modules/@veebox/core/dist/index.umd.js'),
-    path.resolve(base, '../../packages/core/dist/index.es.js'),
-    path.resolve(base, '../../packages/core/dist/index.umd.js'),
-  );
-
-  for (const specifier of fallbacks) {
-    if (!specifier) continue;
-    if (specifier.startsWith('/') && !fs.existsSync(specifier)) continue;
-    try {
-      const core = loadCoreModule(specifier);
-      if (!core) continue;
-      return {
-        DefaultTheme: core?.DefaultTheme ?? {},
-        deepMerge:
-          core?.deepMerge ??
-          ((baseValue, extra) => ({ ...baseValue, ...extra })),
-        normalizeTheme:
-          core?.normalizeTheme ??
-          ((theme) => ({ normalized: theme ?? {}, colorDarkMap: {} })),
-        ObjectStyleKeys: Array.isArray(core?.ObjectStyleKeys)
-          ? core.ObjectStyleKeys
-          : DEFAULT_OBJECT_STYLE_KEYS,
-      };
-    } catch {
-      // continue
-    }
-  }
-
-  return {
-    DefaultTheme: {},
-    deepMerge: (baseValue, extra) => ({ ...baseValue, ...extra }),
-    normalizeTheme: (theme) => ({
-      normalized: theme ?? {},
-      colorDarkMap: {},
-    }),
-    ObjectStyleKeys: DEFAULT_OBJECT_STYLE_KEYS,
-  };
-};
-
-const TOKEN_PREFIX_TO_CATEGORY = {
-  cl: 'color',
-  fs: 'fontSize',
-  fw: 'fontWeight',
-  ff: 'fontFamily',
-  sp: 'spacing',
-  lh: 'lineHeight',
-  ls: 'letterSpacing',
-  br: 'borderRadius',
-  bs: 'boxShadow',
-  z: 'zIndex',
-};
+const core = require('@veebox/core');
+const loadCoreExports = () => core;
+const TOKEN_PREFIX_TO_CATEGORY = core.TokenCategories;
 
 const GLOBAL_SEMANTIC_ATTRIBUTES = new Set([
   'id',
@@ -374,44 +262,7 @@ const COMPLETION_FEATURES = {
   format: false,
 };
 
-const VBOX_DEFAULT_ALIAS_KEYS = new Set([
-  'w',
-  'maxW',
-  'minW',
-  'h',
-  'maxH',
-  'minH',
-  'fs',
-  'fw',
-  'ff',
-  'lh',
-  'ls',
-  'm',
-  'mt',
-  'mb',
-  'ml',
-  'mr',
-  'mx',
-  'my',
-  'p',
-  'pt',
-  'pb',
-  'pl',
-  'pr',
-  'px',
-  'py',
-  'bg',
-  'bgColor',
-  'bgSize',
-  'bgPosition',
-  'bgImage',
-  'bgClip',
-  'bgRepeat',
-  'bgAttachment',
-  'bgOrigin',
-  'radius',
-  'shadow',
-]);
+const VBOX_DEFAULT_ALIAS_KEYS = new Set(Object.keys(core.DefaultAliases));
 
 const isNativeHtmlTag = (tag) => /^[a-z][a-z0-9]*$/.test(tag);
 const isVBoxComponentTag = (tag) => tag === 'v-box' || tag === 'VBox';
@@ -509,41 +360,13 @@ const resolveRootDir = (ctx, userConfig = {}) => {
   return process.cwd();
 };
 
-const loadVBoxConfig = (rootDir, userConfig = {}) => {
-  const explicitPath =
-    typeof userConfig.configPath === 'string'
-      ? path.resolve(rootDir, userConfig.configPath)
-      : null;
-
-  const candidates = explicitPath
-    ? [explicitPath]
-    : [
-        path.join(rootDir, 'vbox.config.ts'),
-        path.join(rootDir, 'vbox.config.js'),
-        path.join(rootDir, 'vbox.config.cjs'),
-        path.join(rootDir, 'vbox.config.mjs'),
-      ];
-
-  for (const candidate of candidates) {
-    if (!fs.existsSync(candidate)) continue;
-
-    try {
-      const mod = importWithJiti(candidate);
-      return mod?.default ?? mod;
-    } catch {
-      return null;
-    }
-  }
-
-  return null;
-};
+const configLoader = importWithJiti('@veebox/core/config');
+const loadVBoxConfig = (rootDir, userConfig = {}) =>
+  configLoader.loadVBoxConfig({ rootDir, configPath: userConfig.configPath })
+    .config;
 
 const buildTokenResolutionMap = (vboxConfig, rootDir) => {
-  const { DefaultTheme, deepMerge, normalizeTheme } = loadCoreExports(rootDir);
-  const enableDefaultTheme = vboxConfig?.enableDefaultTheme !== false;
-  const baseTheme = enableDefaultTheme ? DefaultTheme : {};
-  const mergedTheme = deepMerge(baseTheme, vboxConfig?.theme ?? {});
-  const { normalized, colorDarkMap } = normalizeTheme(mergedTheme);
+  const { normalized, colorDarkMap } = core.resolveVBoxConfig(vboxConfig);
 
   const resolved = new Map();
 
@@ -1170,19 +993,28 @@ const createPlugin = (ctx) => {
   const userConfig = ctx?.config ?? {};
   const rootDir = resolveRootDir(ctx, userConfig);
   const { ObjectStyleKeys } = loadCoreExports(rootDir);
-  const vboxConfig = loadVBoxConfig(rootDir, userConfig) ?? {};
-  const tokenMap = buildTokenResolutionMap(vboxConfig, rootDir);
-  const isStyleKey = createStyleKeyMatcher(vboxConfig, userConfig);
-  const tokenPrefixByProperty = buildTokenPrefixByProperty(
-    vboxConfig,
-    userConfig,
-  );
-  const attrCompletionKeys = buildAttrCompletionKeys(
-    vboxConfig,
-    ObjectStyleKeys,
-    userConfig,
-  );
+  let tokenMap = new Map();
+  let isStyleKey;
+  let tokenPrefixByProperty;
+  let attrCompletionKeys;
+  let fingerprint;
   const tokenCandidatesCache = new Map();
+  const refreshVocabulary = () => {
+    const vboxConfig = loadVBoxConfig(rootDir, userConfig);
+    const next = JSON.stringify(vboxConfig);
+    if (next === fingerprint) return;
+    tokenMap = buildTokenResolutionMap(vboxConfig, rootDir);
+    isStyleKey = createStyleKeyMatcher(vboxConfig, userConfig);
+    tokenPrefixByProperty = buildTokenPrefixByProperty(vboxConfig, userConfig);
+    attrCompletionKeys = buildAttrCompletionKeys(
+      vboxConfig,
+      ObjectStyleKeys,
+      userConfig,
+    );
+    tokenCandidatesCache.clear();
+    fingerprint = next;
+  };
+  refreshVocabulary();
   const getTokenCandidates = (key, typedPrefix = '') =>
     getTokenCandidatesForKey(
       key,
@@ -1205,6 +1037,7 @@ const createPlugin = (ctx) => {
     resolveEmbeddedCode(_fileName, sfc, embeddedFile) {
       if (!/^script_(js|jsx|ts|tsx)$/.test(embeddedFile.id)) return;
       if (!sfc.template?.ast) return;
+      refreshVocabulary();
 
       const hints = collectTokenHints(
         sfc.template.ast,

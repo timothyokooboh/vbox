@@ -39,7 +39,7 @@
     "test": "pnpm build && node --test tests/**/*.test.cjs"
   },
   "dependencies": {
-    "@veebox/core": "^1.1.1",
+    "@veebox/core": "workspace:*",
     "jiti": "^2.6.1",
     "known-css-properties": "^0.37.0"
   },

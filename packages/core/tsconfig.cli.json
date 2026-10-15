@@ -10,6 +10,7 @@
     "src/cli/generate-types.ts",
     "src/helpers/mergeTheme.ts",
     "src/helpers/isObjectLiteral.ts",
-    "src/types.ts"
+    "src/types.ts",
+    "src/config.ts"
   ]
 }
