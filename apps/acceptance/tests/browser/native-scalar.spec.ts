@@ -110,3 +110,17 @@ test('scalar classes hydrate with authored classes and keep updating', async ({
   await expect(target).toHaveCSS('width', '80px');
   await expect(target).toHaveClass(/authored-class/);
 });
+
+for (const route of ['/', '/?ssr']) {
+  test(`normal setup state, hooks, Options API and events survive on ${route}`, async ({
+    page,
+  }) => {
+    await page.goto(route);
+    const button = page.getByTestId('normal-setup');
+    await expect(button).toHaveText('Options preserved');
+    await expect(button).toHaveAttribute('data-mounted', 'true');
+    await expect(button).toHaveCSS('color', 'rgb(255, 0, 0)');
+    await button.click();
+    await expect(button).toHaveCSS('color', 'rgb(0, 0, 255)');
+  });
+}

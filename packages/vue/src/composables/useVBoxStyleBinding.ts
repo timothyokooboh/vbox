@@ -1,4 +1,4 @@
-import { inject, useSSRContext, mergeProps } from 'vue';
+import { inject, useSSRContext, mergeProps, type ComponentOptions } from 'vue';
 import {
   type AliasMap,
   DefaultAliases,
@@ -35,4 +35,19 @@ export const useVBoxStyleBinding = () => {
     else injectCSS(css);
     return mergeProps(semanticProps ?? {}, { class: className });
   };
+};
+
+/** Normal SFC scripts keep their setup, including async setup and lifecycle hooks.
+ * A local mixin provides the template binding without replacing authored options.
+ */
+export const withVBoxStyleBinding = <T extends ComponentOptions>(
+  component: T,
+  name: string,
+): T => {
+  const binding: ComponentOptions = {
+    beforeCreate() {
+      this[name] = useVBoxStyleBinding();
+    },
+  };
+  return { ...component, mixins: [...(component.mixins ?? []), binding] };
 };

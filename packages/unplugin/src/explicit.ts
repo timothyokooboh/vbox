@@ -1,4 +1,9 @@
-import { parse, babelParse, type SFCTemplateBlock } from '@vue/compiler-sfc';
+import {
+  parse,
+  babelParse,
+  rewriteDefault,
+  type SFCTemplateBlock,
+} from '@vue/compiler-sfc';
 import MagicString from 'magic-string';
 import {
   getStyleBindingKey,
@@ -126,6 +131,11 @@ export const transformExplicitStyles = (
           : prop.name === 'bind' && prop.arg?.type === 4 && prop.arg.isStatic
             ? prop.arg.content
             : null;
+      if (name === 'vb') {
+        throw new SyntaxError(
+          '[VBox] Grouped :vb styling is not yet supported in this incremental scalar slice; it must never enter semantic inference.',
+        );
+      }
       const key = name === null ? null : getStyleBindingKey(name);
       if (key === null) continue;
       if (
@@ -208,9 +218,21 @@ export const transformExplicitStyles = (
           '[VBox] Explicit native styling currently requires an inline script; external script integration is not supported yet.',
         );
       const language = descriptor.script?.lang;
-      output.append(
-        `\n<script setup${language ? ` lang="${language}"` : ''}>\n${statement}</script>\n`,
-      );
+      if (descriptor.script) {
+        const componentName = `${bindingName}Component`;
+        const original = rewriteDefault(
+          descriptor.script.content,
+          componentName,
+          language === 'ts' ? ['typescript'] : [],
+        );
+        output.overwrite(
+          descriptor.script.loc.start.offset,
+          descriptor.script.loc.end.offset,
+          `import { withVBoxStyleBinding as ${bindingName}Factory } from '@veebox/vue';\n${original}\nexport default ${bindingName}Factory(${componentName}, '${bindingName}');\n`,
+        );
+      } else {
+        output.append(`\n<script setup>\n${statement}</script>\n`);
+      }
     }
   }
   return changed || warnings.length || literalRegion
