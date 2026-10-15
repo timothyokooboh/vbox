@@ -2,6 +2,7 @@ import { defineConfig } from '@veebox/core';
 export default defineConfig({
   enableDefaultTheme: false,
   cssResets: true,
+  breakpoints: { md: '50em', _2xl: '100rem' },
   classNamePrefix: 'acceptance',
   aliases: {
     values: { brandColor: 'color', pad2: 'padding', measure: 'width' },

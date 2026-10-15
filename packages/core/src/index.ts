@@ -1,3 +1,4 @@
+import { resolveBreakpoints } from './helpers/resolveBreakpoints';
 import { validateAliasKeys } from './helpers/resolveConfig';
 import type { VBoxPluginOptions } from './types';
 
@@ -58,6 +59,7 @@ export type { StyleCollector } from './helpers/styleRegistry';
 export type { CssPriority } from './helpers/styleRegistry';
 
 export function defineConfig(config: VBoxPluginOptions) {
+  resolveBreakpoints(config.breakpoints);
   validateAliasKeys(Object.keys(config.aliases?.values ?? {}));
   return config;
 }

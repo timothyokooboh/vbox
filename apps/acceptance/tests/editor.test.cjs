@@ -297,3 +297,12 @@ const styles: VBoxStyles = { declarations: { filter: { color: 'red' } }, hover: 
   t.after(() => editor.dispose());
   assert.deepEqual(editor.diagnostics(), []);
 });
+
+test('recursive theme/breakpoint types accept clean and compatibility 2xl groups', (t) => {
+  const editor =
+    createEditor(`<script setup lang="ts">import '@veebox/vue'; import type { VBoxStyles } from '@veebox/core';
+const styles: VBoxStyles = { dark: { md: { hover: { color: 'red' } } }, '2xl': { color: 'green' }, _2xl: { opacity: null } };
+</script><template><button :vb="styles">Combined contexts</button></template>`);
+  t.after(() => editor.dispose());
+  assert.deepEqual(editor.diagnostics(), []);
+});

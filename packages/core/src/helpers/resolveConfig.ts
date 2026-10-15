@@ -1,10 +1,6 @@
-import {
-  DefaultAliases,
-  DefaultBreakpoints,
-  DefaultTheme,
-  ObjectStyleKeys,
-} from '../constants.js';
-import type { AliasMap, Breakpoints, VBoxPluginOptions } from '../types.js';
+import { resolveBreakpoints } from './resolveBreakpoints.js';
+import { DefaultAliases, DefaultTheme, ObjectStyleKeys } from '../constants.js';
+import type { AliasMap, VBoxPluginOptions } from '../types.js';
 import { kebabToCamelCase } from './kebabToCamelCase.js';
 import { toKebabCase } from './toKebabCase.js';
 import { deepMerge } from './mergeTheme.js';
@@ -52,12 +48,7 @@ export const resolveVBoxConfig = (options: VBoxPluginOptions = {}) => {
     theme,
     ...tokens,
     themeCss: buildCSSVariables(tokens),
-    breakpoints: Object.fromEntries(
-      Object.entries(DefaultBreakpoints).map(([key, value]) => [
-        key,
-        options.breakpoints?.[key as keyof Breakpoints] ?? value,
-      ]),
-    ) as Breakpoints,
+    breakpoints: resolveBreakpoints(options.breakpoints),
     classNamePrefix: options.classNamePrefix ?? '',
   };
 };

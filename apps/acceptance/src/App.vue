@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import ThemeResponsive from './ThemeResponsive.vue';
 import InteractionStyles from './InteractionStyles.vue';
 import SourceComposition from './SourceComposition.vue';
 import GroupedObject from './GroupedObject.vue';
@@ -28,6 +29,7 @@ const badge = pva({
     <GroupedObject />
     <SourceComposition />
     <InteractionStyles />
+    <ThemeResponsive />
     <NormalSetup />
     <LocalDirective />
     <VBox is="button" type="button" :hover="{ color: 'green' }"

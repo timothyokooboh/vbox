@@ -1,5 +1,5 @@
 import { canonicalState, normalizeStyleContext } from './contexts.js';
-import { InteractionStyleKeys } from '../constants.js';
+import { DefaultBreakpoints, InteractionStyleKeys } from '../constants.js';
 import type { AliasMap } from '../types.js';
 import { readStyleObject } from '../helpers/readStyleObject.js';
 import { getConditionKey } from '../helpers/resolveConfig.js';
@@ -53,7 +53,7 @@ export const composeStyleSources = (
           const step: StyleContext[number] =
             condition === 'dark'
               ? { kind: 'theme', value: 'dark' }
-              : ['sm', 'md', 'lg', 'xl', '_2xl'].includes(condition)
+              : Object.hasOwn(DefaultBreakpoints, condition)
                 ? { kind: 'breakpoint', value: condition }
                 : {
                     kind: 'state',
