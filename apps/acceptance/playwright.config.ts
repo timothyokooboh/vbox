@@ -1,4 +1,5 @@
 import { defineConfig } from '@playwright/test';
+import { driverPorts } from './drivers.mjs';
 const browsers = ['chromium', 'firefox', 'webkit'] as const;
 export default defineConfig({
   testDir: './tests/browser',
@@ -8,18 +9,18 @@ export default defineConfig({
   expect: { timeout: 5_000 },
   retries: 0,
   use: { trace: 'retain-on-failure', viewport: { width: 1280, height: 800 } },
-  projects: ['vite', 'webpack'].flatMap((driver) =>
+  projects: Object.entries(driverPorts).flatMap(([driver, port]) =>
     browsers.map((browserName) => ({
       name: `${driver}-${browserName}`,
       use: {
         browserName,
-        baseURL: `http://127.0.0.1:${driver === 'vite' ? 4721 : 4722}`,
+        baseURL: `http://127.0.0.1:${port}`,
       },
     })),
   ),
-  webServer: ['vite', 'webpack'].map((driver) => ({
+  webServer: Object.entries(driverPorts).map(([driver, port]) => ({
     command: `node serve.mjs ${driver}`,
-    url: `http://127.0.0.1:${driver === 'vite' ? 4721 : 4722}`,
+    url: `http://127.0.0.1:${port}`,
     reuseExistingServer: false,
     timeout: 30_000,
   })),

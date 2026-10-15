@@ -2,15 +2,16 @@ import http from 'node:http';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { driverPorts } from './drivers.mjs';
 import { render } from './dist/server/entry-server.js';
 
 const driver = process.argv[2];
-if (!['vite', 'webpack'].includes(driver))
+if (!Object.hasOwn(driverPorts, driver))
   throw new Error('Expected vite or webpack');
 const root = path.resolve(
   fileURLToPath(new URL(`./dist/${driver}/`, import.meta.url)),
 );
-const port = driver === 'vite' ? 4721 : 4722;
+const port = driverPorts[driver];
 const mime = {
   '.js': 'text/javascript',
   '.css': 'text/css',

@@ -66,12 +66,6 @@ function createEditor(source) {
   return {
     hover: (token) =>
       proxy.getQuickInfoAtPosition(file, source.indexOf(token) + 1),
-    complete: (text) =>
-      proxy.getCompletionsAtPosition(
-        file,
-        source.indexOf(text) + text.length,
-        {},
-      ),
     update: (next) => {
       source = next;
       version++;
