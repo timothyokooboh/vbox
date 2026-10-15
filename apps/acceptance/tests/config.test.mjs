@@ -76,7 +76,7 @@ test('effective theme, alias strategy and breakpoint options share one core voca
 test('the public type-generation command uses explicit config and emits valid custom vocabulary', async (t) => {
   const { default: fs } = await import('node:fs');
   const { default: path } = await import('node:path');
-  const { execFileSync } = await import('node:child_process');
+  const { spawnSync } = await import('node:child_process');
   const { default: ts } = await import('typescript');
   const root = fs.mkdtempSync(path.resolve('.type-case-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
@@ -84,10 +84,15 @@ test('the public type-generation command uses explicit config and emits valid cu
     path.join(root, 'theme.js'),
     `export default { enableDefaultTheme: false, aliases: { values: { 'corner-round': 'borderRadius' } }, theme: { fontSize: { large: '2rem', big: '$fontSize.large' } } };`,
   );
-  execFileSync(
+  const generated = spawnSync(
     'pnpm',
     ['exec', 'vbox-type-gen', '--root', root, '--config', 'theme.js'],
-    { stdio: 'pipe' },
+    { encoding: 'utf8' },
+  );
+  assert.equal(
+    generated.status,
+    0,
+    `${generated.error ?? ''}\n${generated.stdout}\n${generated.stderr}`,
   );
   const declaration = path.join(root, 'vbox.d.ts');
   const emitted = fs.readFileSync(declaration, 'utf8');
