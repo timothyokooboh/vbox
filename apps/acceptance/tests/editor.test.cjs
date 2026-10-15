@@ -306,3 +306,27 @@ const styles: VBoxStyles = { dark: { md: { hover: { color: 'red' } } }, '2xl': {
   t.after(() => editor.dispose());
   assert.deepEqual(editor.diagnostics(), []);
 });
+
+test('recursive query objects accept aliases, tokens and compatibility keys without widening semantic translate', (t) => {
+  const script = `<script setup lang="ts">
+import '@veebox/vue'; import type { VBoxStyles, VBoxStyleInput } from '@veebox/core';
+const styles: VBoxStyles = { mq: { '@media (min-width: 40rem)': { cq: { '@container card (width > 10rem)': { dark: { _2xl: { _disabled: { bg: 'cl-brand', px: 'sp-large', translate: '8px' } } } } } } } };
+const sources: VBoxStyleInput = [styles, false, null, { mq: { '@media (min-width: 40rem)': undefined }, cq: { '@container card (width > 10rem)': null } }] as const;
+</script>`;
+  const editor = createEditor(
+    `${script}<template><button translate="no" :vb="sources">Queries</button></template>`,
+  );
+  t.after(() => editor.dispose());
+  assert.deepEqual(editor.diagnostics(), []);
+  editor.update(
+    `<template><button :vb-cq="{ '@container card (min-width: 400px)': { dark: { hover: { color: 'cl-brand' } } } }">Query token</button></template>`,
+  );
+  assert.match(
+    ts.displayPartsToString(editor.hover('cl-brand')?.documentation),
+    /#123456/,
+  );
+  editor.update(
+    `${script}<template><button translate="8px" :vb="sources">Invalid semantic translate</button></template>`,
+  );
+  assert.ok(editor.diagnostics().length > 0);
+});
