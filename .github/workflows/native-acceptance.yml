@@ -19,6 +19,8 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: pnpm --filter '@veebox/*' build
+      # Local workspace bins cannot be linked until their built entry points exist.
+      - run: pnpm install --frozen-lockfile --ignore-scripts --offline
       - run:
           pnpm --filter @vbox/acceptance exec playwright install --with-deps
           chromium firefox webkit
