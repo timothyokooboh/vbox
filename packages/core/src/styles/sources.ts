@@ -1,3 +1,4 @@
+import { normalizeStyleContext } from './contexts.js';
 import { InteractionStyleKeys } from '../constants.js';
 import type { AliasMap } from '../types.js';
 import { readStyleObject } from '../helpers/readStyleObject.js';
@@ -74,7 +75,11 @@ export const composeStyleSources = (
           !/^(initial|inherit|unset|revert(?:-layer)?|normal|none)$/.test(text)
         )
           text = JSON.stringify(text);
-        declarations.push({ property, value: parseTokens(text), context });
+        declarations.push({
+          property,
+          value: parseTokens(text),
+          context: normalizeStyleContext(context),
+        });
       }
     }
   };
