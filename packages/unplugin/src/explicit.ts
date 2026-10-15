@@ -106,6 +106,7 @@ export const transformExplicitStyles = (
       return;
     }
     const declarations: string[] = [];
+    let grouped: string | undefined;
     const seen = new Set<string>();
     for (const prop of node.props) {
       if (prop.type === 7 && prop.name === 'bind') {
@@ -131,12 +132,8 @@ export const transformExplicitStyles = (
           : prop.name === 'bind' && prop.arg?.type === 4 && prop.arg.isStatic
             ? prop.arg.content
             : null;
-      if (name === 'vb') {
-        throw new SyntaxError(
-          '[VBox] Grouped :vb styling is not yet supported in this incremental scalar slice; it must never enter semantic inference.',
-        );
-      }
-      const key = name === null ? null : getStyleBindingKey(name);
+      const key =
+        name === 'vb' ? 'vb' : name === null ? null : getStyleBindingKey(name);
       if (key === null) continue;
       if (
         [
@@ -163,17 +160,18 @@ export const transformExplicitStyles = (
           `[VBox] ${id}:${prop.loc.start.line}:${prop.loc.start.column} Invalid style property name ${JSON.stringify(name)}.`,
         );
       }
-      if (seen.has(key))
+      const identity = name === 'vb' ? ':vb' : key;
+      if (seen.has(identity))
         throw new SyntaxError(
           `[VBox] Duplicate style binding for ${key}; keep one spelling.`,
         );
-      seen.add(key);
+      seen.add(identity);
       if (prop.type === 7 && prop.modifiers.length) {
         throw new SyntaxError(
           `[VBox] ${id}:${prop.loc.start.line}:${prop.loc.start.column} Style binding modifiers are not supported; remove the modifier from ${name}.`,
         );
       }
-      if (prop.type === 6 && objectKeys.has(key)) {
+      if (prop.type === 6 && (name === 'vb' || objectKeys.has(key))) {
         throw new SyntaxError(
           `[VBox] ${id}:${prop.loc.start.line}:${prop.loc.start.column} ${name} requires an object binding; use :${name}="{ ... }".`,
         );
@@ -184,18 +182,19 @@ export const transformExplicitStyles = (
           : prop.exp?.type === 4
             ? `(${prop.exp.content})`
             : `(${kebabToCamelCase(name!)})`;
-      declarations.push(`${JSON.stringify(key)}: ${value}`);
+      if (name === 'vb') grouped = value;
+      else declarations.push(`${JSON.stringify(key)}: ${value}`);
       output.remove(prop.loc.start.offset, prop.loc.end.offset);
     }
-    if (declarations.length) {
+    if (declarations.length || grouped !== undefined) {
       const spread = node.props.find(
         (prop) => prop.type === 7 && prop.name === 'bind' && !prop.arg,
       );
       const semanticExpression =
         spread?.type === 7 && spread.exp?.type === 4
           ? `, (${spread.exp.content})`
-          : '';
-      const binding = `v-bind="${escapeAttribute(`${bindingName}({ ${declarations.join(', ')} }${semanticExpression})`)}"`;
+          : ', undefined';
+      const binding = `v-bind="${escapeAttribute(`${bindingName}({ ${declarations.join(', ')} }${semanticExpression}, ${grouped ?? 'undefined'})`)}"`;
       if (spread)
         output.overwrite(
           spread.loc.start.offset,

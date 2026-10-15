@@ -5,6 +5,7 @@ import {
   DefaultBreakpoints,
   createDjb2Hash,
   injectCSS,
+  readStyleObject,
 } from '@veebox/core';
 import {
   aliasKey,
@@ -24,9 +25,14 @@ export const useVBoxStyleBinding = () => {
     typeof window === 'undefined' ? useSSRContext<VBoxSSRContext>() : undefined;
 
   return (
-    styles: Record<string, unknown>,
+    direct: Record<string, unknown>,
     semanticProps?: Record<string, unknown> | null,
+    grouped?: unknown,
   ) => {
+    const styles = {
+      ...readStyleObject(grouped),
+      ...readStyleObject(direct, 'individual'),
+    };
     const hash = createDjb2Hash(JSON.stringify([styles, aliases, breakpoints]));
     const className = `${prefix ? `${prefix}-` : ''}css-${hash}`;
     const css = resolveVBoxCss({ styles, className, aliases, breakpoints });

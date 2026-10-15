@@ -218,3 +218,40 @@ test('explicit style completions use prefixed aliases and property-specific toke
   assert.ok(keys.includes('vb-brand-color'));
   assert.ok(!keys.includes('brand-color'));
 });
+
+test('grouped styles are typed separately from native semantic translate and ordinary spreads', (t) => {
+  const template = (binding) =>
+    `<script setup lang="ts">import '@veebox/vue'; import type { VBoxStyleProps } from '@veebox/core'; const styles: VBoxStyleProps = { translate: '8px', color: 'red' };</script><template><button translate="no" ${binding}>Save</button></template>`;
+  const editor = createEditor(template(':vb="styles"'));
+  t.after(() => editor.dispose());
+  assert.deepEqual(editor.diagnostics(), []);
+  editor.update(template('v-bind="styles"').replace(' translate="no"', ''));
+  assert.ok(
+    editor
+      .diagnostics()
+      .some((item) =>
+        /translate/.test(
+          ts.flattenDiagnosticMessageText(item.messageText, '\n'),
+        ),
+      ),
+  );
+  editor.update(template(':vb="123"'));
+  assert.ok(
+    editor
+      .diagnostics()
+      .some((item) =>
+        /number|123/.test(
+          ts.flattenDiagnosticMessageText(item.messageText, '\n'),
+        ),
+      ),
+  );
+});
+
+test('style-only types permit withdrawal inside existing condition and selector groups', (t) => {
+  const editor = createEditor(`<script setup lang="ts">
+import '@veebox/vue'; import type { VBoxStyles } from '@veebox/core';
+const styles: VBoxStyles = { hover: { color: null }, _disabled: { opacity: null }, declarations: { '&::before': { content: null } } };
+</script><template><button :vb="styles">Save</button></template>`);
+  t.after(() => editor.dispose());
+  assert.deepEqual(editor.diagnostics(), []);
+});

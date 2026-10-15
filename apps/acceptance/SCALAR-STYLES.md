@@ -31,8 +31,8 @@ pnpm --filter @veebox/unplugin test
   validation can ignore declarations the browser does not implement.
 - Object-group strings are rejected with guidance to expression bindings.
   Built-in groups come from core metadata, including compatibility spellings.
-  Recursive composition and grouped `:vb` attach in subsequent slices. Until
-  then, reserved grouped bindings fail explicitly rather than entering inference.
+  Grouped `:vb` objects are described in `GROUPED-STYLES.md`; array and recursive
+  composition attach in subsequent slices. Grouped bindings never enter inference.
 - Empty/malformed names, duplicate normalized names, style binding modifiers,
   and non-rendering template/slot targets receive compiler errors. Prefer the
   explicit camel spelling over `.camel`; `.prop`/`.attr` do not apply to CSS.

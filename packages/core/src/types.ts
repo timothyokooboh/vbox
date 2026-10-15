@@ -194,6 +194,15 @@ export type VBoxProps = PseudoProps &
 
 export type VBoxStyleProps = Omit<VBoxProps, 'is' | 'asChild'>;
 
+type NullableStyleValues<T> = T extends object
+  ? { [Key in keyof T]: NullableStyleValues<T[Key]> | null }
+  : T;
+
+/** Style-only object boundary; template prefixes never belong in these keys. */
+export type VBoxStyles = NullableStyleValues<VBoxStyleProps> &
+  Record<string, unknown>;
+export type VBoxStyleInput = VBoxStyles | null | undefined;
+
 export type VBoxNativeTemplateProps = CommonPseudoProps &
   PseudoProps &
   BreakpointProps &

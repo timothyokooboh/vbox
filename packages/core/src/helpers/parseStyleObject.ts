@@ -176,7 +176,10 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
     const parsedKey = normalizeKey(cssProp, aliases);
     const parsedKebabKey = toKebabCase(parsedKey);
 
-    if (isValidCssDeclaration(parsedKebabKey, parsedValue)) {
+    if (
+      typeof rawValue !== 'object' &&
+      isValidCssDeclaration(parsedKebabKey, parsedValue)
+    ) {
       rootStyles[parsedKebabKey] = parsedValue;
     }
 
@@ -288,7 +291,7 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
       continue;
     }
 
-    if (['sm', 'md', 'lg', 'xl'].includes(resolvedKey)) {
+    if (['sm', 'md', 'lg', 'xl', '_2xl'].includes(resolvedKey)) {
       const bpKey = resolvedKey as keyof typeof breakpoints;
       if (typeof rawValue === 'object') {
         const { rootStyleRecord, nestedStyleRecord } = extractStylesFromValue(
