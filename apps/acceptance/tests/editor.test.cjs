@@ -29,6 +29,7 @@ function createEditor(source) {
   };
   const host = {
     ...ts.sys,
+    useCaseSensitiveFileNames: () => ts.sys.useCaseSensitiveFileNames,
     fileExists: (id) => id === file || ts.sys.fileExists(id),
     getCompilationSettings: () => config.options,
     getScriptFileNames: () => [file],
