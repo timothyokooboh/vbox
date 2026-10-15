@@ -917,6 +917,32 @@ const buildHoverCode = (hints) => {
   return out;
 };
 
+// Escape generated literal syntax without shifting the mapped authored characters.
+const mappedCompletionString = (value, offset) => {
+  const out = [];
+  let start = 0;
+  for (const match of value.matchAll(/[\\']/g)) {
+    if (match.index > start)
+      out.push([
+        value.slice(start, match.index),
+        'template',
+        offset + start,
+        COMPLETION_FEATURES,
+      ]);
+    out.push('\\');
+    out.push([match[0], 'template', offset + match.index, COMPLETION_FEATURES]);
+    start = match.index + 1;
+  }
+  if (start < value.length)
+    out.push([
+      value.slice(start),
+      'template',
+      offset + start,
+      COMPLETION_FEATURES,
+    ]);
+  return out;
+};
+
 const buildCompletionCode = (
   attrHints,
   valueHints,
@@ -974,7 +1000,7 @@ const buildCompletionCode = (
         : 'string';
 
     out.push(`const __vboxTokenCompletion${index}: ${valueUnionType} = '`);
-    out.push([hint.mappedValue, 'template', hint.offset, COMPLETION_FEATURES]);
+    out.push(...mappedCompletionString(hint.mappedValue, hint.offset));
     out.push(`';\n`);
   });
 
