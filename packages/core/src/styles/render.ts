@@ -7,16 +7,23 @@ export const renderStyleDeclarations = (
   className: string,
   breakpoints: Breakpoints,
 ) => {
-  const blocks = new Map<string, { context: StyleContext; css: string }>();
-  for (const declaration of declarations) {
+  const conditional = (context: StyleContext) =>
+    context.some((step) => step.kind !== 'selector');
+  const ordered = [...declarations].sort(
+    (a, b) => Number(conditional(a.context)) - Number(conditional(b.context)),
+  );
+  const blocks: Array<{ key: string; context: StyleContext; css: string }> = [];
+  for (const declaration of ordered) {
     const key = JSON.stringify(declaration.context);
-    const block = blocks.get(key) ?? { context: declaration.context, css: '' };
+    let block = blocks.at(-1);
+    // Only coalesce adjacent runs: an intervening selector may match the same node.
+    if (block?.key !== key) {
+      block = { key, context: declaration.context, css: '' };
+      blocks.push(block);
+    }
     block.css += `${declaration.property}:${declaration.value};`;
-    blocks.set(key, block);
   }
-  // A later base source only conflicts with base declarations, not other contexts.
-  return [...blocks.values()]
-    .sort((a, b) => Number(a.context.length > 0) - Number(b.context.length > 0))
+  return blocks
     .map(({ context, css }) => {
       for (const step of [...context].reverse()) {
         const wrapper =

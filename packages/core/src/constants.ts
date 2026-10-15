@@ -75,6 +75,15 @@ export const DefaultBreakpoints: Breakpoints = {
   _2xl: '96rem', // ~1536px
 };
 
+export const InteractionStyleKeys = [
+  'hover',
+  'focusWithin',
+  'focus',
+  'focusVisible',
+  'active',
+  '_disabled',
+] as const;
+
 /**
  * Style props that require bound object expressions in template usage.
  * Shared source-of-truth for compiler/tooling packages.
@@ -85,12 +94,7 @@ export const ObjectStyleKeys = [
   'dark',
   'declarations',
   'pseudos',
-  'hover',
-  'focus',
-  'focusVisible',
-  'focusWithin',
-  'active',
-  '_disabled',
+  ...InteractionStyleKeys,
   'sm',
   'md',
   'lg',

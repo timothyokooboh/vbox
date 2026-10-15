@@ -1,24 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createSSRApp, h } from 'vue';
-import { renderToString } from '@vue/server-renderer';
-import { VBoxPlugin, useVBoxStyleBinding, getSSRStyles } from '@veebox/vue';
-
-async function render(grouped, direct = {}) {
-  const app = createSSRApp({
-    setup() {
-      const bind = useVBoxStyleBinding();
-      return () =>
-        h('button', bind(direct, { translate: 'no' }, grouped), 'Styled');
-    },
-  }).use(VBoxPlugin, { enableDefaultTheme: false });
-  const warnings = [];
-  app.config.warnHandler = (message) => warnings.push(message);
-  const context = {};
-  const html = await renderToString(app, context);
-  assert.deepEqual(warnings, []);
-  return { html, css: getSSRStyles(context) };
-}
+import { renderStyles as render } from './support/render-styles.mjs';
 
 test('invalid grouped source and property shapes have actionable diagnostics', async () => {
   for (const value of [

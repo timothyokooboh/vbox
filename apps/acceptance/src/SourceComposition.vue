@@ -55,6 +55,34 @@ const absence: VBoxStyles = { padding: null, color: undefined, hover: null };
     >
       Context preservation
     </p>
+    <p
+      data-testid="sources-selectors"
+      class="first second"
+      :vb="[
+        { declarations: { '&.first': { color: 'red' } } },
+        { declarations: { '&.second': { color: 'blue' } } },
+        { declarations: { '&.first': { color: 'green' } } },
+      ]"
+    >
+      Selector source order
+    </p>
+    <button
+      data-testid="sources-equivalent-pseudo"
+      disabled
+      :vb="[
+        { disabled: { color: 'red' } },
+        { pseudos: { ':disabled': { color: 'blue' } } },
+      ]"
+      :vb-disabled="{ color: 'green' }"
+    >
+      Direct state
+    </button>
+    <p
+      data-testid="sources-content-reset"
+      :vb="[{ content: 'original' }, { content: 'initial' }]"
+    >
+      Content reset
+    </p>
     <p data-testid="sources-snapshot">{{ JSON.stringify(base) }}</p>
     <button @click="sources = [edge, base]">Reverse sources</button>
     <button @click="sources = [base, false, null, undefined, absence]">
