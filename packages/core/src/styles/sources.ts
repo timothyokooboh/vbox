@@ -1,3 +1,4 @@
+import { canonicalState, normalizeStyleContext } from './contexts.js';
 import { InteractionStyleKeys } from '../constants.js';
 import type { AliasMap } from '../types.js';
 import { readStyleObject } from '../helpers/readStyleObject.js';
@@ -43,7 +44,7 @@ export const composeStyleSources = (
                   : state
                     ? {
                         kind: 'state',
-                        value: toKebabCase(state).replace(/^_/, ''),
+                        value: canonicalState(state),
                       }
                     : { kind: 'selector', value: `&${query}` };
             collect(child as Record<string, unknown>, [...context, step]);
@@ -56,7 +57,7 @@ export const composeStyleSources = (
                 ? { kind: 'breakpoint', value: condition }
                 : {
                     kind: 'state',
-                    value: toKebabCase(condition).replace(/^_/, ''),
+                    value: canonicalState(condition),
                   };
           collect(group, [...context, step]);
         }
@@ -74,7 +75,11 @@ export const composeStyleSources = (
           !/^(initial|inherit|unset|revert(?:-layer)?|normal|none)$/.test(text)
         )
           text = JSON.stringify(text);
-        declarations.push({ property, value: parseTokens(text), context });
+        declarations.push({
+          property,
+          value: parseTokens(text),
+          context: normalizeStyleContext(context),
+        });
       }
     }
   };

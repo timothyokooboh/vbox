@@ -188,3 +188,26 @@ test('valid numeric and Unicode custom-property names retain their spelling', ()
 test('grouped attachment is distinct from a once-stripped property named vb', () => {
   assertVueCompiles(transform('<p :vb="styles" vb-vb="future-css" />').code);
 });
+
+test('all interaction groups require expressions and report the authored source location', () => {
+  for (const name of [
+    'hover',
+    'focus-within',
+    'focus',
+    'focus-visible',
+    'active',
+    'disabled',
+    '_disabled',
+  ]) {
+    assert.throws(
+      () => transform(`<button vb-${name}="{}" />`),
+      (error) =>
+        error instanceof SyntaxError &&
+        /Example.vue:1:\d+/.test(error.message) &&
+        error.message.includes(`:vb-${name}`),
+    );
+    assertVueCompiles(
+      transform(`<button :vb-${name}="{ color: 'red' }" />`).code,
+    );
+  }
+});

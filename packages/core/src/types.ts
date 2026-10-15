@@ -4,7 +4,7 @@ import type {
   VendorPropertiesHyphen,
   Pseudos,
 } from 'csstype';
-import { type DefaultAliases } from './constants';
+import type { DefaultAliases, ObjectStyleKeys } from './constants';
 
 export type CSSCustomProperties = { [index: `--${string}`]: unknown };
 export type CssProperties = StandardProperties &
@@ -194,13 +194,23 @@ export type VBoxProps = PseudoProps &
 
 export type VBoxStyleProps = Omit<VBoxProps, 'is' | 'asChild'>;
 
-type NullableStyleValues<T> = T extends object
-  ? { [Key in keyof T]: NullableStyleValues<T[Key]> | null }
-  : T;
+type RecursiveConditionKey =
+  | Exclude<(typeof ObjectStyleKeys)[number], 'mq' | 'cq' | 'pseudos'>
+  | 'disabled'
+  | '2xl';
+
+type VBoxStyleGroup = VBoxStyles | Record<string, VBoxStyles | null>;
 
 /** Style-only object boundary; template prefixes never belong in these keys. */
-export type VBoxStyles = NullableStyleValues<VBoxStyleProps> &
-  Record<string, unknown>;
+export type VBoxStyles = {
+  [Key in keyof CSSStyleProps]?: CSSStyleProps[Key] | null;
+} & {
+  [Key in AliasKeyVariants<RecursiveConditionKey>]?: VBoxStyleGroup | null;
+} & {
+  mq?: Record<`@media ${string}`, VBoxStyleGroup | null> | null;
+  cq?: Record<`@container ${string}`, VBoxStyleGroup | null> | null;
+  pseudos?: { [Key in Pseudos]?: VBoxStyleGroup | null } | null;
+} & Record<string, unknown>;
 export type VBoxStyleInput =
   | VBoxStyles
   | readonly (VBoxStyles | null | undefined | false)[]
