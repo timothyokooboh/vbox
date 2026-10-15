@@ -4,7 +4,6 @@ const knownCssPropertiesModule = require('known-css-properties');
 
 const importWithJiti = createJiti(__filename, { interopDefault: true });
 const core = require('@veebox/core');
-const loadCoreExports = () => core;
 const TOKEN_PREFIX_TO_CATEGORY = core.TokenCategories;
 
 const GLOBAL_SEMANTIC_ATTRIBUTES = new Set([
@@ -464,54 +463,22 @@ const buildTokenPrefixByProperty = (vboxConfig = {}, pluginConfig = {}) => {
     ['min-height', 'sp'],
   ]);
 
-  const defaultAliasToPrefix = new Map([
-    ['fs', 'fs'],
-    ['fw', 'fw'],
-    ['ff', 'ff'],
-    ['lh', 'lh'],
-    ['ls', 'ls'],
-    ['bg', 'cl'],
-    ['radius', 'br'],
-    ['shadow', 'bs'],
-    ['w', 'sp'],
-    ['max-w', 'sp'],
-    ['min-w', 'sp'],
-    ['h', 'sp'],
-    ['max-h', 'sp'],
-    ['min-h', 'sp'],
-    ['m', 'sp'],
-    ['mt', 'sp'],
-    ['mr', 'sp'],
-    ['mb', 'sp'],
-    ['ml', 'sp'],
-    ['mx', 'sp'],
-    ['my', 'sp'],
-    ['p', 'sp'],
-    ['pt', 'sp'],
-    ['pr', 'sp'],
-    ['pb', 'sp'],
-    ['pl', 'sp'],
-    ['px', 'sp'],
-    ['py', 'sp'],
+  const effectiveAliases = core.resolveVBoxConfig(vboxConfig).aliases;
+  const enabledAliases = new Set([
+    ...(vboxConfig.aliases?.strategy === 'replace'
+      ? []
+      : Object.keys(core.DefaultAliases)),
+    ...resolveAliasKeys(vboxConfig, pluginConfig).map(core.kebabToCamelCase),
   ]);
-
-  for (const [alias, prefix] of defaultAliasToPrefix) {
-    for (const variant of getKeyVariants(alias)) {
+  for (const [alias, property] of Object.entries(effectiveAliases)) {
+    if (!enabledAliases.has(alias)) continue;
+    const css = normalizeCssPropertyKey(property);
+    const prefix =
+      base.get(css) ??
+      (/^(margin|padding|inset)-/.test(css) ? 'sp' : undefined);
+    if (!prefix) continue;
+    for (const variant of getKeyVariants(alias))
       base.set(normalizeCssPropertyKey(variant), prefix);
-    }
-  }
-
-  const configuredAliasMap = vboxConfig?.aliases?.values ?? {};
-  const aliasKeys = resolveAliasKeys(vboxConfig, pluginConfig);
-
-  for (const alias of aliasKeys) {
-    const cssProp = configuredAliasMap?.[alias];
-    if (!cssProp) continue;
-    const cssPrefix = base.get(normalizeCssPropertyKey(cssProp));
-    if (!cssPrefix) continue;
-    for (const variant of getKeyVariants(alias)) {
-      base.set(normalizeCssPropertyKey(variant), cssPrefix);
-    }
   }
 
   return base;
@@ -532,7 +499,9 @@ const getTokenCandidatesForKey = (
   typedPrefix = '',
 ) => {
   if (!key) return [];
-  const normalized = normalizeCssPropertyKey(key);
+  const normalized = normalizeCssPropertyKey(
+    core.getStyleBindingKey(key) ?? key,
+  );
   const prefixHint = String(typedPrefix || '');
   const cacheKey = `${normalized}::${prefixHint}`;
 
@@ -567,7 +536,9 @@ const buildAttrCompletionKeys = (
 ) => {
   const out = new Set();
 
-  for (const key of VBOX_DEFAULT_ALIAS_KEYS) {
+  for (const key of vboxConfig.aliases?.strategy === 'replace'
+    ? []
+    : VBOX_DEFAULT_ALIAS_KEYS) {
     for (const variant of getKeyVariants(key)) {
       out.add(variant);
     }
@@ -961,11 +932,32 @@ const buildCompletionCode = (
       ? attrUnionKeys.map((key) => `'${escapeTsString(key)}'`).join(' | ')
       : 'string';
 
+  const explicitKeys = [
+    ...new Set(
+      attrUnionKeys.flatMap((key) => {
+        const camel = core.kebabToCamelCase(key);
+        if (!camel) return [];
+        if (key.startsWith('--')) return [`vb-${key}`];
+        return [
+          `vb-${core.toKebabCase(key)}`,
+          `vb${camel[0].toUpperCase()}${camel.slice(1)}`,
+        ];
+      }),
+    ),
+  ];
+  const explicitUnionType =
+    explicitKeys.map((key) => `'${escapeTsString(key)}'`).join(' | ') ||
+    'string';
+
   const limitedAttrHints = attrHints.slice(0, maxCompletionItems);
   const limitedValueHints = valueHints.slice(0, maxCompletionItems);
 
   limitedAttrHints.forEach((hint, index) => {
-    out.push(`const __vboxAttrCompletion${index}: ${attrUnionType} = '`);
+    const type =
+      core.getStyleBindingKey(hint.value) !== null
+        ? explicitUnionType
+        : attrUnionType;
+    out.push(`const __vboxAttrCompletion${index}: ${type} = '`);
     out.push([hint.value, 'template', hint.offset, COMPLETION_FEATURES]);
     out.push(`';\n`);
   });
@@ -992,7 +984,7 @@ const buildCompletionCode = (
 const createPlugin = (ctx) => {
   const userConfig = ctx?.config ?? {};
   const rootDir = resolveRootDir(ctx, userConfig);
-  const { ObjectStyleKeys } = loadCoreExports(rootDir);
+  const { ObjectStyleKeys } = core;
   let tokenMap = new Map();
   let isStyleKey;
   let tokenPrefixByProperty;
@@ -1084,7 +1076,6 @@ const createPlugin = (ctx) => {
 };
 
 createPlugin._test = {
-  loadCoreExports,
   buildTokenResolutionMap,
   collectTokenHints,
   collectCompletionHints,

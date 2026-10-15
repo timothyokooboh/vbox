@@ -66,6 +66,10 @@ test('effective theme, alias strategy and breakpoint options share one core voca
   assert.equal(config.colorDarkMap.brand, '#abcdef');
   assert.equal(config.breakpoints.sm, '40rem');
   assert.equal(config.breakpoints.md, '51rem');
+  assert.equal(
+    resolveVBoxConfig({ breakpoints: { md: undefined } }).breakpoints.md,
+    '48rem',
+  );
   assert.ok(resolveVBoxConfig().normalized.color['red-500']);
 });
 
@@ -92,7 +96,7 @@ test('the public type-generation command uses explicit config and emits valid cu
   const consumer = path.join(root, 'consumer.ts');
   fs.writeFileSync(
     consumer,
-    `import type { VBoxStyleProps } from '@veebox/core'; const styles: VBoxStyleProps = { 'corner-round': '10px', fontSize: 'fs-big' }; void styles;`,
+    `import type { VBoxStyleProps } from '@veebox/core'; const styles: VBoxStyleProps = { 'corner-round': '10px', cornerRound: '12px', fontSize: 'fs-big' }; void styles;`,
   );
   const program = ts.createProgram([declaration, consumer], {
     noEmit: true,

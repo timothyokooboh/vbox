@@ -79,3 +79,12 @@ theme enable/disable, runtime alias replacement, config overrides/recovery,
 real dev-session edits, generated declarations checked by TypeScript and
 per-project editor previews. Conditional precedence and the final SSR reset
 collection are separate later tickets, not claims made by this slice.
+
+## Review regressions
+
+The reviewed follow-up verifies partial breakpoint input against public types
+(with complete effective output), both spellings of generated custom aliases,
+namespace-aware attribute/token suggestions, and unknown CSS keys that collide
+with JavaScript object members. Numeric and Unicode custom-property identifiers
+are accepted. The obsolete editor core-loader wrapper and duplicated alias/token
+prefix table were removed; effective core mappings now supply those meanings.

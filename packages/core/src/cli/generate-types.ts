@@ -6,6 +6,7 @@
 import path from 'node:path';
 import fs from 'fs-extra';
 import { ThemeCategories } from '../constants.js';
+import { kebabToCamelCase } from '../helpers/kebabToCamelCase.js';
 import { resolveVBoxConfig } from '../helpers/resolveConfig.js';
 import { loadVBoxConfig } from '../config.js';
 import type { Theme, ThemeKeys } from '../types.js';
@@ -217,8 +218,19 @@ const main = async () => {
     );
   }
 
-  const { theme: mergedTheme } = resolveVBoxConfig(config);
-  const aliases = config.aliases?.values ?? {};
+  const { theme: mergedTheme, aliases: effectiveAliases } =
+    resolveVBoxConfig(config);
+  const aliases = Object.fromEntries(
+    Object.keys(config.aliases?.values ?? {}).flatMap((key) => {
+      const canonical = kebabToCamelCase(key);
+      const property =
+        effectiveAliases[canonical as keyof typeof effectiveAliases];
+      return [
+        [key, property],
+        [canonical, property],
+      ];
+    }),
+  );
   const color = mergedTheme?.color ?? {};
   const fontSizes = mergedTheme?.fontSize ?? {};
   const fontWeights = mergedTheme?.fontWeight ?? {};
