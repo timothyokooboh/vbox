@@ -42,7 +42,11 @@ export interface VBoxNativePluginOptions {
 
 export interface VBoxSfcTransformPayload {
   code: string;
-  warnings?: Array<{ message: string; loc: { line: number; column: number; offset: number } }>;
+  dependencies?: string[];
+  warnings?: Array<{
+    message: string;
+    loc: { line: number; column: number; offset: number };
+  }>;
   map: import('magic-string').SourceMap | null;
 }
 
@@ -51,6 +55,13 @@ export type VBoxSfcTransformResult = VBoxSfcTransformPayload | null;
 export interface VBoxVitePlugin {
   name: string;
   enforce: 'pre';
+  handleHotUpdate?: (ctx: {
+    file: string;
+    server: {
+      moduleGraph: { invalidateAll: () => void };
+      ws: { send: (payload: { type: 'full-reload' }) => void };
+    };
+  }) => [] | void;
   transform: (code: string, id: string) => VBoxSfcTransformResult;
 }
 

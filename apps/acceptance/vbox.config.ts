@@ -1,9 +1,17 @@
 import { defineConfig } from '@veebox/core';
 export default defineConfig({
   enableDefaultTheme: false,
-  aliases: { values: { brandColor: 'color' } },
+  cssResets: true,
+  classNamePrefix: 'acceptance',
+  aliases: {
+    values: { brandColor: 'color', pad2: 'padding', measure: 'width' },
+  },
   theme: {
-    color: { brand: '#123456' },
+    color: {
+      brand: { default: '#123456', dark: '#abcdef' },
+      reference: '$color.brand',
+    },
+    spacing: { large: '24px', larger: '$spacing.large' },
     fontSize: { xl: '1.25rem', lg: '1.125rem' },
   },
 });

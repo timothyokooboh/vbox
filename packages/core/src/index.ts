@@ -1,3 +1,4 @@
+import { validateAliasKeys } from './helpers/resolveConfig';
 import type { VBoxPluginOptions } from './types';
 
 export { isValidCssDeclaration } from './helpers/isValidCssDeclaration';
@@ -23,6 +24,7 @@ export {
   DefaultBreakpoints,
   DefaultTheme,
   ObjectStyleKeys,
+  TokenCategories,
 } from './constants';
 export type {
   VBoxProps,
@@ -54,7 +56,14 @@ export type { StyleCollector } from './helpers/styleRegistry';
 export type { CssPriority } from './helpers/styleRegistry';
 
 export function defineConfig(config: VBoxPluginOptions) {
+  validateAliasKeys(Object.keys(config.aliases?.values ?? {}));
   return config;
 }
 
 export { getStyleBindingKey } from './helpers/styleBindingName';
+
+export {
+  resolveVBoxConfig,
+  validateAliasKeys,
+  isConditionKey,
+} from './helpers/resolveConfig';

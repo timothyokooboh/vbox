@@ -13,6 +13,7 @@ From the repository root, after
 
 ```sh
 pnpm --filter '@veebox/*' build
+pnpm install --frozen-lockfile --ignore-scripts --offline # link newly built workspace CLI bins
 pnpm --filter @vbox/acceptance exec playwright install chromium firefox webkit
 pnpm --filter @vbox/acceptance test
 pnpm --filter @vbox/acceptance type-check

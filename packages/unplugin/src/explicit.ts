@@ -154,7 +154,11 @@ export const transformExplicitStyles = (
           `[VBox] ${name} needs a rendered element; put the binding on the intended HTML/SVG element or component, not <${node.tag}>.`,
         );
       }
-      if (!/^(?:--[A-Za-z_][\w-]*|-?[A-Za-z_0-9][\w-]*)$/.test(key)) {
+      if (
+        !/^(?:--[-\w\u0080-\uFFFF]+|-?[A-Za-z_0-9\u0080-\uFFFF][-\w\u0080-\uFFFF]*)$/.test(
+          key,
+        )
+      ) {
         throw new SyntaxError(
           `[VBox] ${id}:${prop.loc.start.line}:${prop.loc.start.column} Invalid style property name ${JSON.stringify(name)}.`,
         );

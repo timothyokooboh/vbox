@@ -1,5 +1,5 @@
 import type { InjectionKey } from 'vue';
-import type { VBoxPluginOptions } from '@veebox/core';
+import type { Breakpoints, VBoxPluginOptions } from '@veebox/core';
 
 export const aliasKey = Symbol('aliases') as InjectionKey<
   Record<string, keyof CSSStyleDeclaration>
@@ -9,6 +9,6 @@ export const classNamePrefixKey = Symbol('class-name-prefix') as InjectionKey<
   VBoxPluginOptions['classNamePrefix']
 >;
 
-export const breakpointsKey = Symbol('breakpoints') as InjectionKey<
-  VBoxPluginOptions['breakpoints']
->;
+export const breakpointsKey = Symbol(
+  'breakpoints',
+) as InjectionKey<Breakpoints>;
