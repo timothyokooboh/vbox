@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createJiti } from 'jiti';
+import { resolveBreakpoints } from './helpers/resolveBreakpoints.js';
 import { validateAliasKeys } from './helpers/resolveConfig.js';
 import type { VBoxPluginOptions } from './types.js';
 
@@ -56,6 +57,7 @@ export const loadVBoxConfig = (
       Object.keys(config.aliases?.values ?? {}),
       `${file} aliases.values`,
     );
+    resolveBreakpoints(config.breakpoints);
     return { file, config };
   } catch (error) {
     throw new Error(
