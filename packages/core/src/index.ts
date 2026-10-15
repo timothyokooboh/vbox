@@ -29,6 +29,8 @@ export {
 export type {
   VBoxProps,
   VBoxStyleProps,
+  VBoxStyles,
+  VBoxStyleInput,
   VBoxNativeTemplateProps,
   VBoxPluginOptions,
   AliasStrategy,
@@ -67,3 +69,5 @@ export {
   validateAliasKeys,
   isConditionKey,
 } from './helpers/resolveConfig';
+
+export { readStyleObject } from './helpers/readStyleObject';

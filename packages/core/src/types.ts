@@ -194,6 +194,12 @@ export type VBoxProps = PseudoProps &
 
 export type VBoxStyleProps = Omit<VBoxProps, 'is' | 'asChild'>;
 
+/** Style-only object boundary; template prefixes never belong in these keys. */
+export type VBoxStyles = {
+  [Key in keyof VBoxStyleProps]?: VBoxStyleProps[Key] | null;
+} & Record<string, unknown>;
+export type VBoxStyleInput = VBoxStyles | null | undefined;
+
 export type VBoxNativeTemplateProps = CommonPseudoProps &
   PseudoProps &
   BreakpointProps &

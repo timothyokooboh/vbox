@@ -159,13 +159,19 @@ test('v-pre detection does not mistake attribute values or text for directive bo
   assert.ok(attrs.some((prop) => prop.name === 'title'));
 });
 
-test('reserved grouped bindings never enter inference while composition is unavailable', () => {
-  for (const attr of [':vb="styles"', 'vb="styles"']) {
-    assert.throws(
-      () => transform(`<Widget ${attr} color="tomato" size="lg" />`),
-      /grouped.*not.*supported/i,
-    );
-  }
+test('grouped bindings stay outside inference and preserve semantic component props', () => {
+  const out = transform('<Widget :vb="styles" color="tomato" size="lg" />');
+  assertVueCompiles(out.code);
+  const props = parse(out.code).descriptor.template.ast.children[0].props;
+  assert.ok(
+    props.some(
+      (prop) => prop.name === 'color' && prop.value.content === 'tomato',
+    ),
+  );
+  assert.ok(
+    props.some((prop) => prop.name === 'size' && prop.value.content === 'lg'),
+  );
+  assert.throws(() => transform('<p vb="styles" />'), /object binding.*:vb/);
 });
 
 test('valid numeric and Unicode custom-property names retain their spelling', () => {
