@@ -35,7 +35,7 @@
   "scripts": {
     "build": "vite build && pnpm copy:assets && tsc -p tsconfig.cli.json",
     "copy:assets": "cpx src/styles/resets.css dist/styles/",
-    "test": "vitest",
+    "test": "vitest run",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint ."
