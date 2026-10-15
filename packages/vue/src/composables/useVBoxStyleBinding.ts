@@ -5,7 +5,8 @@ import {
   DefaultBreakpoints,
   createDjb2Hash,
   injectCSS,
-  readStyleObject,
+  composeStyleSources,
+  renderStyleDeclarations,
 } from '@veebox/core';
 import {
   aliasKey,
@@ -13,7 +14,6 @@ import {
   classNamePrefixKey,
 } from '../injectionSymbols';
 import { getSSRCollector, type VBoxSSRContext } from '../ssr';
-import { resolveVBoxCss } from './resolveVBoxStyles';
 
 /** Compiler runtime: class bindings participate in Vue rendering and hydration. */
 export const useVBoxStyleBinding = () => {
@@ -29,13 +29,10 @@ export const useVBoxStyleBinding = () => {
     semanticProps?: Record<string, unknown> | null,
     grouped?: unknown,
   ) => {
-    const styles = {
-      ...readStyleObject(grouped),
-      ...readStyleObject(direct, 'individual'),
-    };
+    const styles = composeStyleSources(grouped, direct, aliases);
     const hash = createDjb2Hash(JSON.stringify([styles, aliases, breakpoints]));
     const className = `${prefix ? `${prefix}-` : ''}css-${hash}`;
-    const css = resolveVBoxCss({ styles, className, aliases, breakpoints });
+    const css = renderStyleDeclarations(styles, className, breakpoints);
     if (context) getSSRCollector(context).collect(css);
     else injectCSS(css);
     return mergeProps(semanticProps ?? {}, { class: className });
