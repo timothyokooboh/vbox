@@ -1,75 +1,24 @@
-# Nuxt Minimal Starter
+# VBox Nuxt SSR fixture
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+This workspace app demonstrates the unreleased explicit native interface with
+Nuxt 4. It uses workspace packages, so build them from the repository root first:
 
-## Setup
-
-Make sure to install dependencies:
-
-```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
+```sh
+pnpm --filter '@veebox/*' build
+pnpm --filter vboxssr dev
 ```
 
-## Development Server
+Open `/?theme=dark` or `/?theme=light`. The initial HTML contains reset/theme CSS,
+component defaults and caller overrides before client JavaScript runs. Controls
+exercise override withdrawal/restoration and actual NuxtLink theme navigation.
 
-Start the development server on `http://localhost:3000`:
+For production verification:
 
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
+```sh
+pnpm --filter @vbox/acceptance test:nuxt
 ```
 
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+This builds the app and runs Chromium, Firefox and WebKit checks, including
+JavaScript-disabled and delayed-hydration cases. See
+[SSR integration and limits](../acceptance/SSR.md) for collector wiring, initial
+theme expectations, supported rendering modes and the broader acceptance matrix.

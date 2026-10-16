@@ -1,5 +1,4 @@
 // server/plugins/vbox-ssr.ts
-import { defineNitroPlugin } from 'nitropack/runtime';
 import { getVboxSsrCss } from '../utils/vbox-ssr-shared.mjs';
 
 export default defineNitroPlugin((nitroApp) => {

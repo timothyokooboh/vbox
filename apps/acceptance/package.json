@@ -4,11 +4,12 @@
   "type": "module",
   "scripts": {
     "build": "vite build && webpack --config webpack.config.mjs && vite build --ssr src/entry-server.ts --outDir dist/server",
-    "test": "pnpm build && node --test tests/*.test.mjs && playwright test",
+    "test": "pnpm build && node --test tests/*.test.mjs && playwright test && pnpm test:nuxt",
     "type-check": "vue-tsc --noEmit -p tsconfig.json",
     "test:editor": "node --test tests/editor.test.cjs",
     "test:browser": "playwright test",
-    "benchmark": "node benchmark.mjs"
+    "benchmark": "node benchmark.mjs",
+    "test:nuxt": "pnpm --filter vboxssr build && playwright test --config playwright.nuxt.config.ts"
   },
   "dependencies": {
     "@veebox/core": "workspace:*",
