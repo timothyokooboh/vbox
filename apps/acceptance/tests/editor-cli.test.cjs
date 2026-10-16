@@ -13,7 +13,7 @@ test('vue-tsc completes without swallowed editor-plugin exceptions', (t) => {
   );
   fs.writeFileSync(
     path.join(root, 'Consumer.vue'),
-    `<script setup lang="ts">type __vboxConfig = { message: string }; const value: __vboxConfig = { message: 'Hello' };</script><template><p :vb="{ hover: { color: 'red' } }">{{ value.message }}</p></template>`,
+    `<script setup lang="ts">type __vboxConfig = { message: string }; const value: __vboxConfig = { message: 'Hello' };</script><template><p :vb="{ hover: { color: 'cl-brand' } }">{{ value.message }}</p></template>`,
   );
   const result = spawnSync(
     process.execPath,

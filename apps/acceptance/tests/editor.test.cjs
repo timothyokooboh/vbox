@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 const fs = require('node:fs');
 const ts = require('typescript');
-const { createEditor } = require('./support/editor-service.cjs');
+const { createEditor, previewText } = require('./support/editor-service.cjs');
 
 test('public editor service exposes the published token preview and refreshes edits', (t) => {
   const template = (token) =>
@@ -12,17 +12,11 @@ test('public editor service exposes the published token preview and refreshes ed
   const editor = createEditor(template('fs-xl'));
   t.after(() => editor.dispose());
   const first = editor.hover('fs-xl');
-  assert.match(
-    ts.displayPartsToString(first?.documentation),
-    /fs-xl.*1\.25rem/,
-  );
+  assert.match(previewText(first), /fs-xl.*1\.25rem/);
   const cold = performance.now() - start;
   editor.update(template('fs-lg'));
   const edited = editor.hover('fs-lg');
-  assert.match(
-    ts.displayPartsToString(edited?.documentation),
-    /fs-lg.*1\.125rem/,
-  );
+  assert.match(previewText(edited), /fs-lg.*1\.125rem/);
   const samples = [];
   for (let i = 0; i < 20; i++) {
     const before = performance.now();
@@ -61,10 +55,7 @@ test('namespaced token values retain their source-mapped hover preview', (t) => 
     '<template><p vb-color="cl-brand">Token</p></template>',
   );
   t.after(() => editor.dispose());
-  assert.match(
-    ts.displayPartsToString(editor.hover('cl-brand')?.documentation),
-    /cl-brand.*#123456/,
-  );
+  assert.match(previewText(editor.hover('cl-brand')), /cl-brand.*#123456/);
 });
 
 test('editor vocabulary is config-specific and refreshes on the next document edit', (t) => {
@@ -90,23 +81,14 @@ test('editor vocabulary is config-specific and refreshes on the next document ed
     local.dispose();
     defaultEditor.dispose();
   });
-  assert.match(
-    ts.displayPartsToString(local.hover('cl-brand')?.documentation),
-    /#654321/,
-  );
-  assert.match(
-    ts.displayPartsToString(defaultEditor.hover('cl-brand')?.documentation),
-    /#123456/,
-  );
+  assert.match(previewText(local.hover('cl-brand')), /#654321/);
+  assert.match(previewText(defaultEditor.hover('cl-brand')), /#123456/);
   fs.writeFileSync(
     config,
     'export default { enableDefaultTheme: false, theme: { color: { brand: "#abcdef" } } }',
   );
   local.update(source.replace('Hello', 'Hello again'));
-  assert.match(
-    ts.displayPartsToString(local.hover('cl-brand')?.documentation),
-    /#abcdef/,
-  );
+  assert.match(previewText(local.hover('cl-brand')), /#abcdef/);
   const palette = path.join(root, 'palette.js');
   fs.writeFileSync(palette, 'export default "#112233"');
   fs.writeFileSync(
@@ -114,16 +96,10 @@ test('editor vocabulary is config-specific and refreshes on the next document ed
     'import brand from "./palette.js"; export default { enableDefaultTheme: false, theme: { color: { brand } } }',
   );
   local.update(source.replace('Hello', 'Imported color'));
-  assert.match(
-    ts.displayPartsToString(local.hover('cl-brand')?.documentation),
-    /#112233/,
-  );
+  assert.match(previewText(local.hover('cl-brand')), /#112233/);
   fs.writeFileSync(palette, 'export default "#445566"');
   local.update(source.replace('Hello', 'Imported color updated'));
-  assert.match(
-    ts.displayPartsToString(local.hover('cl-brand')?.documentation),
-    /#445566/,
-  );
+  assert.match(previewText(local.hover('cl-brand')), /#445566/);
 });
 
 test('explicit style completions use prefixed aliases and property-specific token values', (t) => {
@@ -238,10 +214,7 @@ const sources: VBoxStyleInput = [styles, false, null, { mq: { '@media (min-width
   editor.update(
     `<template><button :vb-cq="{ '@container card (min-width: 400px)': { dark: { hover: { color: 'cl-brand' } } } }">Query token</button></template>`,
   );
-  assert.match(
-    ts.displayPartsToString(editor.hover('cl-brand')?.documentation),
-    /#123456/,
-  );
+  assert.match(previewText(editor.hover('cl-brand')), /#123456/);
   editor.update(
     `${script}<template><button translate="8px" :vb="sources">Invalid semantic translate</button></template>`,
   );
@@ -255,10 +228,7 @@ const styles: VBoxStyles = { pseudos: { ':hover, :focus': { color: 'red' }, '::b
   const editor = createEditor(source);
   t.after(() => editor.dispose());
   assert.deepEqual(editor.diagnostics(), []);
-  assert.match(
-    ts.displayPartsToString(editor.hover('cl-brand')?.documentation),
-    /#123456/,
-  );
+  assert.match(previewText(editor.hover('cl-brand')), /#123456/);
 });
 
 test('quoted CSS content values cannot corrupt editor-generated TypeScript', (t) => {
