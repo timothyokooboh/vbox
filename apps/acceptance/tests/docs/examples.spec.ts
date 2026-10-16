@@ -25,8 +25,8 @@ test('the product demo renders on the server and its semantic quantity controls 
     const card = page.locator('[data-scope="product-card"]');
     await expect(card).toBeVisible();
     await expect(card).toHaveCSS('max-width', '400px');
-    const quantity = page.locator('[data-scope="product-qty-selector"]');
-    await expect(quantity).toHaveJSProperty('tagName', 'DIV');
+    const quantity = page.getByRole('group', { name: 'Quantity', exact: true });
+    await expect(quantity).toBeVisible();
     releaseScripts();
     await page.waitForLoadState('load');
     const add = quantity.getByRole('button', { name: 'add', exact: true });

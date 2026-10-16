@@ -38,8 +38,8 @@ must still define the aliases you use. Default alias availability follows that
 strategy.
 
 Keep compiler, editor and runtime config aligned. Namespacing means an
-unfamiliar alias is still styling, but incorrect metadata can produce advisory
-warnings or incomplete editor suggestions.
+unfamiliar alias is still styling, but incorrect metadata can produce incomplete
+editor suggestions. Do not rely on a compiler warning for every unknown name.
 
 Run `npx vbox-type-gen` after changing aliases and include the generated
 `vbox.d.ts` in the app's tsconfig. See
