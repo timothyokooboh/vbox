@@ -1,3 +1,4 @@
+import { withDelayedScripts } from '../support/delayedScripts';
 import { test, expect } from '../browser/fixtures';
 
 test.describe('Nuxt before JavaScript', () => {
@@ -24,10 +25,7 @@ test.describe('Nuxt before JavaScript', () => {
 
 test('Nuxt hydrates after delayed scripts, then updates owners and navigates themes without mismatches', async ({ page }) => {
   await page.addInitScript(() => { Object.defineProperty(CSS, 'supports', { value: () => false }); });
-  let releaseScripts!: () => void;
-  const ready = new Promise<void>((resolve) => { releaseScripts = resolve; });
-  await page.route('**/_nuxt/**', async (route) => { await ready; await route.continue(); });
-  try {
+  await withDelayedScripts(page, '**/_nuxt/**', async (releaseScripts) => {
     await page.goto('/?theme=dark', { waitUntil: 'commit' });
     const owner = page.getByTestId('nuxt-owner');
     await expect(page.locator('html')).not.toHaveAttribute('data-nuxt-mounted');
@@ -57,5 +55,5 @@ test('Nuxt hydrates after delayed scripts, then updates owners and navigates the
     await expect(owner).toHaveCSS('color', 'rgb(255, 255, 0)');
     await owner.hover();
     await expect(owner).toHaveCSS('color', 'rgb(255, 0, 0)');
-  } finally { releaseScripts(); }
+  });
 });

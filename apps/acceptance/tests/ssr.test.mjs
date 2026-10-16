@@ -92,3 +92,20 @@ test('concurrent asynchronous SSR apps isolate alias, token, breakpoint and keyf
     assert.doesNotMatch(result.css, alternate ? /opacity:0.7|--color-brand:red/ : /opacity:0.3|--color-brand:blue/);
   }
 });
+
+test('plugin prelude stays before setup-time raw CSS, including after descendants render', async () => {
+  const Child = { render: () => h('p', 'Descendant') };
+  const app = createSSRApp({
+    setup() {
+      getSSRCollector(useSSRContext()).collect(':root{--color-brand:blue}');
+      return () => h(Child);
+    },
+  }).use(VBoxPlugin, {
+    enableDefaultTheme: false,
+    theme: { color: { brand: 'red' } },
+  });
+  const context = {};
+  await renderToString(app, context);
+  const css = getSSRStyles(context);
+  assert.ok(css.indexOf('--color-brand:red') < css.indexOf('--color-brand:blue'), 'configured defaults precede authored raw overrides');
+});

@@ -7,15 +7,17 @@ import {
 } from '../constants';
 import { createVendorPrefix } from './vendorPrefix';
 
-export type CssPriority = 'base' | 'override';
+export type CssPriority = 'prelude' | 'base' | 'override';
 
 type CssRegistry = {
+  prelude?: Set<string>;
   base: Set<string>;
   override: Set<string>;
   styles?: Map<string, StyleBundle>;
 };
 
 const createRegistry = (): CssRegistry => ({
+  prelude: new Set<string>(),
   base: new Set<string>(),
   override: new Set<string>(),
   styles: new Map(),
@@ -55,8 +57,10 @@ const resolveCssRegistry = (): CssRegistry => {
 
 export const cssRegistry = resolveCssRegistry();
 
-const selectLane = (registry: CssRegistry, priority: CssPriority) =>
-  priority === 'override' ? registry.override : registry.base;
+const selectLane = (registry: CssRegistry, priority: CssPriority) => {
+  if (priority === 'prelude') return (registry.prelude ??= new Set());
+  return priority === 'override' ? registry.override : registry.base;
+};
 
 export const registerCss = (
   css: string,
@@ -74,11 +78,12 @@ export const registerCss = (
 };
 
 export const getCss = (registry: CssRegistry = cssRegistry) => {
+  const preludeCss = Array.from(registry.prelude ?? []).join('\n\n');
   const baseCss = Array.from(registry.base).join('\n\n');
   const overrideCss = Array.from(registry.override).join('\n\n');
 
   const explicitCss = serializeStyleBundles(registry.styles?.values() ?? []);
-  return [baseCss, overrideCss, explicitCss].filter(Boolean).join('\n\n');
+  return [preludeCss, baseCss, overrideCss, explicitCss].filter(Boolean).join('\n\n');
 };
 
 export const registerStyleBundle = (
@@ -118,6 +123,7 @@ export const createStyleCollector = (): StyleCollector => {
       return getCss(registry);
     },
     reset() {
+      registry.prelude?.clear();
       registry.base.clear();
       registry.override.clear();
       registry.styles?.clear();

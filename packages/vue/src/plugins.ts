@@ -21,11 +21,11 @@ export default {
       Object.keys(config.theme).length > 0 ? config.themeCss : '',
     ].filter(Boolean).join('\n');
     if (initialCss) {
-      if (typeof window !== 'undefined') injectCSS(initialCss);
+      if (typeof window !== 'undefined') injectCSS(initialCss, 'prelude');
       else app.mixin({
         beforeCreate() {
           const context = useSSRContext<VBoxSSRContext>();
-          if (context) getSSRCollector(context).collect(initialCss);
+          if (context) getSSRCollector(context).collect(initialCss, 'prelude');
         },
       });
     }

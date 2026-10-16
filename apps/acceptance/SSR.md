@@ -40,7 +40,9 @@ sanitizer for arbitrary user input. Apply the host application's CSP/nonce polic
 when embedding inline CSS.
 
 `cssResets: true` precedes the theme-variable definitions in the collected
-prelude; structured styling follows. Keyframes use the same request collector:
+prelude. Both server and client place that prelude before ordinary collected or
+injected CSS, even if component setup supplies raw CSS before its lifecycle
+hooks run. Structured styling follows the raw CSS lanes. Keyframes use the same request collector:
 
 ```ts
 const collector = getSSRCollector(useSSRContext()!); // server-side setup only
@@ -81,7 +83,9 @@ navigation changes the theme after hydration without replacing the root app.
   without browser globals; no hardcoded generated class names.
 - `tests/browser/ssr.spec.ts`: initial appearance with JavaScript disabled, then
   delayed-script hydration without `window.CSS`, matching class/animation
-  identity, theme-first hover, override withdrawal, lazy navigation/shared styles.
+  identity, theme-first hover below/above md, explicit dark+md+hover refinement,
+  interaction-over-resting priority, conditional-override withdrawal, lazy
+  navigation/shared styles.
 - `tests/nuxt/ssr.spec.ts`: the actual Nuxt production server, initial dark CSS
   without scripts, delayed hydration with validation returning false, override
   updates and route/theme changes. Browser fixtures reject hydration/page errors.
