@@ -351,7 +351,7 @@ test('collectCompletionHints includes empty quoted value context for token compl
   assert.equal(hints.valueHints.length > 0, true);
   const emptyHint = hints.valueHints[0];
   assert.equal(emptyHint.typedValue, '');
-  assert.equal(emptyHint.mappedValue, '""');
+  assert.equal(emptyHint.mappedValue, '');
   assert.deepEqual(emptyHint.candidates, ['fs-lg', 'fs-xl']);
 });
 

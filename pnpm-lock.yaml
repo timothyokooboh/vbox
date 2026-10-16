@@ -558,6 +558,9 @@ importers:
       known-css-properties:
         specifier: ^0.37.0
         version: 0.37.0
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
     devDependencies:
       '@vue/compiler-dom':
         specifier: ^3.5.24

@@ -323,3 +323,131 @@ test('grouped style function calls preserve PVA variant argument completions', (
   assert.ok(values.includes('strong'));
   assert.ok(!values.includes('cl-brand'));
 });
+
+test('kebab and numeric alias spellings share the core-normalized property meaning', (t) => {
+  const root = editorProject(
+    t,
+    `import { defineConfig } from '@veebox/core'; export default defineConfig({ enableDefaultTheme: false, aliases: { values: { 'pad-2': 'padding', 'text-size': 'fontSize' } }, theme: { spacing: { roomy: '2rem' }, fontSize: { heading: '3rem' } } });`,
+  );
+  const editor = createEditor('<template><p/></template>', root);
+  t.after(() => editor.dispose());
+  for (const [name, token] of [
+    ['vb-pad-2', 'sp-roomy'],
+    ['vbPad2', 'sp-roomy'],
+    ['vb-text-size', 'fs-heading'],
+    ['vbTextSize', 'fs-heading'],
+  ]) {
+    const source = `<template><p ${name}=""/></template>`;
+    editor.update(source);
+    assert.ok(
+      editor.completeAt(source.indexOf('""') + 1).includes(token),
+      name,
+    );
+  }
+});
+
+test('plain alias replacement does not advertise defaults removed by runtime configuration', (t) => {
+  const root = editorProject(
+    t,
+    `export default { aliases: { strategy: 'replace', values: { heading: 'fontSize' } } };`,
+  );
+  const source = '<template><p vb /></template>';
+  const editor = createEditor(source, root);
+  t.after(() => editor.dispose());
+  const keys = editor.completeAt(source.indexOf(' vb') + 3);
+  assert.ok(keys.includes('vb-heading'));
+  assert.ok(!keys.includes('vb-fs'));
+  assert.ok(!keys.includes('vb-bg'));
+});
+
+test('style object keys never complete template-prefixed spellings', (t) => {
+  const source = `<template><p :vb="{ vb: '' }"/></template>`;
+  const editor = createEditor(source);
+  t.after(() => editor.dispose());
+  const keys = editor.completeAt(source.lastIndexOf('vb:') + 2);
+  assert.ok(keys.includes('font-size'));
+  assert.ok(!keys.some((key) => key.startsWith('vb-')));
+});
+
+test('style value indexing preserves the indexed object key completions', (t) => {
+  const source = `<script setup lang="ts">const palette = { brand: 'red', muted: 'blue' };</script><template><p :vb-color="palette['']"/></template>`;
+  const editor = createEditor(source);
+  t.after(() => editor.dispose());
+  const values = editor.completeAt(source.indexOf("''") + 1);
+  assert.ok(values.includes('brand'));
+  assert.ok(values.includes('muted'));
+  assert.ok(!values.includes('cl-brand'));
+});
+
+for (const [binding, empty] of [
+  ['vb-font-size=""', '""'],
+  ['stable', "''"],
+  [':vb-font-size=\'""\'', '""'],
+  [':vb-font-size="``"', '``'],
+  ['nested', "''"],
+]) {
+  const attribute =
+    binding === 'stable'
+      ? `:vb-font-size="''"`
+      : binding === 'nested'
+        ? `:vb="{ fontSize: '' }"`
+        : binding;
+  test(`accepting an empty value completion preserves delimiters: ${attribute}`, (t) => {
+    const source = `<template><p ${attribute}/></template>`;
+    const editor = createEditor(source);
+    t.after(() => editor.dispose());
+    const cursor = source.indexOf(empty) + 1;
+    const info = editor.completionInfoAt(cursor);
+    const entry = info?.entries.find((entry) => entry.name === 'fs-xl');
+    assert.ok(entry);
+    const span = entry.replacementSpan ?? info.optionalReplacementSpan;
+    assert.ok(span);
+    const result =
+      source.slice(0, span.start) +
+      (entry.insertText ?? entry.name) +
+      source.slice(span.start + span.length);
+    assert.equal(
+      result,
+      source.slice(0, cursor) + 'fs-xl' + source.slice(cursor),
+    );
+  });
+}
+
+for (const [tag, attribute, object] of [
+  ['button', 'vb-hover', '{  }'],
+  ['AppButton', 'vb', '{  }'],
+  ['p', 'vb', "{ color: 'red',  }"],
+  ['p', 'vb', "{ mq: { '@media (width > 40rem)': {  } } }"],
+]) {
+  test(`style keys complete at an insertion point on ${tag} :${attribute}: ${object}`, (t) => {
+    const source = `<template><${tag} :${attribute}="${object}"/></template>`;
+    const editor = createEditor(source);
+    t.after(() => editor.dispose());
+    const keys = editor.completeAt(source.indexOf('  ') + 1);
+    for (const key of [
+      'backdrop-filter',
+      'fontSize',
+      'brand-color',
+      'mq',
+      'hover',
+    ])
+      assert.ok(keys.includes(key), key);
+    assert.ok(!keys.includes('vb-color'));
+  });
+}
+
+test('broadly annotated configs retain current runtime token and alias metadata', (t) => {
+  const root = editorProject(
+    t,
+    `import type { VBoxPluginOptions } from '@veebox/core'; const config: VBoxPluginOptions = { enableDefaultTheme: false, aliases: { values: { heading: 'fontSize' } }, theme: { fontSize: { custom: '2rem' } } }; export default config;`,
+  );
+  const source = '<template><p vb-heading="" vb /></template>';
+  const editor = createEditor(source, root);
+  t.after(() => editor.dispose());
+  const values = editor.completeAt(source.indexOf('""') + 1);
+  assert.ok(values.includes('fs-custom'));
+  assert.ok(!values.includes('fs-xl'));
+  assert.ok(
+    editor.completeAt(source.lastIndexOf(' vb') + 3).includes('vb-heading'),
+  );
+});

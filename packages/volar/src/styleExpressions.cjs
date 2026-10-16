@@ -1,6 +1,6 @@
 const core = require('@veebox/core');
 
-/** Use the editor's TypeScript parser, including its incomplete-expression recovery. */
+/** Use the public TypeScript parser, including its incomplete-expression recovery. */
 function collectExpressionCompletions(ts, expression, boundKey, getCandidates) {
   const prefix = '(';
   const source = ts.createSourceFile(
@@ -14,11 +14,33 @@ function collectExpressionCompletions(ts, expression, boundKey, getCandidates) {
   const offset = (node) =>
     expression.loc.start.offset + node.getStart(source) - prefix.length;
 
+  const isSelectorMap = (key) =>
+    ['mq', 'cq', 'pseudos'].includes(core.getConditionKey(key));
+  function addInsertionHint(start, end) {
+    let gap = source.text.slice(start, end);
+    // AST property boundaries isolate whitespace; comments and expressions are not insertion zones.
+    if (!/^\s*,?\s*$/.test(gap)) return;
+    const comma = gap.indexOf(',');
+    if (comma >= 0) {
+      start += comma + 1;
+      gap = gap.slice(comma + 1);
+    }
+    attributes.push({
+      objectKey: true,
+      insertion: true,
+      value: gap,
+      offset: expression.loc.start.offset + start - prefix.length,
+      length: gap.length,
+    });
+  }
+
   function visit(node, key) {
     // Calls such as pva({ variant: 'solid' }) keep their own argument types.
     if (
       ts.isCallExpression(node) ||
       ts.isNewExpression(node) ||
+      ts.isElementAccessExpression(node) ||
+      ts.isTaggedTemplateExpression(node) ||
       ts.isArrowFunction(node) ||
       ts.isFunctionExpression(node)
     )
@@ -32,6 +54,18 @@ function collectExpressionCompletions(ts, expression, boundKey, getCandidates) {
       visit(node.right, key);
       return;
     }
+    if (ts.isObjectLiteralExpression(node)) {
+      if (!isSelectorMap(key)) {
+        let start = node.getStart(source) + 1;
+        for (const property of node.properties) {
+          addInsertionHint(start, property.getStart(source));
+          start = property.end;
+        }
+        addInsertionHint(start, node.end - 1);
+      }
+      for (const property of node.properties) visit(property, key);
+      return;
+    }
     if (ts.isPropertyAssignment(node)) {
       const name = node.name;
       const property =
@@ -39,13 +73,14 @@ function collectExpressionCompletions(ts, expression, boundKey, getCandidates) {
           ? name.text
           : undefined;
       if (property === undefined) return;
-      attributes.push({
-        objectKey: true,
-        quoted: ts.isStringLiteral(name),
-        value: property,
-        offset: offset(name) + (ts.isStringLiteral(name) ? 1 : 0),
-        length: property.length,
-      });
+      if (!isSelectorMap(key))
+        attributes.push({
+          objectKey: true,
+          quoted: ts.isStringLiteral(name),
+          value: property,
+          offset: offset(name) + (ts.isStringLiteral(name) ? 1 : 0),
+          length: property.length,
+        });
       visit(node.initializer, property);
       return;
     }
@@ -67,8 +102,8 @@ function collectExpressionCompletions(ts, expression, boundKey, getCandidates) {
         values.push({
           property: key,
           typedValue: value,
-          mappedValue: value || raw,
-          offset: start + (value ? 1 : 0),
+          mappedValue: value,
+          offset: start + 1,
           candidates: getCandidates(key),
         });
       } else {

@@ -20,7 +20,12 @@ TypeScript adapter 2.4.28 and TypeScript 5.9.3.
   media/container and selector groups use each leaf's property. Compound values
   complete the token segment without replacing surrounding CSS.
 - Calls such as `:vb="buttonStyles({ tone: 'quiet' })"` retain normal TypeScript
-  argument completions. VBox does not reinterpret PVA variant options as styles.
+  argument completions. Indexed expressions such as `palette['']` also retain
+  their own key suggestions. VBox does not reinterpret PVA variant options as
+  styles.
+- Empty object positions offer unprefixed style keys, including between existing
+  properties. Accepting an empty-value suggestion preserves the surrounding HTML
+  or JavaScript quote/backtick delimiters.
 - Generated `vbox.d.ts` token and alias augmentation is reused. Keep it included
   in the consumer's tsconfig and regenerate it when its source configuration
   changes; stale generated declarations remain declarations to TypeScript.
@@ -37,7 +42,9 @@ Plain config exports still work. If TypeScript widens an alias target to
 `string` or a feature flag to `boolean`, runtime metadata supplies its current
 meaning; changes to those widened values refresh on the next Vue document edit.
 Use `defineConfig` (or literal-preserving types) for config-only updates. Token
-keys remain live because their key types are retained.
+keys remain live when their key types are retained. Broad annotations such as
+`const config: VBoxPluginOptions` erase those literal keys too, so they use the
+same runtime fallback and refresh on a Vue document edit.
 
 Completions work inside incomplete tags when Vue can recover the template block.
 If an unfinished SFC has no recoverable template content at all (for example a
@@ -57,7 +64,11 @@ The shared editor host retains unchanged snapshots, so config-only tests cannot
 pass by accidentally regenerating the Vue document. It loads included ambient
 declarations as a real consumer does. Tests also protect semantic `translate`,
 component props, duplicate entries, generated-name collisions, replacement
-spans, and existing legacy component behavior.
+spans, and existing legacy component behavior. A separate real `vue-tsc` process
+asserts both a successful exit and no plugin exception output: Vue can catch
+plugin errors and still exit zero. The plugin ships the full public TypeScript
+parser because the CLI-injected, tree-shaken facade is not a complete compiler
+API. This does not replace the consumer's own TypeScript language service.
 
 The native-heavy test reports cold, warm-P95 and incremental timings and applies
 generous regression budgets (doubled on CI). These are safety checks, not

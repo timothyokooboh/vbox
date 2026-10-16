@@ -1,4 +1,5 @@
 const core = require('@veebox/core');
+const path = require('node:path');
 
 // Type imports let the editor invalidate config/token dependencies itself. A Vue
 // document need not change for its imported vocabulary to become up to date.
@@ -9,11 +10,12 @@ function buildTokenTypes(
   aliases,
   config,
 ) {
+  const resolved = core.resolveVBoxConfig(config);
   const code = [
-    `type __vboxConfig = ${configFile ? `typeof import(${JSON.stringify(configFile.replaceAll('\\', '/'))}).default` : '{}'};\n`,
+    `type __vboxConfig = ${configFile ? `typeof import(${JSON.stringify(configFile.replaceAll(path.sep, '/'))}).default` : '{}'};\n`,
     `type __vboxGet<T, K> = K extends keyof T ? NonNullable<T[K]> : {};\n`,
-    `type __vboxKeys<T> = string extends keyof T ? never : Extract<keyof T, string>;\n`,
-    `type __vboxUseDefaults = __vboxConfig extends { enableDefaultTheme: infer Flag } ? boolean extends Flag ? ${config.enableDefaultTheme !== false} : Flag : true;\n`,
+    `type __vboxKeys<T, Fallback = never> = string extends keyof T ? Fallback : Extract<keyof T, string>;\n`,
+    `type __vboxUseDefaults = 'enableDefaultTheme' extends keyof __vboxConfig ? boolean extends __vboxGet<__vboxConfig, 'enableDefaultTheme'> ? ${config.enableDefaultTheme !== false} : __vboxGet<__vboxConfig, 'enableDefaultTheme'> : true;\n`,
     'type __vboxTokens = {\n',
   ];
   for (const [prefix, category] of Object.entries(core.TokenCategories)) {
@@ -23,7 +25,11 @@ function buildTokenTypes(
         .filter((key) => key.startsWith(`${prefix}-`))
         .map((key) => JSON.stringify(key.slice(prefix.length + 1)))
         .join(' | ') || 'never';
-    const keys = `__vboxKeys<__vboxGet<__vboxGet<__vboxConfig, 'theme'>, '${category}'>> | Extract<keyof import('@veebox/core').${declaration}, string> | (__vboxUseDefaults extends false ? never : ${defaults})`;
+    const runtimeKeys =
+      Object.keys(resolved.normalized[category] ?? {})
+        .map((key) => JSON.stringify(key))
+        .join(' | ') || 'never';
+    const keys = `__vboxKeys<__vboxGet<__vboxGet<__vboxConfig, 'theme'>, '${category}'>, ${runtimeKeys}> | Extract<keyof import('@veebox/core').${declaration}, string> | (__vboxUseDefaults extends false ? never : ${defaults})`;
     code.push(
       `${prefix}: \`${prefix}-\${${keys}}\` | \`var(--${core.toKebabCase(category)}-\${${keys}})\`;\n`,
     );
@@ -34,13 +40,24 @@ type __vboxCamel<S extends string> = S extends \`\${infer H}-\${infer T}\` ? \`\
 type __vboxKebab<S extends string> = S extends \`\${infer H}\${infer T}\` ? T extends Uncapitalize<T> ? \`\${Lowercase<H>}\${__vboxKebab<T>}\` : \`\${Lowercase<H>}-\${__vboxKebab<T>}\` : S;
 `);
   code.push(
-    `type __vboxCustomAliases = __vboxGet<__vboxGet<__vboxConfig, 'aliases'>, 'values'>;\n`,
+    `type __vboxNormalizeAliases<T> = { [K in keyof T as K extends string ? __vboxCamel<K> : never]: T[K] };\n`,
+    `type __vboxConfigAliases = __vboxNormalizeAliases<__vboxGet<__vboxGet<__vboxConfig, 'aliases'>, 'values'>>;\n`,
+  );
+  const customKeys = [
+    ...new Set(
+      Object.keys(config.aliases?.values ?? {}).map(core.kebabToCamelCase),
+    ),
+  ];
+  code.push(
+    `type __vboxCustomAliases = string extends keyof __vboxConfigAliases ? { ${customKeys.map((key) => `${JSON.stringify(key)}: ${JSON.stringify(resolved.aliases[key])}`).join('; ')} } : __vboxConfigAliases;\n`,
   );
   code.push(
-    `type __vboxDeclaredAliases = Omit<import('@veebox/core').AliasMap, keyof typeof import('@veebox/core').DefaultAliases>;\n`,
+    `type __vboxDeclaredAliases = __vboxNormalizeAliases<Omit<import('@veebox/core').AliasMap, keyof typeof import('@veebox/core').DefaultAliases>>;\n`,
   );
   code.push(
-    `type __vboxDefaultAliases = __vboxConfig extends { aliases: { strategy: 'replace' } } ? {} : typeof import('@veebox/core').DefaultAliases;\n`,
+    `type __vboxAliasStrategy = __vboxGet<__vboxGet<__vboxConfig, 'aliases'>, 'strategy'>;\n`,
+    `type __vboxReplaceAliases = __vboxAliasStrategy extends 'replace' ? true : __vboxAliasStrategy extends 'merge' ? false : ${config.aliases?.strategy === 'replace'};\n`,
+    `type __vboxDefaultAliases = __vboxReplaceAliases extends true ? {} : typeof import('@veebox/core').DefaultAliases;\n`,
   );
   code.push(
     `type __vboxDiscoveredAliases = Omit<__vboxDeclaredAliases, keyof __vboxCustomAliases> & __vboxCustomAliases;\n`,
@@ -62,7 +79,7 @@ type __vboxKebab<S extends string> = S extends \`\${infer H}\${infer T}\` ? T ex
   code.push(
     'type __vboxExplicitAliasKeys = `vb-${__vboxKebab<Extract<keyof __vboxAliases, string>>}` | `vb${Capitalize<__vboxCamel<Extract<keyof __vboxAliases, string>>>}`;\n',
   );
-  const resolvedAliases = core.resolveVBoxConfig(config).aliases;
+  const resolvedAliases = resolved.aliases;
   code.push(
     `type __vboxRuntimeAliases = { ${Object.entries(resolvedAliases)
       .map(([key, value]) => `${JSON.stringify(key)}: ${JSON.stringify(value)}`)
