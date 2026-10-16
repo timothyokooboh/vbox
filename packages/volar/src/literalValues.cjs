@@ -40,6 +40,7 @@ function collectLiteralValues(expression) {
       const start = node.getStart(source);
       values.push({
         content: raw.slice(1, end ? -end : undefined),
+        rawAt: (left, right) => text.rawAt(start + left, start + right),
         startAt: (index) => text.startAt(start + index),
         endAt: (index) => text.endAt(start + index),
       });

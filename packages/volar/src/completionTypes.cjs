@@ -15,7 +15,7 @@ function buildTokenTypes(
     `type __vboxConfig = ${configFile ? `typeof import(${JSON.stringify(configFile.replaceAll(path.sep, '/'))}).default` : '{}'};\n`,
     `type __vboxGet<T, K> = K extends keyof T ? NonNullable<T[K]> : {};\n`,
     `type __vboxKeys<T, Fallback = never> = string extends keyof T ? Fallback : Extract<keyof T, string>;\n`,
-    `type __vboxUseDefaults = 'enableDefaultTheme' extends keyof __vboxConfig ? boolean extends __vboxGet<__vboxConfig, 'enableDefaultTheme'> ? ${config.enableDefaultTheme !== false} : __vboxGet<__vboxConfig, 'enableDefaultTheme'> : true;\n`,
+    `type __vboxUseDefaults = import('@veebox/core').VBoxDefaultThemeEnabled<__vboxConfig, ${config.enableDefaultTheme !== false}>;\n`,
     'type __vboxTokens = {\n',
   ];
   for (const [prefix, category] of Object.entries(core.TokenCategories)) {

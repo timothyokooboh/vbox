@@ -25,6 +25,11 @@ function attributeText(raw, offset = 0) {
   }
   return {
     content,
+    rawAt: (start, end) =>
+      raw.slice(
+        (starts[start] ?? offset + raw.length) - offset,
+        (ends[end - 1] ?? offset) - offset,
+      ),
     startAt: (index) => starts[index] ?? offset + raw.length,
     endAt: (index) => ends[index - 1] ?? offset,
   };

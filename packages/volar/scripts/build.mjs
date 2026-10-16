@@ -8,6 +8,7 @@ const root = path.resolve(__dirname, '..');
 const srcDir = path.join(root, 'src');
 const distDir = path.join(root, 'dist');
 
+await fs.rm(distDir, { recursive: true, force: true });
 await fs.mkdir(distDir, { recursive: true });
 for (const name of await fs.readdir(srcDir)) {
   if (name.endsWith('.cjs'))

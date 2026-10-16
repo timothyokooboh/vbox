@@ -82,17 +82,22 @@ Previews explain recognized tokens in both style bindings and semantic HTML or
 component props. A preview on `title="cl-brand"` does not imply that the
 compiler transforms `title`. Tests cover branches, loops, slots, nested
 templates, grouped sources and query/selector objects, compound strings, literal
-template segments, HTML entities and recoverable incomplete expressions. Unknown
-tokens and unrelated scripts, text, comments, event handlers, object keys and
-non-string expressions do not acquire a VBox preview. The editor inspects
-expression ASTs; it does not run application expressions to discover values.
+template segments, HTML entities (including every cursor position within an
+encoded token) and recoverable incomplete expressions. Compiler-excluded
+metadata tags and components named `Title` or `Style` still receive
+informational previews. Unknown tokens and unrelated scripts, text, comments,
+event handlers, object keys and non-string expressions do not acquire a VBox
+preview. The editor inspects expression ASTs; it does not run application
+expressions to discover values.
 
 The hover displays the token's property name and configured value, without an
 invented variable declaration or unused-variable warning. Configured colors with
 default/dark appearances show both; color references show their CSS variable,
-while non-color references resolve as the core does. This is configuration
-information, not a browser-computed style or a promise about the currently
-active appearance. Circular references are described as unresolved.
+while non-color references resolve as the core does, even across color-reference
+chains. Preview resolution and default-theme typing now live in core alongside
+the runtime theme parser, rather than as generated policy inside Volar. This is
+configuration information, not a browser-computed style or a promise about the
+currently active appearance. Circular references are described as unresolved.
 
 With `defineConfig` or equivalent literal-preserving types, adding, changing or
 removing tokens, toggling the default theme and editing imported literal
