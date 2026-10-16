@@ -87,3 +87,14 @@ test('selector functions, pseudo-elements and encoded parent references retain e
     assert.equal(actual.column, expected.column);
   }
 });
+
+test('Options API script identifiers keep their original source positions after runtime wrapping', () => {
+  const source = `<script lang="ts">\nconst authoredColor = 'red';\nexport default { data: () => ({ color: authoredColor }) };\n</script>\n<template><p :vb-color="color" /></template>`;
+  const out = transformVueSfc(source, '/project/Options.vue');
+  const actual = originalPositionFor(
+    new TraceMap(out.map),
+    position(out.code, out.code.indexOf('authoredColor')),
+  );
+  assert.equal(actual.line, 2);
+  assert.equal(actual.column, 6);
+});

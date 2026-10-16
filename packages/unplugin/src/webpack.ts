@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { vboxWebpackLoader } from './webpack-loader.js';
 import type {
   VBoxNativePluginOptions,
@@ -5,7 +6,12 @@ import type {
   VBoxWebpackPlugin,
 } from './types.js';
 
-const loaderPath = new URL('./webpack-loader.js', import.meta.url).pathname;
+const loaderPath = fileURLToPath(
+  new URL('./webpack-loader.js', import.meta.url),
+);
+const mapLoaderPath = fileURLToPath(
+  new URL('./webpack-map-loader.js', import.meta.url),
+);
 
 export const vboxWebpackPlugin = (
   options: VBoxNativePluginOptions = {},
@@ -26,6 +32,12 @@ export const vboxWebpackPlugin = (
               options,
             },
           ],
+        });
+
+        rules.push({
+          test: /\.vue$/,
+          enforce: 'post',
+          use: [{ loader: mapLoaderPath }],
         });
 
         moduleConfig.rules = rules;

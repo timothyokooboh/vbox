@@ -7,3 +7,5 @@ export async function render(fixture: FixtureName = 'standard') {
   const html = await renderToString(createFixture(true, fixture), context);
   return { html, css: getSSRStyles(context) };
 }
+
+export { resolveFixtureName } from './app';

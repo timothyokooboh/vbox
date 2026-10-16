@@ -21,7 +21,10 @@ test('transformVueSfc transforms marked custom components', () => {
   const out = transformVueSfc(source, '/tmp/example.vue');
 
   assert.equal(typeof out?.code, 'string');
-  assert.match(out.code, /<BaseButton v-vbox-runtime:override="\{ 'color': 'blue' \}">Sign in<\/BaseButton>/);
+  assert.match(
+    out.code,
+    /<BaseButton v-vbox-runtime:override="\{ 'color': 'blue' \}">Sign in<\/BaseButton>/,
+  );
 });
 
 test('transformVueSfc auto-transforms framework links without marker', () => {
@@ -29,7 +32,10 @@ test('transformVueSfc auto-transforms framework links without marker', () => {
   const out = transformVueSfc(source, '/tmp/example.vue');
 
   assert.equal(typeof out?.code, 'string');
-  assert.match(out.code, /<router-link to="\/" v-vbox-runtime:override="\{ 'color': 'blue' \}">Home<\/router-link>/);
+  assert.match(
+    out.code,
+    /<router-link to="\/" v-vbox-runtime:override="\{ 'color': 'blue' \}">Home<\/router-link>/,
+  );
 });
 
 test('transformVueSfc transforms unmarked custom components by default', () => {
@@ -37,7 +43,10 @@ test('transformVueSfc transforms unmarked custom components by default', () => {
   const out = transformVueSfc(source, '/tmp/example.vue');
 
   assert.equal(typeof out?.code, 'string');
-  assert.match(out.code, /<BaseButton v-vbox-runtime:override="\{ 'color': 'blue' \}">Sign in<\/BaseButton>/);
+  assert.match(
+    out.code,
+    /<BaseButton v-vbox-runtime:override="\{ 'color': 'blue' \}">Sign in<\/BaseButton>/,
+  );
 });
 
 test('transformVueSfc keeps unmarked custom components untouched when parseAllComponents is false', () => {
@@ -54,7 +63,10 @@ test('transformVueSfc preserves semantic attributes on media tags', () => {
   const out = transformVueSfc(source, '/tmp/example.vue');
 
   assert.equal(typeof out?.code, 'string');
-  assert.match(out.code, /<img src="\/a\.png" v-vbox-runtime="\{ 'width': '40px', 'color': 'red' \}" \/>/);
+  assert.match(
+    out.code,
+    /<img src="\/a\.png" v-vbox-runtime="\{ 'width': '40px', 'color': 'red' \}" \/>/,
+  );
   assert.doesNotMatch(out.code, /'src':/);
 });
 
@@ -78,7 +90,10 @@ test('denylisted native tags are not transformed', () => {
   const out = transformVueSfc(source, '/tmp/example.vue');
 
   assert.equal(typeof out?.code, 'string');
-  assert.match(out.code, /<script type="application\/json" color="red"><\/script>/);
+  assert.match(
+    out.code,
+    /<script type="application\/json" color="red"><\/script>/,
+  );
   assert.match(out.code, /<p v-vbox-runtime="\{ 'color': 'blue' \}">Hi<\/p>/);
   assert.doesNotMatch(out.code, /<script[^>]*v-vbox-runtime=/);
 });
@@ -126,7 +141,9 @@ test('webpack plugin injects pre vue rule with shared loader', () => {
   assert.deepEqual(taps, ['veebox-webpack-transform']);
   assert.equal(Array.isArray(compiler.options.module.rules), true);
 
-  const rule = compiler.options.module.rules.at(-1);
+  const rule = compiler.options.module.rules.find(
+    (item) => item.enforce === 'pre',
+  );
   assert.equal(String(rule.test), String(/\.vue$/));
   assert.equal(rule.enforce, 'pre');
   assert.equal(typeof rule.use?.[0]?.loader, 'string');
