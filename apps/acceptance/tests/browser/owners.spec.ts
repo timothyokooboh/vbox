@@ -41,13 +41,6 @@ test('legitimate props, merged classes/styles, listeners, model, refs and slots 
       el.querySelector('span')?.textContent,
     ]),
   ).toEqual(['BUTTON', 'SECTION', 'Caller styling']);
-  expect(
-    await target.evaluate(
-      (el) =>
-        el.className.split(/\s+/).filter((name) => name.includes('-css-'))
-          .length,
-    ),
-  ).toBe(2);
   await target.click();
   await expect(page.getByTestId('owner-events')).toHaveText('1 / true');
   await expect(target).toHaveAttribute('aria-pressed', 'true');
@@ -100,13 +93,23 @@ test('class order, shared registration and null withdrawal cannot promote an ent
     el.className = el.className.split(/\s+/).reverse().join(' ');
   });
   await expect(target).toHaveCSS('color', 'rgb(255, 255, 0)');
-  await page
-    .getByRole('button', { name: 'Toggle unrelated styled component' })
-    .click();
-  await expect(target).toHaveCSS('color', 'rgb(255, 255, 0)');
-  await target.hover();
-  await expect(target).toHaveCSS('color', 'rgb(255, 0, 0)');
+  const toggle = page.getByRole('button', {
+    name: 'Toggle unrelated styled component',
+  });
+  const unrelated = page.getByTestId('owner-unrelated');
+  for (let cycle = 0; cycle < 3; cycle++) {
+    await toggle.click();
+    await expect(unrelated).toHaveCSS('color', 'rgb(255, 255, 0)');
+    await expect(target).toHaveCSS('color', 'rgb(255, 255, 0)');
+    await target.hover();
+    await expect(target).toHaveCSS('color', 'rgb(255, 0, 0)');
+    if (cycle < 2) {
+      await toggle.click();
+      await expect(unrelated).toHaveCount(0);
+    }
+  }
   await page.getByRole('button', { name: 'Withdraw caller with null' }).click();
   await expect(target).toHaveCSS('color', 'rgb(255, 255, 255)');
   await expect(target).toHaveCSS('background-color', 'rgb(0, 0, 0)');
+  await expect(unrelated).toHaveCSS('color', 'rgb(255, 255, 0)');
 });

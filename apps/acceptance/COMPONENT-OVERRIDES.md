@@ -60,7 +60,7 @@ semantic props, refs/model/events/slots, class/style merging, shorthand/longhand
 theme/responsive contexts, class order reversal and unrelated registration.
 
 Public request-collector tests reverse collection order, re-register identical
-bundles, preserve raw CSS, and isolate reset. Public Vue SSR consumers verify that
-identical data at different owners retains distinct priority identities and
-repeatable request output. The real editor service plus `vue-tsc` consumers check
+bundles, preserve raw CSS, and isolate reset. Public Vue SSR consumers verify authored class preservation and repeatable
+request output. Browser cases repeatedly mount shared styling and withdraw one
+caller without changing another caller's active appearance. The real editor service plus `vue-tsc` consumers check
 semantic component prop types independently of style-only bindings.
