@@ -33,21 +33,22 @@ export default defineConfig({
         dark: '#e50914',
       },
       ink: {
-        default: '#11131f',
-        dark: '#f5f7ff',
+        default: '#191b21',
+        dark: '#f8f5ef',
       },
       canvas: {
-        default: '#f6f8ff',
-        dark: '#090b16',
+        default: '#f7f5f0',
+        dark: '#0d1015',
       },
       'canvas-soft': {
-        default: '#dfe7ff',
-        dark: '#121526',
+        default: '#eae6de',
+        dark: '#191e26',
       },
       accent: {
-        default: '#0067a5',
-        dark: '#00d1ff',
+        default: '#80400c',
+        dark: '#f3c67a',
       },
+      muted: { default: '#52565e', dark: '#bbc0c9' },
       ring: {
         default: '#1c4ce0',
         dark: '#74b9ff',
@@ -57,7 +58,8 @@ export default defineConfig({
       18: '4.5rem',
     },
     borderRadius: {
-      card: '1rem',
+      card: '0.75rem',
+      panel: '1.5rem',
       pill: '999px',
     },
     boxShadow: {

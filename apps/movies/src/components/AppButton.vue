@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { useMotionPreferences } from '../composables/useMotionPreferences';
 import { computed } from 'vue';
 import { RouterLink } from 'vue-router';
 import { pva } from '@veebox/property-variance-authority';
+
+const { allowViewTransition } = useMotionPreferences();
 
 const props = withDefaults(
   defineProps<{
@@ -64,6 +67,7 @@ const elementProps = computed(() => {
   if (props.as === 'router-link') {
     return {
       to: props.to,
+      viewTransition: allowViewTransition.value,
     };
   }
 
@@ -97,13 +101,25 @@ const elementProps = computed(() => {
     vb-text-decoration="none"
     vb-fw="700"
     vb-cursor="pointer"
-    vb-transition="background-color 180ms ease, border-color 180ms ease, color 180ms ease"
+    vb-min-h="2.75rem"
+    vb-white-space="nowrap"
+    vb-transition="transform 160ms var(--ease-out)"
+    :vb-disabled="{ opacity: 0.55, cursor: 'not-allowed' }"
+    :vb-mq="{
+      '@media (prefers-reduced-motion: no-preference)': {
+        declarations: {
+          '&:active:not(:disabled):not(:focus-visible)': {
+            transform: 'scale(0.97)',
+          },
+        },
+      },
+    }"
     :vb-focus-visible="{
       outline: '3px solid var(--color-ring)',
       outlineOffset: '2px',
     }"
     :vb-hover="{
-      backgroundColor: 'color-mix(in oklab, var(--color-brand) 85%, white)',
+      backgroundColor: 'color-mix(in oklab, var(--color-brand) 88%, black)',
       borderColor: 'color-mix(in oklab, var(--color-brand) 65%, black)',
       color: 'white',
     }"

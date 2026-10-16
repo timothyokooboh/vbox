@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useMotionPreferences } from '../composables/useMotionPreferences';
 import { computed } from 'vue';
 import { getPosterUrl } from '../api/tmdb';
 import {
@@ -6,6 +7,8 @@ import {
   getMovieYear,
 } from '../composables/useMovieFormatting';
 import type { TmdbMovie } from '../types/tmdb';
+
+const { allowViewTransition } = useMotionPreferences();
 
 const props = defineProps<{
   movie: TmdbMovie;
@@ -19,48 +22,56 @@ const posterSrc = computed(() => getPosterUrl(props.movie.poster_path));
 
 <template>
   <article
-    class="movie-card"
     vb-pos="relative"
     vb-border-radius="br-card"
     vb-overflow="hidden"
     vb-bg="var(--color-canvas-soft)"
     vb-border="1px solid color-mix(in oklab, var(--color-ink) 10%, transparent)"
-    vb-shadow="bs-glow"
-    vb-transition="transform 420ms cubic-bezier(0.22, 0.85, 0.24, 1), box-shadow 420ms ease, filter 420ms ease, opacity 420ms ease"
+    vb-transition="transform 180ms ease"
+    :vb-mq="{
+      '@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)':
+        {
+          hover: { transform: 'translateY(-4px) scale(1.025)', zIndex: 1 },
+        },
+    }"
   >
     <router-link
-      class="movie-card__link"
+      :view-transition="allowViewTransition"
       :to="`/movie/${movie.id}`"
       vb-text-decoration="none"
       vb-color="inherit"
       vb-display="block"
+      :vb-focus-visible="{
+        outline: '3px solid cl-ring',
+        outlineOffset: '-4px',
+      }"
       @click="emit('select')"
     >
       <img
-        class="movie-card__image"
         :src="
           posterSrc ||
           'https://placehold.co/480x720/111827/FFFFFF?text=VBox+Movies'
         "
         :alt="`Poster for ${movie.title}`"
         vb-w="100%"
-        vb-h="16rem"
+        vb-aspect-ratio="2 / 3"
+        vb-h="auto"
+        vb-display="block"
         vb-object-fit="cover"
         loading="lazy"
       />
 
-      <div
-        class="movie-card__content"
-        vb-p="sp-3"
-        vb-display="grid"
-        vb-gap="sp-1"
-      >
-        <h3 vb-m="0" vb-fs="fs-base" vb-color="cl-ink">{{ movie.title }}</h3>
-        <p
+      <div vb-p="sp-3" vb-display="grid" vb-gap="sp-1">
+        <h3
           vb-m="0"
-          vb-fs="fs-sm"
-          vb-color="color-mix(in oklab, var(--color-ink) 75%, transparent)"
+          vb-fs="fs-base"
+          vb-color="cl-ink"
+          vb-lh="1.4"
+          vb-overflow-wrap="anywhere"
         >
+          {{ movie.title }}
+        </h3>
+        <p vb-m="0" vb-fs="fs-sm" vb-color="cl-muted">
           {{ getMovieYear(movie) }} • ★ {{ getMovieRating(movie) }}
         </p>
       </div>

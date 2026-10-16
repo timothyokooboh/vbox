@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { focusDialogTrigger } from '../utils/dialogFocus';
 import {
   DialogClose,
   DialogContent,
@@ -46,7 +47,7 @@ const trailerEmbedUrl = computed(() =>
 
 <template>
   <DialogRoot v-model:open="open">
-    <DialogTrigger as-child>
+    <DialogTrigger as-child @click="focusDialogTrigger">
       <AppButton
         as="button"
         :variant="variant"
@@ -70,13 +71,13 @@ const trailerEmbedUrl = computed(() =>
         vb-left="50%"
         vb-transform="translate(-50%, -50%)"
         vb-w="min(76rem, 95vw)"
-        vb-max-h="92vh"
+        vb-max-h="92dvh"
         vb-overflow-y="auto"
         vb-p="sp-4"
         :vb-sm="{ p: 'sp-5' }"
         vb-bg="var(--color-canvas)"
         vb-border="1px solid color-mix(in oklab, var(--color-ink) 16%, transparent)"
-        vb-border-radius="br-card"
+        vb-border-radius="br-panel"
         vb-shadow="bs-card"
       >
         <DialogTitle vb-m="0" vb-fs="fs-xl" vb-color="cl-ink">
@@ -118,18 +119,7 @@ const trailerEmbedUrl = computed(() =>
 
         <div vb-mt="sp-4" vb-display="flex" vb-justify-content="flex-end">
           <DialogClose as-child>
-            <button
-              type="button"
-              vb-px="sp-3"
-              vb-py="sp-2"
-              vb-border="1px solid color-mix(in oklab, var(--color-ink) 14%, transparent)"
-              vb-border-radius="br-pill"
-              vb-bg="transparent"
-              vb-color="cl-ink"
-              vb-cursor="pointer"
-            >
-              Close
-            </button>
+            <AppButton variant="outline">Close</AppButton>
           </DialogClose>
         </div>
       </DialogContent>

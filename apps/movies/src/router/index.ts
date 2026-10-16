@@ -17,23 +17,6 @@ export const router = createRouter({
     },
   ],
   scrollBehavior() {
-    return { top: 0, behavior: 'smooth' };
+    return { top: 0, behavior: 'instant' };
   },
-});
-
-router.beforeResolve((to, from, next) => {
-  const supportsViewTransition =
-    typeof document !== 'undefined' && 'startViewTransition' in document;
-
-  if (!supportsViewTransition || to.fullPath === from.fullPath) {
-    next();
-    return;
-  }
-
-  // Defer navigation inside the browser view-transition pipeline.
-  (
-    document as Document & { startViewTransition?: (cb: () => void) => void }
-  ).startViewTransition?.(() => {
-    next();
-  });
 });
