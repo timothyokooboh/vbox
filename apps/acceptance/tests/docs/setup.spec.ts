@@ -1,25 +1,39 @@
 import { test, expect } from '../browser/fixtures';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import os from 'node:os';
 import { pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { build, preview } from 'vite';
-import webpack from 'webpack';
+import { compileWebpack } from '../support/webpack.mjs';
 
 for (const bundler of ['vite', 'webpack']) {
   test.describe(`copyable ${bundler} setup`, () => {
     let root: string;
     let server: Awaited<ReturnType<typeof preview>>;
     test.beforeAll(async () => {
-      root = await fs.mkdtemp(path.resolve('.docs-setup-'));
+      // Keep Vite's root and resolved HTML paths identical on macOS (/var -> /private/var).
+      root = await fs.realpath(
+        await fs.mkdtemp(path.join(os.tmpdir(), 'vbox-docs-setup-')),
+      );
       await fs.cp(path.resolve('../docs/docs/examples/setup'), root, {
         recursive: true,
       });
-      await fs.symlink(
-        path.resolve('node_modules'),
-        path.join(root, 'node_modules'),
-        'dir',
+      const manifest = JSON.parse(
+        await fs.readFile(path.join(root, 'package.json'), 'utf8'),
       );
+      for (const name of Object.keys({
+        ...manifest.dependencies,
+        ...manifest.devDependencies,
+      })) {
+        const target = path.join(root, 'node_modules', name);
+        await fs.mkdir(path.dirname(target), { recursive: true });
+        await fs.symlink(
+          await fs.realpath(path.resolve('node_modules', name)),
+          target,
+          'dir',
+        );
+      }
       for (const args of [
         ['vbox-type-gen', '--config', './theme/vbox.config.ts'],
         ['vue-tsc', '--noEmit', '-p', 'tsconfig.json'],
@@ -44,18 +58,7 @@ for (const bundler of ['vite', 'webpack']) {
         const { default: config } = await import(
           pathToFileURL(path.join(root, 'webpack.config.mjs')).href
         );
-        const compiler = webpack(config)!;
-        try {
-          await new Promise<void>((resolve, reject) =>
-            compiler.run((error, stats) => {
-              if (error || stats?.hasErrors())
-                reject(error ?? new Error(stats?.toString('errors-only')));
-              else resolve();
-            }),
-          );
-        } finally {
-          await new Promise<void>((resolve) => compiler.close(() => resolve()));
-        }
+        await compileWebpack(config);
       }
       server = await preview({
         root,

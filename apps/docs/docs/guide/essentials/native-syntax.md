@@ -49,9 +49,10 @@ RouterLink and NuxtLink. Component classes must reach a real
 - CSS custom properties are case-sensitive: `vb---accent="red"` supplies
   `--accent`; `vb---Accent` is a different property. Grouped objects are often
   clearer: `:vb="{ '--accent': 'red', color: 'var(--accent)' }"`.
-- An unfamiliar `vb-*` name remains an explicit style declaration, with advisory
-  guidance when not recognized. A CSS dataset cannot silently turn it into a
-  semantic prop. Browsers decide whether future CSS declarations are supported.
+- An unfamiliar `vb-*` name remains an explicit style declaration, even when not
+  recognized. The current compiler does not warn for every unknown property. A
+  CSS dataset cannot silently turn it into a semantic prop. Browsers decide
+  whether future CSS declarations are supported.
 - Duplicate equivalent individual names, style-binding modifiers, invalid object
   values and non-rendering targets receive diagnostics. Do not style `template`,
   `slot`, script/style blocks or rely on a fragment receiving classes.

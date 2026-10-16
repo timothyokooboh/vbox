@@ -1,4 +1,24 @@
 {
   "private": true,
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "vue": "^3.5.24",
+    "@veebox/core": "beta",
+    "@veebox/vue": "beta"
+  },
+  "devDependencies": {
+    "@veebox/unplugin": "beta",
+    "@veebox/volar": "beta",
+    "@types/node": "^24.10.1",
+    "@vitejs/plugin-vue": "^6.0.3",
+    "@vue/compiler-sfc": "^3.5.24",
+    "html-webpack-plugin": "^5.6.4",
+    "ts-loader": "^9.5.4",
+    "typescript": "~5.9.3",
+    "vite": "^7.2.4",
+    "vue-loader": "^17.4.2",
+    "vue-tsc": "3.2.5",
+    "webpack": "^5.102.1",
+    "webpack-cli": "^6.0.1"
+  }
 }

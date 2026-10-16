@@ -107,8 +107,9 @@ plain Node.
 ## Editor and type generation
 
 Use Vue (Official) or a compatible Vue language-tools integration, with
-TypeScript and `vue-tsc` installed in the app. Here is the standalone example's
-`tsconfig.json`:
+TypeScript and `vue-tsc` installed in the app, plus `@types/node` for the Node
+config imports and the explicit `types: ["node"]` below. Here is the standalone
+example's `tsconfig.json`:
 
 <<< @/examples/setup/tsconfig.json
 
@@ -144,6 +145,17 @@ rather than adding to it; it does not define the runtime property mapping. See
 [custom aliases](./customization/custom-aliases.md) and
 [editor configuration](../up-next/enhanced-dx.md) for the matching editor
 override and literal/snapshot preview limits.
+
+## Standalone dependency checklist
+
+The executable starter declares all direct dependencies explicitly. This
+manifest includes **both** bundlers for verification; an app only needs its
+chosen bundler's tooling. Its `beta` package entries are placeholders for the
+upcoming published tag, not evidence that the tag exists today. The tests link
+the declared packages from the built workspace into an isolated project; they do
+not install from npm.
+
+<<< @/examples/setup/package.json
 
 ## Nuxt and VitePress
 

@@ -50,9 +50,12 @@ declarations.
 
 Composition retains CSS shorthand semantics. Later `paddingLeft: '24px'` changes
 only the left side of an earlier `padding: '12px'`; a later `padding: '8px'`
-intentionally replaces all four sides of earlier longhands. Ordered CSS fallback
-values remain ordered. Style-source arrays and CSS fallback arrays serve
-different purposes.
+intentionally replaces all four sides of earlier longhands. Repeated CSS
+declarations remain ordered: for example,
+`:vb="[{ display: 'block' }, { display: 'grid' }]"` lets a browser use the
+earlier value if it does not support the later one. Property-value arrays such
+as `{ display: ['block', 'grid'] }` are not supported; arrays belong at the
+style-source level, not the declaration-value level.
 
 Compatibility keys such as `_disabled` and clean `disabled` normalize to the
 same context. Source order resolves conflicts; neither spelling gets special
