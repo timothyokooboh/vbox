@@ -1,5 +1,5 @@
-/** Own completions only inside style ranges; keep Vue's types and semantic edits. */
-function prioritizeStyleCompletions(content, hints, feature = 'completion') {
+/** Prefer VBox's targeted editor features without disabling Vue type verification. */
+function prioritizeEditorMappings(content, hints, feature = 'completion') {
   const ranges = hints
     .map((hint) => [
       Math.max(0, hint.offset - (feature === 'completion' ? 1 : 0)),
@@ -36,4 +36,4 @@ function prioritizeStyleCompletions(content, hints, feature = 'completion') {
     });
   });
 }
-module.exports = { prioritizeStyleCompletions };
+module.exports = { prioritizeEditorMappings };

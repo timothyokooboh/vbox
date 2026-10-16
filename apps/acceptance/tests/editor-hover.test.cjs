@@ -371,3 +371,53 @@ test('widened config values identify their snapshot instead of pretending to be 
   t.after(() => editor.dispose());
   assert.match(preview(editor.hover('cl-brand')), /#123456.*snapshot.*widened/);
 });
+
+test('non-color references resolve through color references without adopting color-variable semantics', (t) => {
+  const { root } = hoverProject(
+    t,
+    `{ enableDefaultTheme: false, theme: { color: { base: '#123456', alias: '$color.base' }, boxShadow: { accent: '$color.alias' } } }`,
+  );
+  const editor = createEditor(
+    '<template><p vb-box-shadow="bs-accent" vb-color="cl-alias"/></template>',
+    root,
+  );
+  t.after(() => editor.dispose());
+  assert.match(preview(editor.hover('bs-accent')), /#123456/);
+  assert.doesNotMatch(preview(editor.hover('bs-accent')), /var\(--color/);
+  assert.match(preview(editor.hover('cl-alias')), /var\(--color-base\)/);
+});
+
+test('an explicitly undefined theme flag preserves default-token previews and completions', (t) => {
+  const { root, write } = hoverProject(t, '{}');
+  const source = '<template><p title="fs-2xl" vb-font-size=""/></template>';
+  const editor = createEditor(source, root);
+  t.after(() => editor.dispose());
+  assert.match(preview(editor.hover('fs-2xl')), /1\.5rem/);
+  write('{ enableDefaultTheme: undefined }');
+  editor.projectChanged();
+  assert.match(preview(editor.hover('fs-2xl')), /1\.5rem/);
+  assert.ok(editor.completeAt(source.indexOf('""') + 1).includes('fs-2xl'));
+});
+
+test('non-transformed native tags and similarly named components still have informational previews', (t) => {
+  const editor = createEditor('<template><p/></template>');
+  t.after(() => editor.dispose());
+  for (const tag of ['meta', 'link', 'Title', 'Style', 'Script']) {
+    const source = `<template><${tag} content="cl-brand" /></template>`;
+    editor.update(source);
+    assert.match(preview(editor.hover('cl-brand')), /#123456/, tag);
+  }
+});
+
+test('every character of an entity-encoded token can open its full-span preview', (t) => {
+  const source = '<template><p title="cl&#45;brand"/></template>';
+  const token = 'cl&#45;brand';
+  const start = source.indexOf(token);
+  const editor = createEditor(source);
+  t.after(() => editor.dispose());
+  for (let index = 0; index < token.length; index++) {
+    const info = editor.hoverAt(start + index);
+    assert.match(preview(info), /#123456/, `character ${index}`);
+    assert.deepEqual(info.textSpan, { start, length: token.length });
+  }
+});
