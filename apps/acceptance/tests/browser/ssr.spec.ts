@@ -1,3 +1,4 @@
+import { withDelayedScripts } from '../support/delayedScripts';
 import { test, expect } from './fixtures';
 
 test.describe('initial server styling', () => {
@@ -20,10 +21,7 @@ test('delayed hydration preserves critical CSS and then supports overrides and l
   await page.addInitScript(() => {
     Object.defineProperty(window, 'CSS', { value: undefined, configurable: true });
   });
-  let releaseScripts!: () => void;
-  const scriptsReady = new Promise<void>((resolve) => { releaseScripts = resolve; });
-  await page.route('**/*.js', async (route) => { await scriptsReady; await route.continue(); });
-  try {
+  await withDelayedScripts(page, '**/*.js', async (releaseScripts) => {
     await page.goto('/?ssr&theme=dark&fixture=hydration', { waitUntil: 'commit' });
     const target = page.getByTestId('ssr-owned');
     await expect(page.locator('html')).not.toHaveAttribute('data-mounted');
@@ -48,5 +46,48 @@ test('delayed hydration preserves critical CSS and then supports overrides and l
     await page.getByRole('button', { name: 'Withdraw hydrated override', exact: true }).click();
     await expect(target).toHaveCSS('color', 'rgb(255, 255, 255)');
     await expect(page.getByTestId('ssr-lazy')).toHaveCSS('color', 'rgb(255, 255, 0)');
-  } finally { releaseScripts(); }
+  });
+});
+
+for (const scenario of [
+  { name: 'dark below md', width: 600, theme: 'dark', generic: 'rgb(0, 0, 255)', refined: 'rgb(0, 0, 255)' },
+  { name: 'dark above md', width: 900, theme: 'dark', generic: 'rgb(0, 0, 255)', refined: 'rgb(255, 165, 0)' },
+  { name: 'light above md', width: 900, theme: 'light', generic: 'rgb(0, 128, 0)', refined: 'rgb(0, 128, 0)' },
+]) {
+  test(`conditional priority survives delayed hydration: ${scenario.name}`, async ({ page }) => {
+    await page.setViewportSize({ width: scenario.width, height: 800 });
+    const assertConditions = async () => {
+      await page.getByTestId('ssr-theme').hover();
+      await expect(page.getByTestId('ssr-theme')).toHaveCSS('color', scenario.generic);
+      await page.getByTestId('ssr-refined').hover();
+      await expect(page.getByTestId('ssr-refined')).toHaveCSS('color', scenario.refined);
+      await page.getByTestId('ssr-resting').hover();
+      await expect(page.getByTestId('ssr-resting')).toHaveCSS('color', 'rgb(255, 0, 0)');
+      await page.getByTestId('ssr-conditional-owner').hover();
+      await expect(page.getByTestId('ssr-conditional-owner')).toHaveCSS('color', 'rgb(0, 0, 255)');
+    };
+    await withDelayedScripts(page, '**/*.js', async (release) => {
+      await page.goto(`/?ssr&fixture=hydration&theme=${scenario.theme}`, { waitUntil: 'commit' });
+      await expect(page.locator('html')).not.toHaveAttribute('data-mounted');
+      await assertConditions();
+      release();
+      await expect(page.locator('html')).toHaveAttribute('data-mounted', 'true');
+      await assertConditions();
+      await page.getByRole('button', { name: 'Withdraw hydrated hover', exact: true }).click();
+      await expect(page.getByTestId('ssr-conditional-owner')).toHaveCSS('color', 'rgb(255, 255, 0)');
+      await page.getByTestId('ssr-conditional-owner').hover();
+      await expect(page.getByTestId('ssr-conditional-owner')).toHaveCSS('color', 'rgb(255, 0, 0)');
+    });
+  });
+}
+
+test('setup-time raw theme overrides keep their priority through hydration', async ({ page }) => {
+  await withDelayedScripts(page, '**/*.js', async (release) => {
+    await page.goto('/?ssr&fixture=hydration', { waitUntil: 'commit' });
+    await expect(page.locator('html')).not.toHaveAttribute('data-mounted');
+    await expect(page.getByTestId('ssr-legacy')).toHaveCSS('color', 'rgb(102, 51, 153)');
+    release();
+    await expect(page.locator('html')).toHaveAttribute('data-mounted', 'true');
+    await expect(page.getByTestId('ssr-legacy')).toHaveCSS('color', 'rgb(102, 51, 153)');
+  });
 });
