@@ -21,7 +21,8 @@ pnpm --filter @vbox/acceptance test:editor
 pnpm --filter @vbox/acceptance benchmark
 ```
 
-The `test` script builds both production clients and the shared Vite SSR entry.
+The `test` script builds independent Vite/webpack production clients and SSR
+entries, then builds the real Nuxt fixture and runs its browser checks.
 After a build, focus without rebuilding:
 
 ```sh
@@ -31,14 +32,13 @@ pnpm --filter @veebox/property-variance-authority test
 ```
 
 Matrix: pinned Playwright Chromium, Firefox and WebKit, each with Vite and
-webpack clients. The SSR renderer is currently built with Vite for both clients,
-**not** a claim of independent webpack SSR or Nuxt coverage. Add those in the
-SSR slice.
+webpack client/server pairs, plus three Nuxt production-server projects. See
+[SSR coverage and integration](./SSR.md) for the rendering contract and limits.
 
 Every test gets a fresh browser context/page (DOM and client registries). Each
 SSR request creates an app and collector. Only loopback network requests are
 allowed; no third-party APIs are needed. Readiness and retries use Playwright
-assertions, not sleeps. Ports 4721/4722 must be free: existing servers are
+assertions, not sleeps. Ports 4721/4722/4723 must be free: existing servers are
 deliberately not reused. Traces are retained only on failure. No watch processes
 survive the suite.
 
