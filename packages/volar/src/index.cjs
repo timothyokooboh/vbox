@@ -1,6 +1,9 @@
 const path = require('node:path');
 // vue-tsc injects a tree-shaken TS facade; parsing uses the full public compiler API.
 const typescript = require('typescript');
+const { buildHoverTypes } = require('./hoverTypes.cjs');
+const { staticAttributeText } = require('./attributeText.cjs');
+const { collectLiteralValues } = require('./literalValues.cjs');
 const { collectExpressionCompletions } = require('./styleExpressions.cjs');
 const { buildTokenTypes } = require('./completionTypes.cjs');
 const { scopeCompletionCode } = require('./completionScope.cjs');
@@ -250,7 +253,7 @@ const SEMANTIC_ATTRIBUTES_BY_TAG = {
 };
 
 const HOVER_FEATURES = {
-  verification: true,
+  verification: false,
   completion: false,
   semantic: true,
   navigation: true,
@@ -605,7 +608,7 @@ const collectTokenHints = (
   options = {},
 ) => {
   const hints = [];
-  const pushTokensFromValue = (value, offset) => {
+  const pushTokensFromValue = ({ content: value, startAt, endAt }) => {
     let match;
     TOKEN_IN_VALUE_REGEX.lastIndex = 0;
     while ((match = TOKEN_IN_VALUE_REGEX.exec(value)) != null) {
@@ -613,13 +616,13 @@ const collectTokenHints = (
       if (!token) continue;
 
       const resolved = resolveTokenValue(token);
-      if (!resolved) continue;
+      if (!resolved && !core.TokenCategories[token.split('-')[0]]) continue;
 
       hints.push({
         token,
         resolved,
-        offset: offset + match.index,
-        length: token.length,
+        offset: startAt(match.index),
+        length: endAt(match.index + token.length) - startAt(match.index),
       });
     }
   };
@@ -657,68 +660,29 @@ const collectTokenHints = (
 
     if (node.type !== 1 /* ELEMENT */) return;
 
-    const tag = node.tag;
-    const isCustomComponent = !isNativeHtmlTag(tag) && !isVBoxComponentTag(tag);
-    let hasVBoxMarker = false;
-    let hasIgnoreMarker = false;
-
-    for (const prop of node.props) {
-      if (prop.type === 6 /* ATTRIBUTE */) {
-        if (prop.name === 'vbox') hasVBoxMarker = true;
-        if (prop.name === 'vbox-ignore') hasIgnoreMarker = true;
-      }
-    }
-
-    const nativeAutoEligible =
-      !ignored && isNativeHtmlTag(tag) && canProcessNativeTag(tag);
-    const frameworkLinkAutoEligible =
-      !ignored && isCustomComponent && isFrameworkLinkTag(tag);
-    const vboxComponentEligible = !ignored && isVBoxComponentTag(tag);
-    const markedCustomComponentEligible =
-      !ignored && hasVBoxMarker && isCustomComponent;
-    const globalCustomComponentEligible =
-      !ignored && options.parseAllComponents !== false && isCustomComponent;
-
-    const shouldProcessHoverCustomComponent = isCustomComponent;
-
-    const shouldProcessElement =
-      shouldProcessHoverCustomComponent ||
-      (!ignored &&
-        !hasIgnoreMarker &&
-        (nativeAutoEligible ||
-          frameworkLinkAutoEligible ||
-          markedCustomComponentEligible ||
-          globalCustomComponentEligible ||
-          vboxComponentEligible));
+    // Previews explain token values, not whether a binding is compiled as styling.
+    const shouldProcessElement = canProcessNativeTag(node.tag);
 
     if (shouldProcessElement) {
       for (const prop of node.props) {
         if (prop.type === 6 /* ATTRIBUTE */) {
           if (!prop.value) continue;
           if (prop.name === 'vbox' || prop.name === 'vbox-ignore') continue;
-          if (!isCustomComponent && !isStyleKey(tag, prop.name)) continue;
 
-          const { content, offset } = getAttrValueContentAndOffset(prop.value);
-          pushTokensFromValue(String(content || ''), offset);
+          pushTokensFromValue(staticAttributeText(prop.value));
           continue;
         }
 
         if (prop.type !== 7 /* DIRECTIVE */) continue;
         if (prop.name !== 'bind') continue;
-        if (!prop.arg || prop.arg.type !== 4 || !prop.arg.isStatic) continue;
         if (!prop.exp || prop.exp.type !== 4) continue;
-
-        const boundKey = prop.arg.content;
-        if (!isCustomComponent && !isStyleKey(tag, boundKey)) continue;
-
-        pushTokensFromValue(
-          String(prop.exp.content || ''),
-          prop.exp.loc.start.offset,
-        );
+        for (const value of collectLiteralValues(prop.exp)) {
+          pushTokensFromValue(value);
+        }
       }
     }
 
-    const nextIgnored = ignored || hasIgnoreMarker;
+    const nextIgnored = false;
 
     for (const child of node.children || []) {
       walk(child, nextIgnored);
@@ -941,22 +905,43 @@ const collectCompletionHints = (
   };
 };
 
-const buildHoverCode = (hints) => {
-  const out = [];
-
-  hints.forEach((hint, index) => {
-    const ident = makeMappedIdentifier(index, hint.length);
-    const safeToken = hint.token.replace(/\*\//g, '*\\/');
-    const safeResolved = hint.resolved.replace(/\*\//g, '*\\/');
-
+const buildHoverCode = (hints, configFile, config, compilerOptions) => {
+  const { code: out, snapshot } = buildHoverTypes(
+    configFile,
+    config,
+    compilerOptions,
+  );
+  for (const hint of hints) {
+    const dash = hint.token.indexOf('-');
+    const category = core.TokenCategories[hint.token.slice(0, dash)];
+    const key = hint.token.slice(dash + 1);
     out.push(
-      `/** VBox token preview:\n * ${safeToken} => ${safeResolved}\n */\n`,
+      `({} as __vboxHoverProperty<${JSON.stringify(category)}, ${JSON.stringify(key)}, ${JSON.stringify(hint.resolved)}, {\n/** VBox token preview: ${snapshot ? 'configured snapshot (untyped config imports); refreshes on template edits' : 'configured value'}, not browser-computed. */\n${JSON.stringify(hint.token)}: __vboxHoverValue<${JSON.stringify(category)}, ${JSON.stringify(key)}, ${JSON.stringify(hint.resolved)}> } >)[`,
     );
-    out.push('const ');
-    out.push([ident, 'template', hint.offset, HOVER_FEATURES]);
-    out.push(' = 0;\n');
-  });
-
+    // Match Vue's string-key boundary protocol so quotes do not extend the source span.
+    const boundary = Symbol('template');
+    out.push([
+      '',
+      'template',
+      hint.offset,
+      { ...HOVER_FEATURES, __combineToken: boundary },
+    ]);
+    out.push("'");
+    out.push([
+      hint.token,
+      'template',
+      hint.offset,
+      { __combineToken: boundary },
+    ]);
+    out.push("'");
+    out.push([
+      '',
+      'template',
+      hint.offset + hint.length,
+      { __combineToken: boundary },
+    ]);
+    out.push('];\n');
+  }
   return out;
 };
 
@@ -1174,8 +1159,27 @@ const createPlugin = (ctx) => {
       }
 
       if (hints.length > 0) {
+        embeddedFile.content = prioritizeStyleCompletions(
+          embeddedFile.content,
+          hints,
+          'semantic',
+        );
         embeddedFile.content.push('\n/* VBox token hovers */\n');
-        embeddedFile.content.push(...buildHoverCode(hints));
+        embeddedFile.content.push(
+          ...scopeCompletionCode(
+            typescript,
+            buildHoverCode(
+              hints,
+              configLoader.findVBoxConfig({
+                rootDir,
+                configPath: userConfig.configPath,
+              }),
+              config,
+              ctx.compilerOptions ?? {},
+            ),
+            sfc.content,
+          ),
+        );
       }
 
       if (

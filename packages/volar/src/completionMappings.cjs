@@ -1,17 +1,15 @@
 /** Own completions only inside style ranges; keep Vue's types and semantic edits. */
-function prioritizeStyleCompletions(content, hints) {
+function prioritizeStyleCompletions(content, hints, feature = 'completion') {
   const ranges = hints
     .map((hint) => [
-      Math.max(0, hint.offset - 1),
-      hint.offset + (hint.length ?? hint.mappedValue.length) + 1,
+      Math.max(0, hint.offset - (feature === 'completion' ? 1 : 0)),
+      hint.offset +
+        (hint.length ?? hint.mappedValue.length) +
+        (feature === 'completion' ? 1 : 0),
     ])
     .sort((a, b) => a[0] - b[0]);
   return content.flatMap((part) => {
-    if (
-      typeof part === 'string' ||
-      part[1] !== 'template' ||
-      !part[3].completion
-    )
+    if (typeof part === 'string' || part[1] !== 'template' || !part[3][feature])
       return [part];
     const [text, source, offset, features] = part;
     const boundaries = new Set([0, text.length]);
@@ -33,7 +31,7 @@ function prioritizeStyleCompletions(content, hints) {
         text.slice(start, end),
         source,
         offset + start,
-        ownsRange ? { ...features, completion: false } : features,
+        ownsRange ? { ...features, [feature]: false } : features,
       ];
     });
   });

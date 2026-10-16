@@ -83,8 +83,16 @@ function createEditor(source, root = path.resolve(__dirname, '../..')) {
       proxy
         .getCompletionsAtPosition(file, offset, {})
         ?.entries.map((entry) => entry.name.replace(/^["']|["']$/g, '')) ?? [],
+    hoverAt: (offset) => proxy.getQuickInfoAtPosition(file, offset),
     hover: (token) =>
       proxy.getQuickInfoAtPosition(file, source.indexOf(token) + 1),
+    suggestions: () =>
+      proxy
+        .getSuggestionDiagnostics(file)
+        .map(({ code, messageText }) => ({
+          code,
+          messageText: ts.flattenDiagnosticMessageText(messageText, '\n'),
+        })),
     diagnostics: () =>
       proxy
         .getSemanticDiagnostics(file)
@@ -105,4 +113,9 @@ function createEditor(source, root = path.resolve(__dirname, '../..')) {
   };
 }
 
-module.exports = { createEditor };
+const previewText = (info) =>
+  ts.displayPartsToString(info?.displayParts) +
+  '\n' +
+  ts.displayPartsToString(info?.documentation);
+
+module.exports = { createEditor, previewText };
