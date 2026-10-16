@@ -7,12 +7,13 @@ Use `vboxVitePlugin()` before Vue's Vite plugin, or install
 from `@veebox/unplugin` and their `/vite` and `/webpack` subpaths. They share
 the same Vue-AST transform; style expression scope and evaluation belong to Vue.
 
-The transform supports HTML SFC templates, inline script setup, and inline
-Options API scripts. Template preprocessors such as Pug are not supported and
-receive a located error rather than being scanned as HTML. External
-`<script src>` blocks with explicit styling also receive an actionable error:
-move the component export into an inline script. This slice does not silently
-claim support for those forms.
+The transform supports HTML SFC templates, script setup, inline Options API
+scripts and external `<script src>` modules. External scripts are imported and
+wrapped locally; their named exports and component options are retained without
+editing the original module. Self-closing external script blocks also work.
+Template preprocessors such as Pug are passed through unchanged. Detectable
+explicit styling in them receives located advisory guidance because the native
+transform requires HTML; preprocessor source is never interpreted as HTML.
 
 Ordinary shorthand bindings, dynamic arguments, models, listeners, refs and
 spreads retain Vue semantics in explicit files. `:vb-color` uses Vue's same-name
@@ -20,7 +21,10 @@ shorthand (`vbColor`); `:vb-color="color"` explicitly reads `color`. Static
 object style attributes need Vue binding syntax, for example
 `:vb-hover="{ color: 'red' }"`, not `vb-hover="{}"`. Empty expressions,
 malformed expressions, normalized duplicates, modifiers and non-rendering
-targets have original-source diagnostics.
+targets have original-source diagnostics. Equivalent individual condition
+spellings (such as `:vb-hover` and `:vb-_hover`) are duplicates. To compose both
+spellings, use ordered grouped sources instead; style objects continue to accept
+and merge compatibility keys normally.
 
 ## Boundaries and source maps
 

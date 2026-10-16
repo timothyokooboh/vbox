@@ -70,6 +70,7 @@ export {
   resolveVBoxConfig,
   validateAliasKeys,
   isConditionKey,
+  getConditionKey,
 } from './helpers/resolveConfig';
 
 export { readStyleObject } from './helpers/readStyleObject';

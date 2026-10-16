@@ -40,17 +40,36 @@ for (const [markup, message] of [
   });
 }
 
-test('unsupported template preprocessors are rejected before treating their source as HTML', () => {
-  assert.throws(
-    () =>
-      transformVueSfc(
-        '<template lang="pug">\np(vb-color="red") Hello\n</template>',
-        id,
-      ),
-    (error) => {
-      assert.match(error.message, /HTML.*pug|pug.*HTML/);
-      assert.equal(error.loc.file, id);
-      return true;
-    },
-  );
+test('nonparticipating preprocessed templates pass through unchanged', () => {
+  const source = '<template lang="pug">\np Hello\n</template>';
+  const result = transformVueSfc(source, id);
+  assert.equal(result?.code ?? source, source);
+  assert.equal(result?.warnings?.length ?? 0, 0);
 });
+
+test('explicit styling in an unsupported preprocessor produces located guidance without rewriting it', () => {
+  const source = '<template lang="pug">\np(vb-color="red") Hello\n</template>';
+  const result = transformVueSfc(source, id);
+  assert.equal(result.code, source);
+  assert.match(result.warnings[0].message, /HTML.*pug|pug.*HTML/);
+  assert.ok(result.warnings[0].message.includes(id));
+  assert.ok(result.warnings[0].loc.line >= 1);
+});
+
+for (const [clean, compatibility] of [
+  ['hover', '_hover'],
+  ['2xl', '_2xl'],
+  ['focus-visible', '_focusVisible'],
+]) {
+  test(`duplicate ${clean} condition spellings identify the second binding`, () => {
+    const source = `<template>\n<p :vb-${clean}="{color:'red'}"\n   :vb-${compatibility}="{opacity:0.5}" />\n</template>`;
+    assert.throws(
+      () => transformVueSfc(source, id),
+      (error) => {
+        assert.match(error.message, /Duplicate style binding/);
+        assert.deepEqual(error.loc, { file: id, line: 3, column: 3 });
+        return true;
+      },
+    );
+  });
+}

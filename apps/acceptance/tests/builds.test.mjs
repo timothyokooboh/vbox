@@ -31,6 +31,29 @@ async function compile(config) {
   }
 }
 
+function webpackComponentConfig(root, plugin = vboxWebpackPlugin()) {
+  return {
+    context: root,
+    mode: 'production',
+    target: 'node',
+    entry: './App.vue',
+    output: {
+      path: path.join(root, 'dist'),
+      filename: 'component.cjs',
+      library: { type: 'commonjs2' },
+    },
+    externals: {
+      vue: 'commonjs vue',
+      '@veebox/vue': 'commonjs @veebox/vue',
+      'vue/server-renderer': 'commonjs vue/server-renderer',
+    },
+    module: {
+      rules: [{ test: /\.vue$/, loader: require.resolve('vue-loader') }],
+    },
+    plugins: [plugin, new VueLoaderPlugin()],
+  };
+}
+
 test('installed webpack artifact resolves its loader inside a project path containing spaces', async (t) => {
   const root = await fs.mkdtemp(path.resolve('.build case-'));
   t.after(() => fs.rm(root, { recursive: true, force: true }));
@@ -66,26 +89,7 @@ test('installed webpack artifact resolves its loader inside a project path conta
     path.join(root, 'App.vue'),
     '<template><p vb-color="red" title="semantic">Installed artifact</p></template>',
   );
-  await compile({
-    context: root,
-    mode: 'production',
-    target: 'node',
-    entry: './App.vue',
-    output: {
-      path: path.join(root, 'dist'),
-      filename: 'component.cjs',
-      library: { type: 'commonjs2' },
-    },
-    externals: {
-      vue: 'commonjs vue',
-      '@veebox/vue': 'commonjs @veebox/vue',
-      'vue/server-renderer': 'commonjs vue/server-renderer',
-    },
-    module: {
-      rules: [{ test: /\.vue$/, loader: require.resolve('vue-loader') }],
-    },
-    plugins: [vboxWebpackPlugin(), new VueLoaderPlugin()],
-  });
+  await compile(webpackComponentConfig(root, vboxWebpackPlugin()));
   const { default: output } = await import(
     pathToFileURL(path.join(root, 'dist/component.cjs')).href
   );
@@ -128,27 +132,12 @@ export default { data: () => ({ message }) };
         },
       });
     } else {
+      const config = webpackComponentConfig(root);
       await compile({
-        context: root,
-        mode: 'production',
-        target: 'node',
-        entry: './App.vue',
+        ...config,
         devtool: 'source-map',
         optimization: { minimize: false },
-        output: {
-          path: output,
-          filename: 'bundle.js',
-          library: { type: 'commonjs2' },
-        },
-        externals: {
-          vue: 'commonjs vue',
-          '@veebox/vue': 'commonjs @veebox/vue',
-          'vue/server-renderer': 'commonjs vue/server-renderer',
-        },
-        module: {
-          rules: [{ test: /\.vue$/, loader: require.resolve('vue-loader') }],
-        },
-        plugins: [vboxWebpackPlugin(), new VueLoaderPlugin()],
+        output: { ...config.output, filename: 'bundle.js' },
       });
     }
     const code = await fs.readFile(path.join(output, 'bundle.js'), 'utf8');
@@ -198,24 +187,66 @@ for (const driver of ['vite', 'webpack']) {
               plugins: [vboxVitePlugin(), vue()],
               build: { ssr: filename, outDir: path.join(root, 'dist') },
             })
-        : () =>
-            compile({
-              context: root,
-              mode: 'production',
-              target: 'node',
-              entry: './App.vue',
-              output: { path: path.join(root, 'dist') },
-              module: {
-                rules: [
-                  { test: /\.vue$/, loader: require.resolve('vue-loader') },
-                ],
-              },
-              plugins: [vboxWebpackPlugin(), new VueLoaderPlugin()],
-            });
+        : () => compile(webpackComponentConfig(root));
     await assert.rejects(build, (error) => {
       assert.ok(error.message.includes(`${filename}:3:5`), error.message);
       assert.match(error.message, /requires an object binding/);
       return true;
     });
   });
+}
+
+for (const driver of ['vite', 'webpack']) {
+  for (const script of [
+    '<script src="./options.js"></script>',
+    '<script src="./options.js"/>',
+    '<script src="./options.js">ignored content</script>',
+  ]) {
+    test(`${driver} preserves external options and named exports: ${script}`, async (t) => {
+      const root = await fs.mkdtemp(path.resolve('.external-script-'));
+      t.after(() => fs.rm(root, { recursive: true, force: true }));
+      const source = `<template><button :vb-color="color" :title="message">{{ message }}</button></template>
+${script}`;
+      const options = `export const namedExport = 'external-named';
+export default { data: () => ({ color: 'red', message: 'External options' }) };`;
+      await fs.writeFile(path.join(root, 'App.vue'), source);
+      await fs.writeFile(path.join(root, 'options.js'), options);
+      let componentModule;
+      if (driver === 'vite') {
+        await viteBuild({
+          root,
+          configFile: false,
+          logLevel: 'silent',
+          plugins: [vboxVitePlugin(), vue()],
+          build: {
+            ssr: path.join(root, 'App.vue'),
+            outDir: path.join(root, 'dist'),
+            rollupOptions: { output: { entryFileNames: 'component.mjs' } },
+          },
+        });
+        componentModule = await import(
+          pathToFileURL(path.join(root, 'dist/component.mjs')).href
+        );
+      } else {
+        await compile(webpackComponentConfig(root));
+        componentModule = require(path.join(root, 'dist/component.cjs'));
+      }
+      const context = {};
+      const html = await renderToString(
+        createSSRApp(componentModule.default).use(VBoxPlugin, {
+          enableDefaultTheme: false,
+        }),
+        context,
+      );
+      assert.match(html, /title="External options"/);
+      assert.match(html, />External options<\/button>/);
+      assert.doesNotMatch(html, /vb-color/);
+      assert.match(getSSRStyles(context), /color:red/);
+      assert.equal(componentModule.namedExport, 'external-named');
+      assert.equal(
+        await fs.readFile(path.join(root, 'options.js'), 'utf8'),
+        options,
+      );
+    });
+  }
 }
