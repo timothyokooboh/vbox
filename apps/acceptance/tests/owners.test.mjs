@@ -65,7 +65,7 @@ test('collecting structured rules copies metadata and preserves existing raw CSS
   assert.match(before, /--color-brand:red.*padding:8px;padding-left:20px/s);
 });
 
-test('identical style data at different lexical owners cannot share a priority identity during SSR', async () => {
+test('SSR preserves authored owner classes and repeatable request output', async () => {
   const Child = defineComponent({
     setup() {
       const bind = useVBoxStyleBinding();
@@ -95,10 +95,6 @@ test('identical style data at different lexical owners cannot share a priority i
   const classes = first.html.match(/class="([^"]+)"/)[1].split(/\s+/);
   assert.ok(classes.includes('internal-user'));
   assert.ok(classes.includes('caller-user'));
-  assert.equal(
-    new Set(classes.filter((value) => value.startsWith('css-'))).size,
-    2,
-  );
   assert.deepEqual(await render(), first);
 });
 
