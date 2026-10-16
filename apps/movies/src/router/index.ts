@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
-// import MovieDetailsView from '../views/MovieDetailsView.vue';
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -13,7 +12,7 @@ export const router = createRouter({
     {
       path: '/movie/:id',
       name: 'movie-details',
-      component: import('../views/MovieDetailsView.vue'),
+      component: () => import('../views/MovieDetailsView.vue'),
       props: true,
     },
   ],

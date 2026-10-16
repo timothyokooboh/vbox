@@ -58,47 +58,46 @@ const trailerEmbedUrl = computed(() =>
 
     <DialogPortal>
       <DialogOverlay
-        position="fixed"
-        inset="0"
-        bg="color-mix(in oklab, black 68%, transparent)"
-        z-index="z-modalOverlay"
+        vb-position="fixed"
+        vb-inset="0"
+        vb-bg="color-mix(in oklab, black 68%, transparent)"
+        vb-z-index="z-modalOverlay"
       />
       <DialogContent
-        pos="fixed"
-        z-index="z-modalContent"
-        top="50%"
-        left="50%"
-        transform="translate(-50%, -50%)"
-        w="min(76rem, 95vw)"
-        max-h="92vh"
-        overflow-y="auto"
-        p="sp-4"
-        :sm="{ p: 'sp-5' }"
-        bg="var(--color-canvas)"
-        border="1px solid color-mix(in oklab, var(--color-ink) 16%, transparent)"
-        border-radius="br-card"
-        shadow="bs-card"
-        z="1101"
+        vb-pos="fixed"
+        vb-z-index="z-modalContent"
+        vb-top="50%"
+        vb-left="50%"
+        vb-transform="translate(-50%, -50%)"
+        vb-w="min(76rem, 95vw)"
+        vb-max-h="92vh"
+        vb-overflow-y="auto"
+        vb-p="sp-4"
+        :vb-sm="{ p: 'sp-5' }"
+        vb-bg="var(--color-canvas)"
+        vb-border="1px solid color-mix(in oklab, var(--color-ink) 16%, transparent)"
+        vb-border-radius="br-card"
+        vb-shadow="bs-card"
       >
-        <DialogTitle m="0" fs="fs-xl" color="cl-ink">
+        <DialogTitle vb-m="0" vb-fs="fs-xl" vb-color="cl-ink">
           {{ movieTitle }} Trailer
         </DialogTitle>
         <DialogDescription
-          mt="sp-2"
-          mb="sp-4"
-          color="color-mix(in oklab, var(--color-ink) 72%, transparent)"
+          vb-mt="sp-2"
+          vb-mb="sp-4"
+          vb-color="color-mix(in oklab, var(--color-ink) 72%, transparent)"
         >
           Trailer data powered by TMDB.
         </DialogDescription>
 
-        <p v-if="trailerQuery.isFetching.value" m="0" color="cl-ink">
+        <p v-if="trailerQuery.isFetching.value" vb-m="0" vb-color="cl-ink">
           Loading trailer...
         </p>
 
         <p
           v-else-if="!trailerEmbedUrl"
-          m="0"
-          color="color-mix(in oklab, var(--color-ink) 78%, transparent)"
+          vb-m="0"
+          vb-color="color-mix(in oklab, var(--color-ink) 78%, transparent)"
         >
           No playable trailer is available for this title right now.
         </p>
@@ -107,27 +106,27 @@ const trailerEmbedUrl = computed(() =>
           v-else
           :src="trailerEmbedUrl"
           :title="`${movieTitle} trailer player`"
-          w="100%"
-          aspect-ratio="16 / 9"
-          border="none"
-          border-radius="br-card"
+          vb-w="100%"
+          vb-aspect-ratio="16 / 9"
+          vb-border="none"
+          vb-border-radius="br-card"
           allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
           allowfullscreen
           loading="lazy"
           referrerpolicy="origin-when-cross-origin"
         />
 
-        <div mt="sp-4" display="flex" justify-content="flex-end">
+        <div vb-mt="sp-4" vb-display="flex" vb-justify-content="flex-end">
           <DialogClose as-child>
             <button
               type="button"
-              px="sp-3"
-              py="sp-2"
-              border="1px solid color-mix(in oklab, var(--color-ink) 14%, transparent)"
-              border-radius="br-pill"
-              bg="transparent"
-              color="cl-ink"
-              cursor="pointer"
+              vb-px="sp-3"
+              vb-py="sp-2"
+              vb-border="1px solid color-mix(in oklab, var(--color-ink) 14%, transparent)"
+              vb-border-radius="br-pill"
+              vb-bg="transparent"
+              vb-color="cl-ink"
+              vb-cursor="pointer"
             >
               Close
             </button>

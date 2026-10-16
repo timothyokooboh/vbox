@@ -17,29 +17,29 @@ const movie = computed(() => detailsQuery.data.value ?? null);
 </script>
 
 <template>
-  <main p="sp-4" :sm="{ p: 'sp-6' }">
+  <main vb-p="sp-4" :vb-sm="{ p: 'sp-6' }">
     <router-link
       to="/"
-      color="cl-accent"
-      text-decoration="none"
-      fw="700"
-      display="inline-block"
-      mb="sp-5"
+      vb-color="cl-accent"
+      vb-text-decoration="none"
+      vb-fw="700"
+      vb-display="inline-block"
+      vb-mb="sp-5"
     >
       ← Back to Home
     </router-link>
 
     <section
       v-if="movie"
-      display="grid"
-      :md="{
+      vb-display="grid"
+      :vb-md="{
         gridTemplateColumns: '18rem 1fr',
       }"
-      gap="sp-5"
-      p="sp-4"
-      bg="var(--color-canvas-soft)"
-      border="1px solid color-mix(in oklab, var(--color-ink) 14%, transparent)"
-      border-radius="br-card"
+      vb-gap="sp-5"
+      vb-p="sp-4"
+      vb-bg="var(--color-canvas-soft)"
+      vb-border="1px solid color-mix(in oklab, var(--color-ink) 14%, transparent)"
+      vb-border-radius="br-card"
     >
       <img
         :src="
@@ -47,23 +47,26 @@ const movie = computed(() => detailsQuery.data.value ?? null);
           'https://placehold.co/480x720/111827/FFFFFF?text=Poster'
         "
         :alt="`Poster for ${movie.title}`"
-        w="100%"
-        max-w="18rem"
-        h="auto"
-        border-radius="br-card"
+        vb-w="100%"
+        vb-max-w="18rem"
+        vb-h="auto"
+        vb-border-radius="br-card"
       />
 
-      <div display="grid" gap="sp-3">
-        <h1 m="0" fs="clamp(1.8rem,4.2vw,3rem)" color="cl-ink">
+      <div vb-display="grid" vb-gap="sp-3">
+        <h1 vb-m="0" vb-fs="clamp(1.8rem,4.2vw,3rem)" vb-color="cl-ink">
           {{ movie.title }}
         </h1>
-        <p v-if="movie.tagline" m="0" fs="fs-lg" color="cl-accent">
+        <p v-if="movie.tagline" vb-m="0" vb-fs="fs-lg" vb-color="cl-accent">
           {{ movie.tagline }}
         </p>
-        <p m="0" color="color-mix(in oklab, var(--color-ink) 82%, transparent)">
+        <p
+          vb-m="0"
+          vb-color="color-mix(in oklab, var(--color-ink) 82%, transparent)"
+        >
           {{ movie.overview }}
         </p>
-        <p m="0" color="cl-ink" fw="700">
+        <p vb-m="0" vb-color="cl-ink" vb-fw="700">
           {{ getMovieYear(movie) }} • ★ {{ getMovieRating(movie) }} •
           {{ movie.runtime ?? 'N/A' }} min
         </p>
@@ -74,22 +77,22 @@ const movie = computed(() => detailsQuery.data.value ?? null);
             button-label="Watch Trailer"
           />
         </div>
-        <p m="0" color="cl-ink">Status: {{ movie.status }}</p>
+        <p vb-m="0" vb-color="cl-ink">Status: {{ movie.status }}</p>
 
-        <div display="flex" flex-wrap="wrap" gap="sp-2" mt="sp-2">
+        <div vb-display="flex" vb-flex-wrap="wrap" vb-gap="sp-2" vb-mt="sp-2">
           <p
             v-for="genre in movie.genres"
             :key="genre.id"
-            px="sp-3"
-            py="sp-2"
-            border-radius="br-pill"
-            bg="color-mix(in oklab, var(--color-brand) 22%, transparent)"
-            color="cl-ink"
-            flex-grow="0"
-            display="flex"
-            justify-content="center"
-            align-items="center"
-            height="40px"
+            vb-px="sp-3"
+            vb-py="sp-2"
+            vb-border-radius="br-pill"
+            vb-bg="color-mix(in oklab, var(--color-brand) 22%, transparent)"
+            vb-color="cl-ink"
+            vb-flex-grow="0"
+            vb-display="flex"
+            vb-justify-content="center"
+            vb-align-items="center"
+            vb-height="40px"
           >
             {{ genre.name }}
           </p>
@@ -99,75 +102,105 @@ const movie = computed(() => detailsQuery.data.value ?? null);
           v-if="movie.backdrop_path"
           :src="getBackdropUrl(movie.backdrop_path, 'w1280')"
           :alt="`Backdrop image for ${movie.title}`"
-          w="100%"
-          h="38rem"
-          object-fit="cover"
-          object-position="center top"
-          border-radius="br-card"
-          mt="sp-3"
+          vb-w="100%"
+          vb-h="38rem"
+          vb-object-fit="cover"
+          vb-object-position="center top"
+          vb-border-radius="br-card"
+          vb-mt="sp-3"
         />
       </div>
     </section>
 
     <section
       v-else-if="detailsQuery.isLoading.value"
-      display="grid"
-      :md="{ gridTemplateColumns: '18rem 1fr' }"
-      gap="sp-5"
-      p="sp-4"
-      bg="var(--color-canvas-soft)"
-      border="1px solid color-mix(in oklab, var(--color-ink) 14%, transparent)"
-      border-radius="br-card"
+      vb-display="grid"
+      :vb-md="{ gridTemplateColumns: '18rem 1fr' }"
+      vb-gap="sp-5"
+      vb-p="sp-4"
+      vb-bg="var(--color-canvas-soft)"
+      vb-border="1px solid color-mix(in oklab, var(--color-ink) 14%, transparent)"
+      vb-border-radius="br-card"
       aria-busy="true"
       aria-live="polite"
     >
       <div
         class="movie-skeleton"
-        w="100%"
-        max-w="18rem"
-        h="26rem"
-        border-radius="br-card"
+        vb-w="100%"
+        vb-max-w="18rem"
+        vb-h="26rem"
+        vb-border-radius="br-card"
       />
 
-      <div display="grid" gap="sp-3">
+      <div vb-display="grid" vb-gap="sp-3">
         <div
           class="movie-skeleton"
-          h="2.75rem"
-          w="70%"
-          border-radius="0.75rem"
+          vb-h="2.75rem"
+          vb-w="70%"
+          vb-border-radius="0.75rem"
         />
         <div
           class="movie-skeleton"
-          h="1.35rem"
-          w="40%"
-          border-radius="0.75rem"
+          vb-h="1.35rem"
+          vb-w="40%"
+          vb-border-radius="0.75rem"
         />
-        <div class="movie-skeleton" h="1rem" w="96%" border-radius="0.5rem" />
-        <div class="movie-skeleton" h="1rem" w="92%" border-radius="0.5rem" />
-        <div class="movie-skeleton" h="1rem" w="80%" border-radius="0.5rem" />
-        <div class="movie-skeleton" h="1rem" w="50%" border-radius="0.5rem" />
+        <div
+          class="movie-skeleton"
+          vb-h="1rem"
+          vb-w="96%"
+          vb-border-radius="0.5rem"
+        />
+        <div
+          class="movie-skeleton"
+          vb-h="1rem"
+          vb-w="92%"
+          vb-border-radius="0.5rem"
+        />
+        <div
+          class="movie-skeleton"
+          vb-h="1rem"
+          vb-w="80%"
+          vb-border-radius="0.5rem"
+        />
+        <div
+          class="movie-skeleton"
+          vb-h="1rem"
+          vb-w="50%"
+          vb-border-radius="0.5rem"
+        />
 
-        <div display="flex" flex-wrap="wrap" gap="sp-2" mt="sp-2">
-          <div class="movie-skeleton" h="2rem" w="5rem" border-radius="999px" />
-          <div class="movie-skeleton" h="2rem" w="6rem" border-radius="999px" />
+        <div vb-display="flex" vb-flex-wrap="wrap" vb-gap="sp-2" vb-mt="sp-2">
           <div
             class="movie-skeleton"
-            h="2rem"
-            w="4.5rem"
-            border-radius="999px"
+            vb-h="2rem"
+            vb-w="5rem"
+            vb-border-radius="999px"
+          />
+          <div
+            class="movie-skeleton"
+            vb-h="2rem"
+            vb-w="6rem"
+            vb-border-radius="999px"
+          />
+          <div
+            class="movie-skeleton"
+            vb-h="2rem"
+            vb-w="4.5rem"
+            vb-border-radius="999px"
           />
         </div>
 
         <div
           class="movie-skeleton"
-          w="100%"
-          h="38rem"
-          border-radius="br-card"
-          mt="sp-3"
+          vb-w="100%"
+          vb-h="38rem"
+          vb-border-radius="br-card"
+          vb-mt="sp-3"
         />
       </div>
     </section>
-    <p v-else color="cl-ink">Movie details unavailable.</p>
+    <p v-else vb-color="cl-ink">Movie details unavailable.</p>
   </main>
 </template>
 

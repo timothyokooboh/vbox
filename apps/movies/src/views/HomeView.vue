@@ -20,7 +20,13 @@ const featuredMovie = computed(
 </script>
 
 <template>
-  <main display="grid" gap="sp-8" p="sp-4" :sm="{ p: 'sp-6' }" role="main">
+  <main
+    vb-display="grid"
+    vb-gap="sp-8"
+    vb-p="sp-4"
+    :vb-sm="{ p: 'sp-6' }"
+    role="main"
+  >
     <HeroBanner :movie="featuredMovie" />
 
     <MovieRow
