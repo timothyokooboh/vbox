@@ -85,23 +85,24 @@ const elementProps = computed(() => {
 <template>
   <component
     :is="resolvedTag"
-    v-bind="{ ...elementProps, ...resolvedStyles }"
-    py="sp-3"
-    px="sp-5"
-    display="inline-flex"
-    align-items="center"
-    justify-content="center"
-    gap="sp-2"
-    border-radius="br-pill"
-    text-decoration="none"
-    fw="700"
-    cursor="pointer"
-    transition="background-color 180ms ease, border-color 180ms ease, color 180ms ease"
-    :focus-visible="{
+    v-bind="elementProps"
+    :vb="resolvedStyles"
+    vb-py="sp-3"
+    vb-px="sp-5"
+    vb-display="inline-flex"
+    vb-align-items="center"
+    vb-justify-content="center"
+    vb-gap="sp-2"
+    vb-border-radius="br-pill"
+    vb-text-decoration="none"
+    vb-fw="700"
+    vb-cursor="pointer"
+    vb-transition="background-color 180ms ease, border-color 180ms ease, color 180ms ease"
+    :vb-focus-visible="{
       outline: '3px solid var(--color-ring)',
       outlineOffset: '2px',
     }"
-    :hover="{
+    :vb-hover="{
       backgroundColor: 'color-mix(in oklab, var(--color-brand) 85%, white)',
       borderColor: 'color-mix(in oklab, var(--color-brand) 65%, black)',
       color: 'white',

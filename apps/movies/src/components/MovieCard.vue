@@ -20,20 +20,20 @@ const posterSrc = computed(() => getPosterUrl(props.movie.poster_path));
 <template>
   <article
     class="movie-card"
-    pos="relative"
-    border-radius="br-card"
-    overflow="hidden"
-    bg="var(--color-canvas-soft)"
-    border="1px solid color-mix(in oklab, var(--color-ink) 10%, transparent)"
-    shadow="bs-glow"
-    transition="transform 420ms cubic-bezier(0.22, 0.85, 0.24, 1), box-shadow 420ms ease, filter 420ms ease, opacity 420ms ease"
+    vb-pos="relative"
+    vb-border-radius="br-card"
+    vb-overflow="hidden"
+    vb-bg="var(--color-canvas-soft)"
+    vb-border="1px solid color-mix(in oklab, var(--color-ink) 10%, transparent)"
+    vb-shadow="bs-glow"
+    vb-transition="transform 420ms cubic-bezier(0.22, 0.85, 0.24, 1), box-shadow 420ms ease, filter 420ms ease, opacity 420ms ease"
   >
     <router-link
       class="movie-card__link"
       :to="`/movie/${movie.id}`"
-      text-decoration="none"
-      color="inherit"
-      display="block"
+      vb-text-decoration="none"
+      vb-color="inherit"
+      vb-display="block"
       @click="emit('select')"
     >
       <img
@@ -43,18 +43,23 @@ const posterSrc = computed(() => getPosterUrl(props.movie.poster_path));
           'https://placehold.co/480x720/111827/FFFFFF?text=VBox+Movies'
         "
         :alt="`Poster for ${movie.title}`"
-        w="100%"
-        h="16rem"
-        object-fit="cover"
+        vb-w="100%"
+        vb-h="16rem"
+        vb-object-fit="cover"
         loading="lazy"
       />
 
-      <div class="movie-card__content" p="sp-3" display="grid" gap="sp-1">
-        <h3 m="0" fs="fs-base" color="cl-ink">{{ movie.title }}</h3>
+      <div
+        class="movie-card__content"
+        vb-p="sp-3"
+        vb-display="grid"
+        vb-gap="sp-1"
+      >
+        <h3 vb-m="0" vb-fs="fs-base" vb-color="cl-ink">{{ movie.title }}</h3>
         <p
-          m="0"
-          fs="fs-sm"
-          color="color-mix(in oklab, var(--color-ink) 75%, transparent)"
+          vb-m="0"
+          vb-fs="fs-sm"
+          vb-color="color-mix(in oklab, var(--color-ink) 75%, transparent)"
         >
           {{ getMovieYear(movie) }} • ★ {{ getMovieRating(movie) }}
         </p>
