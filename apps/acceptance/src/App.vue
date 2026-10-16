@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import CachedOwnership from './ownership/CachedOwnership.vue';
+import NumericOwnership from './ownership/NumericOwnership.vue';
+import NestedOwnership from './ownership/NestedOwnership.vue';
 import ComponentOverrides from './ComponentOverrides.vue';
 import AdvancedSelectors from './AdvancedSelectors.vue';
 import QueryStyles from './QueryStyles.vue';
@@ -36,6 +39,9 @@ const badge = pva({
     <QueryStyles />
     <AdvancedSelectors />
     <ComponentOverrides />
+    <NestedOwnership />
+    <NumericOwnership />
+    <CachedOwnership />
     <NormalSetup />
     <LocalDirective />
     <VBox is="button" type="button" :hover="{ color: 'green' }"
