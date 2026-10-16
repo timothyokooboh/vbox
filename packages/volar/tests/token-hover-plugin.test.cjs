@@ -58,7 +58,8 @@ test('collectTokenHints supports token hovers directly on <v-box> props', () => 
   const ast = baseParse(`<v-box fs=\"fs-xl\" color=\"cl-brand\">Hello</v-box>`);
   const hints = collectTokenHints(
     ast,
-    (token) => (token === 'fs-xl' ? '3rem' : token === 'cl-brand' ? '#c52341' : null),
+    (token) =>
+      token === 'fs-xl' ? '3rem' : token === 'cl-brand' ? '#c52341' : null,
     () => true,
   );
 
@@ -115,7 +116,9 @@ test('collectTokenHints supports custom component hovers when parseAllComponents
 });
 
 test('collectTokenHints still shows custom component hovers with vbox-ignore', () => {
-  const ast = baseParse(`<BaseButton vbox-ignore color="cl-brand">Save</BaseButton>`);
+  const ast = baseParse(
+    `<BaseButton vbox-ignore color="cl-brand">Save</BaseButton>`,
+  );
   const hints = collectTokenHints(
     ast,
     (token) => (token === 'cl-brand' ? '#c52341' : null),
@@ -142,8 +145,14 @@ test('collectTokenHints works on elements with v-if and children under that bran
     () => true,
   );
 
-  assert.equal(hints.some((hint) => hint.token === 'cl-red-900'), true);
-  assert.equal(hints.some((hint) => hint.token === 'fs-lg'), true);
+  assert.equal(
+    hints.some((hint) => hint.token === 'cl-red-900'),
+    true,
+  );
+  assert.equal(
+    hints.some((hint) => hint.token === 'fs-lg'),
+    true,
+  );
 });
 
 test('collectTokenHints works on elements with v-for', () => {
@@ -161,8 +170,14 @@ test('collectTokenHints works on elements with v-for', () => {
     () => true,
   );
 
-  assert.equal(hints.some((hint) => hint.token === 'cl-red-900'), true);
-  assert.equal(hints.some((hint) => hint.token === 'fs-lg'), true);
+  assert.equal(
+    hints.some((hint) => hint.token === 'cl-red-900'),
+    true,
+  );
+  assert.equal(
+    hints.some((hint) => hint.token === 'fs-lg'),
+    true,
+  );
 });
 
 test('collectTokenHints finds token inside compound style values', () => {
@@ -185,11 +200,15 @@ test('collectTokenHints finds tokens inside bound object-style props', () => {
   );
   const hints = collectTokenHints(
     ast,
-    (token) => (token === 'cl-emerald-400' ? 'oklch(0.765 0.177 163.223)' : null),
+    (token) =>
+      token === 'cl-emerald-400' ? 'oklch(0.765 0.177 163.223)' : null,
     () => true,
   );
 
-  assert.equal(hints.some((hint) => hint.token === 'cl-emerald-400'), true);
+  assert.equal(
+    hints.some((hint) => hint.token === 'cl-emerald-400'),
+    true,
+  );
 });
 
 test('collectTokenHints skips denylisted native tags even with marker', () => {
@@ -240,7 +259,7 @@ test('buildAttrCompletionKeys explicit aliases replace config aliases', () => {
 });
 
 test('collectCompletionHints returns style attr and token value hints', () => {
-  const ast = baseParse(`<p color=\"cl-brand\" fs=\"fs-lg\">Hello</p>`);
+  const ast = baseParse(`<p vb-color=\"cl-brand\" vb-fs=\"fs-lg\">Hello</p>`);
   const tokenMap = new Map([
     ['cl-brand', '#c52341'],
     ['cl-red-400', '#f87171'],
@@ -256,10 +275,22 @@ test('collectCompletionHints returns style attr and token value hints', () => {
     {},
   );
 
-  assert.equal(hints.attrHints.some((hint) => hint.value === 'color'), true);
-  assert.equal(hints.attrHints.some((hint) => hint.value === 'fs'), true);
-  assert.equal(hints.valueHints.some((hint) => hint.typedValue === 'cl-brand'), true);
-  assert.equal(hints.valueHints.some((hint) => hint.typedValue === 'fs-lg'), true);
+  assert.equal(
+    hints.attrHints.some((hint) => hint.value === 'vb-color'),
+    true,
+  );
+  assert.equal(
+    hints.attrHints.some((hint) => hint.value === 'vb-fs'),
+    true,
+  );
+  assert.equal(
+    hints.valueHints.some((hint) => hint.typedValue === 'cl-brand'),
+    true,
+  );
+  assert.equal(
+    hints.valueHints.some((hint) => hint.typedValue === 'fs-lg'),
+    true,
+  );
 });
 
 test('buildCompletionCode emits mapped completion segments', () => {
@@ -278,8 +309,20 @@ test('buildCompletionCode emits mapped completion segments', () => {
   );
 
   assert.equal(code.length > 0, true);
-  assert.equal(code.some((part) => typeof part === 'string' && part.includes('__vboxAttrCompletion')), true);
-  assert.equal(code.some((part) => typeof part === 'string' && part.includes('__vboxTokenCompletion')), true);
+  assert.equal(
+    code.some(
+      (part) =>
+        typeof part === 'string' && part.includes('__vboxAttrCompletion'),
+    ),
+    true,
+  );
+  assert.equal(
+    code.some(
+      (part) =>
+        typeof part === 'string' && part.includes('__vboxTokenCompletion'),
+    ),
+    true,
+  );
 });
 
 test('buildAttrCompletionKeys includes broad css properties', () => {
@@ -289,7 +332,7 @@ test('buildAttrCompletionKeys includes broad css properties', () => {
 });
 
 test('collectCompletionHints includes empty quoted value context for token completion', () => {
-  const ast = baseParse(`<h1 font-size=\"\">Hello</h1>`);
+  const ast = baseParse(`<h1 vb-font-size=\"\">Hello</h1>`);
   const tokenMap = new Map([
     ['fs-lg', '1.125rem'],
     ['fs-xl', '1.25rem'],

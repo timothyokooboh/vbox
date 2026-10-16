@@ -1,4 +1,8 @@
 const path = require('node:path');
+const { collectExpressionCompletions } = require('./styleExpressions.cjs');
+const { buildTokenTypes } = require('./completionTypes.cjs');
+const { scopeCompletionCode } = require('./completionScope.cjs');
+const { prioritizeStyleCompletions } = require('./completionMappings.cjs');
 const { createJiti } = require('jiti');
 const knownCssPropertiesModule = require('known-css-properties');
 
@@ -463,6 +467,15 @@ const buildTokenPrefixByProperty = (vboxConfig = {}, pluginConfig = {}) => {
     ['min-height', 'sp'],
   ]);
 
+  for (const property of knownCssPropertiesModule.all ?? []) {
+    const key = normalizeCssPropertyKey(property);
+    if (key.endsWith('-color')) base.set(key, 'cl');
+    if (key.endsWith('-radius')) base.set(key, 'br');
+    if (/^(margin|padding|inset)-/.test(key)) base.set(key, 'sp');
+  }
+  for (const property of ['border', 'outline', 'text-shadow'])
+    base.set(property, 'cl');
+
   const effectiveAliases = core.resolveVBoxConfig(vboxConfig).aliases;
   const enabledAliases = new Set([
     ...(vboxConfig.aliases?.strategy === 'replace'
@@ -544,7 +557,10 @@ const buildAttrCompletionKeys = (
     }
   }
 
-  for (const key of objectStyleKeys) {
+  for (const key of objectStyleKeys.flatMap((key) => [
+    key,
+    key.replace(/^_/, ''),
+  ])) {
     for (const variant of getKeyVariants(key)) {
       out.add(variant);
     }
@@ -729,14 +745,21 @@ const collectCompletionHints = (
     attrHints.push({ value, offset, length });
   };
 
-  const pushValueHint = (typedValue, mappedValue, offset, candidates) => {
-    if (!Array.isArray(candidates) || candidates.length === 0) return;
+  const pushValueHint = (
+    typedValue,
+    mappedValue,
+    offset,
+    candidates,
+    property,
+  ) => {
+    if (!Array.isArray(candidates)) return;
     if (typeof mappedValue !== 'string' || mappedValue.length === 0) return;
     const dedupeKey = `${offset}:${mappedValue.length}:${typedValue}`;
     if (valueHintSeen.has(dedupeKey)) return;
     valueHintSeen.add(dedupeKey);
     valueHints.push({
       typedValue,
+      property,
       mappedValue,
       offset,
       candidates,
@@ -777,41 +800,17 @@ const collectCompletionHints = (
     if (node.type !== 1 /* ELEMENT */) return;
 
     const tag = node.tag;
-    let hasVBoxMarker = false;
-    let hasIgnoreMarker = false;
-
-    for (const prop of node.props) {
-      if (prop.type === 6 /* ATTRIBUTE */) {
-        if (prop.name === 'vbox') hasVBoxMarker = true;
-        if (prop.name === 'vbox-ignore') hasIgnoreMarker = true;
-      }
-    }
-
-    const nativeAutoEligible =
-      !ignored && isNativeHtmlTag(tag) && canProcessNativeTag(tag);
-    const isCustomComponent = !isNativeHtmlTag(tag) && !isVBoxComponentTag(tag);
-    const frameworkLinkAutoEligible =
-      !ignored && isCustomComponent && isFrameworkLinkTag(tag);
-    const vboxComponentEligible = !ignored && isVBoxComponentTag(tag);
-    const markedCustomComponentEligible =
-      !ignored && hasVBoxMarker && isCustomComponent;
-    const globalCustomComponentEligible =
-      !ignored && options.parseAllComponents !== false && isCustomComponent;
-
     const shouldProcessElement =
-      !ignored &&
-      !hasIgnoreMarker &&
-      (nativeAutoEligible ||
-        frameworkLinkAutoEligible ||
-        markedCustomComponentEligible ||
-        globalCustomComponentEligible ||
-        vboxComponentEligible);
-
+      canProcessNativeTag(tag) && !['template', 'slot'].includes(tag);
+    const acceptsStyleName = (key) =>
+      key === 'vb' ||
+      core.getStyleBindingKey(key) !== null ||
+      (isVBoxComponentTag(tag) && isStyleKey(tag, key));
     if (shouldProcessElement) {
       for (const prop of node.props) {
         if (prop.type === 6 /* ATTRIBUTE */) {
           if (prop.name === 'vbox' || prop.name === 'vbox-ignore') continue;
-          if (!isStyleKey(tag, prop.name)) continue;
+          if (!acceptsStyleName(prop.name)) continue;
 
           pushAttrHint(prop.name, prop.loc.start.offset, prop.name.length);
 
@@ -832,6 +831,24 @@ const collectCompletionHints = (
               token,
               offset + match.index,
               getTokenCandidates(prop.name, extractTokenPrefix(token)),
+              prop.name,
+            );
+          }
+
+          const partialToken = value.match(/\b([a-z]{1,3}-[\w-]*)$/);
+          if (
+            partialToken &&
+            core.TokenCategories[extractTokenPrefix(partialToken[1])]
+          ) {
+            pushValueHint(
+              partialToken[1],
+              partialToken[1],
+              offset + partialToken.index,
+              getTokenCandidates(
+                prop.name,
+                extractTokenPrefix(partialToken[1]),
+              ),
+              prop.name,
             );
           }
 
@@ -841,11 +858,17 @@ const collectCompletionHints = (
             !value.includes('}')
           ) {
             if (value.length > 0) {
-              pushValueHint(value, value, offset, candidates);
+              pushValueHint(value, value, offset, candidates, prop.name);
             } else {
               // For empty quoted values (e.g. font-size=""), map both quotes so
               // completions trigger when cursor is between them.
-              pushValueHint('', '""', prop.value.loc.start.offset, candidates);
+              pushValueHint(
+                '',
+                '""',
+                prop.value.loc.start.offset,
+                candidates,
+                prop.name,
+              );
             }
           }
           continue;
@@ -856,11 +879,29 @@ const collectCompletionHints = (
         if (!prop.arg || prop.arg.type !== 4 || !prop.arg.isStatic) continue;
 
         const boundKey = prop.arg.content;
-        if (!isStyleKey(tag, boundKey)) continue;
+        if (!acceptsStyleName(boundKey)) continue;
 
         pushAttrHint(boundKey, prop.arg.loc.start.offset, boundKey.length);
 
         if (!prop.exp || prop.exp.type !== 4) continue;
+        if (options.typescript) {
+          const nested = collectExpressionCompletions(
+            options.typescript,
+            prop.exp,
+            boundKey,
+            getTokenCandidates,
+          );
+          attrHints.push(...nested.attributes);
+          for (const hint of nested.values)
+            pushValueHint(
+              hint.typedValue,
+              hint.mappedValue,
+              hint.offset,
+              hint.candidates,
+              hint.property,
+            );
+          continue;
+        }
         const exp = String(prop.exp.content || '');
         const candidates = getTokenCandidates(
           boundKey,
@@ -877,12 +918,13 @@ const collectCompletionHints = (
             token,
             prop.exp.loc.start.offset + match.index,
             getTokenCandidates(boundKey, extractTokenPrefix(token)),
+            boundKey,
           );
         }
       }
     }
 
-    const nextIgnored = ignored || hasIgnoreMarker;
+    const nextIgnored = false;
     for (const child of node.children || []) {
       walk(child, nextIgnored);
     }
@@ -947,7 +989,7 @@ const buildCompletionCode = (
   attrHints,
   valueHints,
   attrCompletionKeys,
-  maxCompletionItems = 200,
+  options = {},
 ) => {
   const out = [];
   const attrUnionKeys = Array.isArray(attrCompletionKeys)
@@ -975,31 +1017,66 @@ const buildCompletionCode = (
     explicitKeys.map((key) => `'${escapeTsString(key)}'`).join(' | ') ||
     'string';
 
-  const limitedAttrHints = attrHints.slice(0, maxCompletionItems);
-  const limitedValueHints = valueHints.slice(0, maxCompletionItems);
+  out.push(
+    `type __vboxCompletionAttributes = ${attrUnionType}${options.tokenTypes ? ' | __vboxAliasKeys' : ''};\n`,
+  );
+  out.push(
+    `type __vboxCompletionExplicitAttributes = ${explicitUnionType}${options.tokenTypes ? ' | __vboxExplicitAliasKeys' : ''};\n`,
+  );
+  const valueTypes = new Map();
+  if (options.tokenTypes) out.push(...options.tokenTypes);
+  out.push(
+    `type __vboxRawValue<K> = K extends keyof import('@veebox/core').CssProperties ? import('@veebox/core').CssProperties[K] : never;\n`,
+  );
 
-  limitedAttrHints.forEach((hint, index) => {
+  attrHints.forEach((hint, index) => {
     const type =
-      core.getStyleBindingKey(hint.value) !== null
-        ? explicitUnionType
-        : attrUnionType;
-    out.push(`const __vboxAttrCompletion${index}: ${type} = '`);
-    out.push([hint.value, 'template', hint.offset, COMPLETION_FEATURES]);
-    out.push(`';\n`);
+      hint.value === 'vb' || core.getStyleBindingKey(hint.value) !== null
+        ? '__vboxCompletionExplicitAttributes'
+        : '__vboxCompletionAttributes';
+    if (hint.objectKey && !hint.quoted) {
+      out.push(
+        `const __vboxAttrCompletion${index}: Partial<Record<${type}, unknown>> = { `,
+      );
+      out.push([hint.value, 'template', hint.offset, COMPLETION_FEATURES]);
+      out.push(': undefined };\n');
+    } else {
+      out.push(`const __vboxAttrCompletion${index}: ${type} = '`);
+      out.push(...mappedCompletionString(hint.value, hint.offset));
+      out.push(`';\n`);
+    }
   });
 
-  limitedValueHints.forEach((hint, index) => {
-    const candidates = hint.candidates
-      .slice(0, maxCompletionItems)
-      .concat(hint.typedValue)
-      .filter(Boolean);
-    const deduped = Array.from(new Set(candidates));
-    const valueUnionType =
-      deduped.length > 0
-        ? deduped.map((token) => `'${escapeTsString(token)}'`).join(' | ')
-        : 'string';
-
-    out.push(`const __vboxTokenCompletion${index}: ${valueUnionType} = '`);
+  valueHints.forEach((hint, index) => {
+    let type;
+    if (options.tokenTypes) {
+      const key =
+        core.getStyleBindingKey(hint.property ?? '') ?? hint.property ?? '';
+      const prefix = extractTokenPrefix(hint.typedValue);
+      type = core.TokenCategories[prefix]
+        ? `__vboxTokens[${JSON.stringify(prefix)}]`
+        : `__vboxValue<${JSON.stringify(key)}>`;
+    } else {
+      const candidates = Array.from(new Set(hint.candidates));
+      const signature = JSON.stringify(candidates);
+      type = valueTypes.get(signature);
+      if (!type) {
+        type = `__vboxCompletionValues${valueTypes.size}`;
+        valueTypes.set(signature, type);
+        out.push(
+          `type ${type} = ${candidates.map((token) => `'${escapeTsString(token)}'`).join(' | ') || 'string'};\n`,
+        );
+      }
+    }
+    const typed = hint.typedValue
+      ? ` | '${escapeTsString(hint.typedValue)}'`
+      : '';
+    const property =
+      options.resolveProperty?.(hint.property) ??
+      core.kebabToCamelCase(hint.property ?? '');
+    out.push(
+      `const __vboxTokenCompletion${index}: ${type}${typed}${options.tokenTypes ? '' : ` | __vboxRawValue<${JSON.stringify(property)}>`} = '`,
+    );
     out.push(...mappedCompletionString(hint.mappedValue, hint.offset));
     out.push(`';\n`);
   });
@@ -1016,18 +1093,22 @@ const createPlugin = (ctx) => {
   let tokenPrefixByProperty;
   let attrCompletionKeys;
   let fingerprint;
+  let aliases;
+  let config;
   const tokenCandidatesCache = new Map();
   const refreshVocabulary = () => {
     const vboxConfig = loadVBoxConfig(rootDir, userConfig);
+    config = vboxConfig;
     const next = JSON.stringify(vboxConfig);
     if (next === fingerprint) return;
     tokenMap = buildTokenResolutionMap(vboxConfig, rootDir);
+    aliases = core.resolveVBoxConfig(vboxConfig).aliases;
     isStyleKey = createStyleKeyMatcher(vboxConfig, userConfig);
     tokenPrefixByProperty = buildTokenPrefixByProperty(vboxConfig, userConfig);
     attrCompletionKeys = buildAttrCompletionKeys(
-      vboxConfig,
+      { aliases: { strategy: 'replace' } },
       ObjectStyleKeys,
-      userConfig,
+      { aliases: [] },
     );
     tokenCandidatesCache.clear();
     fingerprint = next;
@@ -1040,8 +1121,16 @@ const createPlugin = (ctx) => {
       tokenPrefixByProperty,
       tokenCandidatesCache,
       typedPrefix,
-    );
-  const maxCompletionItems = 200;
+    ).flatMap((token) => {
+      const dash = token.indexOf('-');
+      const category = core.TokenCategories[token.slice(0, dash)];
+      return category
+        ? [
+            token,
+            `var(--${core.toKebabCase(category)}-${token.slice(dash + 1)})`,
+          ]
+        : [token];
+    });
 
   const resolveTokenValue = (token) => tokenMap.get(token) ?? null;
 
@@ -1067,7 +1156,10 @@ const createPlugin = (ctx) => {
         sfc.template.ast,
         isStyleKey,
         getTokenCandidates,
-        { parseAllComponents: userConfig.parseAllComponents !== false },
+        {
+          parseAllComponents: userConfig.parseAllComponents !== false,
+          typescript: ctx.modules?.typescript,
+        },
       );
 
       if (
@@ -1087,13 +1179,41 @@ const createPlugin = (ctx) => {
         completionHints.attrHints.length > 0 ||
         completionHints.valueHints.length > 0
       ) {
+        embeddedFile.content = prioritizeStyleCompletions(
+          embeddedFile.content,
+          [...completionHints.attrHints, ...completionHints.valueHints],
+        );
         embeddedFile.content.push('\n/* VBox completions */\n');
         embeddedFile.content.push(
-          ...buildCompletionCode(
-            completionHints.attrHints,
-            completionHints.valueHints,
-            attrCompletionKeys,
-            maxCompletionItems,
+          ...scopeCompletionCode(
+            ctx.modules.typescript,
+            buildCompletionCode(
+              completionHints.attrHints,
+              completionHints.valueHints,
+              attrCompletionKeys,
+              {
+                tokenTypes: buildTokenTypes(
+                  configLoader.findVBoxConfig({
+                    rootDir,
+                    configPath: userConfig.configPath,
+                  }),
+                  buildTokenResolutionMap({}, rootDir),
+                  buildTokenPrefixByProperty(
+                    { aliases: { strategy: 'replace', values: {} } },
+                    { aliases: [] },
+                  ),
+                  userConfig.aliases,
+                  config,
+                ),
+                resolveProperty: (key) => {
+                  const property = core.kebabToCamelCase(
+                    core.getStyleBindingKey(key ?? '') ?? key ?? '',
+                  );
+                  return aliases[property] ?? property;
+                },
+              },
+            ),
+            sfc.content,
           ),
         );
       }

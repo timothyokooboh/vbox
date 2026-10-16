@@ -68,3 +68,6 @@ source-map handoff, actual HMR coverage and installed-artifact checks.
 
 Only introduce shared normalization metadata when the next tested behavior needs
 it; do not split every file or redesign the engine in this baseline ticket.
+
+[Editor coverage and limitations](./EDITOR.md) describes contextual completions,
+project invalidation, generated declarations and the real-service latency checks.
