@@ -1,59 +1,46 @@
 # Custom Aliases
 
-VBox allows you to define your own custom aliases for CSS properties in addition to the default aliases provided. This can help streamline your styling process by using shorter or more intuitive names for frequently used properties.
+Aliases rename properties, not token values or condition groups. Define their
+runtime meaning in the shared config:
 
 ```ts
-// vbox.config.ts
-import { defineConfig } from '@veebox/core'
-
+import { defineConfig } from '@veebox/core';
 export default defineConfig({
   aliases: {
-    strategy: 'merge', // or 'replace' to override default aliases
-    values: {
-      mTop: 'marginBlockStart',
-      mBottom: 'marginBlockEnd',
-    },
+    strategy: 'merge',
+    values: { mTop: 'marginBlockStart', borderR: 'borderRadius' },
   },
-})
+});
 ```
 
-In the example above, we define two custom aliases: `mTop` for `marginBlockStart` and `mBottom` for `marginBlockEnd`. The `strategy` option determines whether to merge these custom aliases with the default ones or to replace them entirely. If you choose `merge`, both default and custom aliases will be available. If you choose `replace`, you won't have access to the default aliases anymore.
+Use `vb-m-top="12px"`, `vb-border-r="8px"`, or the matching Vue camelCase
+spellings. Object keys stay unprefixed. `strategy: 'merge'` keeps default
+aliases; `strategy: 'replace'` disables defaults and uses the supplied
+definitions. CSS property names remain available. Aliases may not replace
+built-in condition-group names such as `hover` or `md`.
 
-You can then use these custom aliases in your `v-box` components like so:
+## Compiler and editor discovery
 
-```html
-<v-box m-top="1rem" m-bottom="2rem"> Custom margin using aliases! </v-box>
-```
-
-## Native Syntax Plugin Note
-
-If you use the native syntax transform (`@veebox/unplugin`), also pass your
-custom alias keys into the plugin so compile-time parsing recognizes them:
+Both tools discover the project config by default. A nonstandard location can be
+specified with `rootDir` and `configPath`. Prefer that over repeating alias
+keys.
 
 ```ts
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import { vboxVitePlugin } from '@veebox/unplugin/vite'
-import vboxConfig from './vbox.config'
-
-export default defineConfig({
-  plugins: [
-    vboxVitePlugin({
-      aliases: Object.keys(vboxConfig.aliases?.values ?? {}),
-    }),
-    vue(),
-  ],
-})
+vboxVitePlugin({ rootDir: projectRoot, configPath: './theme/vbox.config.ts' });
+// The webpack wrapper accepts the same options.
 ```
 
-## Intellisense Support
+An explicit `aliases: ['borderR']` is still available. It **replaces**
+discovered custom alias keys in compiler/editor metadata; it does not merge with
+them, and an empty array is an intentional empty override. It does not supply
+runtime property mappings or override `aliases.strategy`. The runtime config
+must still define the aliases you use. Default alias availability follows that
+strategy.
 
-When you run `npx vbox-type-gen`, the vbox cli will automatically pick up your custom aliases defined in the `vbox.config.ts` file and update the generated types accordingly. This ensures that you get proper Intellisense support in your IDE for both default and custom aliases :ok_hand:
+Keep compiler, editor and runtime config aligned. Namespacing means an
+unfamiliar alias is still styling, but incorrect metadata can produce advisory
+warnings or incomplete editor suggestions.
 
-::: info
-Make sure that `vbox.config.js` or `vbox.config.ts` is located at the root of your Vue.js project.
-
-And if you're using TypeScript, ensure that both `vbox.config.ts` and `vbox.d.ts` are included in your `tsconfig.json` file's `include` array.
-
-`vbox.d.ts` is the generated types file created when you run `npx vbox-type-gen` to update the types based on your custom configuration. This ensure proper Intellisense support in your IDE.
-:::
+Run `npx vbox-type-gen` after changing aliases and include the generated
+`vbox.d.ts` in the app's tsconfig. See
+[editor setup](../../up-next/enhanced-dx.md).

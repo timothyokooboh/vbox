@@ -1,23 +1,23 @@
 <template>
   <button
     data-scope="add-to-cart-btn"
-    cursor="pointer"
-    border="none"
-    bg="cl-primary"
-    position="relative"
-    display="flex"
-    align-items="center"
-    justify-content="center"
-    gap="0.5rem"
-    overflow="hidden"
-    radius="br-full"
-    h="3.5rem"
-    flex-grow="1"
-    px="1.5rem"
-    shadow="0 8px 20px -6px rgba(249,245,6,0.5)"
-    transition="scale 0.2s ease-in-out"
-    v-bind="outlineStyles"
-    :hover="{
+    vb-cursor="pointer"
+    vb-border="none"
+    vb-bg="cl-primary"
+    vb-position="relative"
+    vb-display="flex"
+    vb-align-items="center"
+    vb-justify-content="center"
+    vb-gap="0.5rem"
+    vb-overflow="hidden"
+    vb-radius="br-full"
+    vb-h="3.5rem"
+    vb-flex-grow="1"
+    vb-px="1.5rem"
+    vb-shadow="0 8px 20px -6px rgba(249,245,6,0.5)"
+    vb-transition="scale 0.2s ease-in-out"
+    :vb="outlineStyles"
+    :vb-hover="{
       '[data-scope=empty-div]': {
         opacity: 1,
       },
@@ -25,37 +25,37 @@
         transform: 'translateX(-0.25rem)',
       },
     }"
-    :active="{
+    :vb-active="{
       scale: 0.95,
     }"
   >
     <span
-      position="relative"
-      z="10"
-      display="flex"
-      align-items="center"
-      gap="0.2rem"
-      :md="{
+      vb-position="relative"
+      vb-z-index="10"
+      vb-display="flex"
+      vb-align-items="center"
+      vb-gap="0.2rem"
+      :vb-md="{
         gap: '0.5rem',
       }"
     >
       <span
         data-scope="icon"
-        color="#1c1c0d"
+        vb-color="#1c1c0d"
         class="material-symbols-outlined"
-        transition="transform 0.2s ease-in-out"
-        display="none !important"
-        :md="{
+        vb-transition="transform 0.2s ease-in-out"
+        vb-display="none !important"
+        :vb-md="{
           display: 'inline-block !important',
         }"
       >
         shopping_cart
       </span>
       <span
-        fs="fs-sm"
-        fw="fw-bold"
-        color="#1c1c0d"
-        :md="{
+        vb-fs="fs-sm"
+        vb-fw="fw-bold"
+        vb-color="#1c1c0d"
+        :vb-md="{
           fs: 'fs-base',
         }"
       >
@@ -65,14 +65,14 @@
 
     <div
       data-scope="empty-div"
-      position="absolute"
-      top="0"
-      bottom="0"
-      right="0"
-      left="0"
-      bg="rgba(255,255,255,0.2)"
-      opacity="0"
-      transition="opacity 0.2s ease-in-out"
+      vb-position="absolute"
+      vb-top="0"
+      vb-bottom="0"
+      vb-right="0"
+      vb-left="0"
+      vb-bg="rgba(255,255,255,0.2)"
+      vb-opacity="0"
+      vb-transition="opacity 0.2s ease-in-out"
     />
   </button>
 </template>

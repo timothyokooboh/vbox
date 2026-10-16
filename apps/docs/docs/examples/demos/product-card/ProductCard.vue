@@ -1,20 +1,20 @@
 <template>
   <div
     data-scope="product-card"
-    bg="cl-bg-product"
-    border-radius="br-lg"
-    p="1rem"
-    box-shadow="0 1px 10px rgba(0,0,0,.1)"
-    w="100%"
-    max-w="25rem"
-    ff="ff-sans"
+    vb-bg="cl-bg-product"
+    vb-border-radius="br-lg"
+    vb-p="1rem"
+    vb-box-shadow="0 1px 10px rgba(0,0,0,.1)"
+    vb-w="100%"
+    vb-max-w="25rem"
+    vb-ff="ff-sans"
   >
     <ProductMedia />
     <ProductDetails>
       <ProductHeader />
       <ProductSizeSelector />
       <ProductDescription />
-      <div mt="auto" display="flex" align-items="center" gap="1rem">
+      <div vb-mt="auto" vb-display="flex" vb-align-items="center" vb-gap="1rem">
         <ProductQtySelector />
         <AddToCartBtn />
       </div>

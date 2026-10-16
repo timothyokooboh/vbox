@@ -1,6 +1,6 @@
 <template>
   <div
-    :declarations="{
+    :vb-declarations="{
       color: 'tomato',
       padding: '0.5rem',
       '&:has(p)': {

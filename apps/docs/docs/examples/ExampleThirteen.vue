@@ -1,7 +1,7 @@
 <template>
   <label
-    position="relative"
-    :pseudos="{
+    vb-position="relative"
+    :vb-pseudos="{
       '::after': {
         position: 'absolute',
         content: '*',

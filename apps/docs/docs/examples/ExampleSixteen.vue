@@ -1,18 +1,18 @@
 <template>
   <div
-    container-name="responsive-box"
-    container-type="inline-size"
-    border="2px dashed gray"
-    padding="1rem"
+    vb-container-name="responsive-box"
+    vb-container-type="inline-size"
+    vb-border="2px dashed gray"
+    vb-padding="1rem"
   >
     <div
-      w="100%"
-      max-w="400px"
-      border="1px solid black"
-      p="1rem"
-      bg="tomato"
-      color="white"
-      :cq="{
+      vb-w="100%"
+      vb-max-w="400px"
+      vb-border="1px solid black"
+      vb-p="1rem"
+      vb-bg="tomato"
+      vb-color="white"
+      :vb-cq="{
         '@container responsive-box (min-width: 40rem)': {
           backgroundColor: 'indigo',
         },

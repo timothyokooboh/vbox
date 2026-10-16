@@ -2,9 +2,7 @@
 
 A banner styled with VBox :tada:
 
-<ClientOnly>
-    <BannerRoot />
-</ClientOnly>
+<BannerRoot />
 
 <<< @/examples/demos/banner/BannerRoot.vue
 

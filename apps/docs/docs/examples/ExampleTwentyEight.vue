@@ -1,6 +1,6 @@
 <template>
   <div
-    :sm="{
+    :vb-sm="{
       '&:has(p)': {
         color: 'cl-cyan-500',
       },

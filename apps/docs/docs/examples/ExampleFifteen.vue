@@ -1,11 +1,11 @@
 <template>
   <div
-    fs="1rem"
-    bg="tomato"
-    py="2rem"
-    text-align="center"
-    color="white"
-    :mq="{
+    vb-fs="1rem"
+    vb-bg="tomato"
+    vb-py="2rem"
+    vb-text-align="center"
+    vb-color="white"
+    :vb-mq="{
       '@media (min-width: 48rem)': {
         fontSize: '2rem',
         backgroundColor: 'indigo',

@@ -1,7 +1,7 @@
 <template>
   <button
     disabled
-    :_disabled="{
+    :vb-disabled="{
       cursor: 'not-allowed',
       opacity: 0.7,
     }"

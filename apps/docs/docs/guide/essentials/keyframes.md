@@ -1,80 +1,28 @@
 # Keyframes
 
-VBox provides a `keyframes` helper function that allows you to define CSS
-keyframe animations directly within your Vue components.
-
-<ExampleEighteen />
+`keyframes` returns a stable animation name from the authored definition. Use it
+with `:vb-animation` or `:vb-animation-name`. In SSR, collect keyframes using
+the same request-local collector as component styles.
 
 <<< @/examples/ExampleEighteen.vue
 
-::: tip
+<ExampleEighteen />
 
-You can export animations to reuse across components
-
-```ts
-// animations.ts
-import { keyframes } from '@veebox/core';
-
-export const slideFromTop = keyframes({
-  from: {
-    opacity: 0,
-    transform: 'translateY(-15px)',
-  },
-  to: {
-    opacity: 1,
-    transform: 'none',
-  },
-});
-```
-
-:::
-
-You could also use percentage for the keyframe steps
+For reusable animations, export the **definition**, then register it from setup
+for each SSR request. A module-level registration has no request context and
+must not be relied on for critical SSR CSS.
 
 ```ts
-const slideFromTop = keyframes({
-  '0%': {
-    opacity: 0,
-    transform: 'translateY(-15px)',
-  },
-  '70%': {
-    opacity: 0.7,
-    transform: 'translateY(-5px)',
-  },
-  '100%': {
-    opacity: 1,
-    transform: 'none',
-  },
-});
+export const fadeDefinition = { from: { opacity: 0 }, to: { opacity: 1 } };
+// In setup, after obtaining the current request collector when server rendering:
+// const fade = keyframes('fade', fadeDefinition, { collector });
 ```
 
-<hr />
+The optional first string supplies a readable name prefix; a hash still
+separates different definitions. Percentages such as `'0%'`, `'70%'`, `'100%'`
+are also supported. Choose the same definition and initial data on server and
+client, and respect `prefers-reduced-motion` as shown in the runnable example.
 
-By default, `keyframes` generate unique and stable identifiers used for the
-`animation-name` e.g vbox-kf-15614bc4, where 15614bc4 is a stable hash based on
-the object passed to the `keyframes` function. However, you can customize the
-animation name by providing a string as the first argument.
-
-```ts
-const fadeIn = keyframes('fade-in', {
-  from: {
-    opacity: 0,
-  },
-  to: {
-    opacity: 1,
-  },
-});
-```
-
-Now, the generated animation name will be `fade-in-xxxxxxxx`, where `xxxxxxxx`
-is a stable hash based on the keyframes object.
-
-And the usage is still the same:
-
-```html
-<v-box is="p" :animation="`${fadeIn} 0.5s ease-in-out both`">...</v-box>
-```
-
-<script lang="ts" setup>
+<script setup lang="ts">
 import ExampleEighteen from '../../examples/ExampleEighteen.vue'
 </script>

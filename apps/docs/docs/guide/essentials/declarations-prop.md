@@ -1,71 +1,50 @@
-# Declarations Prop
+# Declarations and Selectors
 
-The `declarations` prop accepts any valid CSS property and CSS selectors. We've
-seen that all the pseudo props and responsive style props accepts CSS selectors.
-The `declarations` prop is a good place to apply selectors that are not scoped
-to pseudo states, responsive design etc.
+`:vb-declarations` groups base declarations, CSS custom properties and arbitrary
+selectors. Condition groups also support nested selectors.
 
 <<< @/examples/ExampleTwentyNine.vue
 
 <ExampleTwentyNine />
 
-::: tip
-
-This is also a good place to apply _scoped CSS custom properties_.
-
-<br />
-
-:x: won't work as Vue.js does not consider --border-input a valid attribute
-
-```html
-<v-box --border-input="gray">
-  <v-box is="input" border="1px solid var(--border-input)"> </v-box
-></v-box>
-```
-
-:white_check_mark: works
+## Custom properties and vendor declarations
 
 <<< @/examples/ExampleThirty.vue
 
 <ExampleThirty />
 
-:::
+Custom properties can also use `vb---accent="red"` (the `vb-` namespace plus
+`--accent`), or `:vb="{ '--accent': 'red' }"`. Their spelling remains
+case-sensitive. Vendor declarations can be expressed inside grouped styling:
 
-## Setting Vendor prefixes
-
-The `declarations` prop is also where vendor prefixes should be applied when
-necessary. For the same reason as custom properties above, setting
-`-ms-overflow-style` directly as an attribute is invalid in Vue.js.
-
-```html
-<v-box
-  display="flex"
-  gap="1rem"
-  overflow-x="auto"
-  scrollbar-width="none"
-  :declarations="{
-        '-ms-overflow-style': 'none',
-        '&::-webkit-scrollbar': {
-          display: 'none',
-        },
-      }"
-/>
+```vue
+<template>
+  <div
+    :vb="{ '-webkit-user-select': 'none', '--accent': 'tomato' }"
+    vb-color="var(--accent)"
+  >
+    A styled element
+  </div>
+</template>
 ```
 
-::: info
+VBox's CSS serializer adds applicable vendor prefixes. Authored future/vendor
+CSS is not filtered through browser `CSS.supports`; an unsupported declaration
+is left for the browser to ignore consistently with ordinary CSS.
 
-If a CSS property has an associated vendor prefix, VBox autogenerates and
-applies the vendor prefix on your behalf. Thanks to
-[stylis](https://www.npmjs.com/package/stylis).
+## Selector boundaries
 
-NB: When you explicitly set vendor prefixes, they would only appear in the
-generated CSS if that vendor prefix is supported by the browser inwhich the code
-is running. This is because, VBox internally uses `CSS.supports` to permit style
-rules that are supported by the that browser.
+Selectors keep their native specificity. Use `&` for the current style target;
+descendant selectors, sibling selectors, lists and pseudo-elements retain their
+intended targets. Simple recognized equivalents, such as a hover shorthand and
+`pseudos: { ':hover': ... }`, share a structured context. Distinct arbitrary
+selectors do not become equivalent merely because they overlap on an element.
 
-:::
+The deterministic parent-override contract covers matching normalized contexts
+and selectors. External CSS, inline styles and `!important` can still win
+through the browser's cascade. See [style priority](./style-priority.md).
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import ExampleTwentyNine from '../../examples/ExampleTwentyNine.vue'
 import ExampleThirty from '../../examples/ExampleThirty.vue'
 </script>
