@@ -7,13 +7,13 @@ import type { AliasMap, ColorTokensInterface, FontSizeTokensInterface, FontWeigh
 declare module "@veebox/core" {
   
 interface AliasMap {
-    glass: "backdropFilter";
-    mTop: "marginTop";
-    bfilter: "backdropFilter";
-    bImage: "backgroundImage";
-    textTra: "textTransform";
-    textDeco: "textDecoration";
-    backFil: "backdropFilter";
+    "glass": "backdropFilter";
+    "mTop": "marginTop";
+    "bfilter": "backdropFilter";
+    "bImage": "backgroundImage";
+    "textTra": "textTransform";
+    "textDeco": "textDecoration";
+    "backFil": "backdropFilter";
 }
 
   interface ColorTokensInterface {
@@ -991,25 +991,30 @@ interface AliasMap {
  */
   "brand": "#d1131e" | "#e50914";
 /**
- * default: #11131f
- * dark: #f5f7ff
+ * default: #191b21
+ * dark: #f8f5ef
  */
-  "ink": "#11131f" | "#f5f7ff";
+  "ink": "#191b21" | "#f8f5ef";
 /**
- * default: #f6f8ff
- * dark: #090b16
+ * default: #f7f5f0
+ * dark: #0d1015
  */
-  "canvas": "#f6f8ff" | "#090b16";
+  "canvas": "#f7f5f0" | "#0d1015";
 /**
- * default: #dfe7ff
- * dark: #121526
+ * default: #eae6de
+ * dark: #191e26
  */
-  "canvas-soft": "#dfe7ff" | "#121526";
+  "canvas-soft": "#eae6de" | "#191e26";
 /**
- * default: #0067a5
- * dark: #00d1ff
+ * default: #80400c
+ * dark: #f3c67a
  */
-  "accent": "#0067a5" | "#00d1ff";
+  "accent": "#80400c" | "#f3c67a";
+/**
+ * default: #52565e
+ * dark: #bbc0c9
+ */
+  "muted": "#52565e" | "#bbc0c9";
 /**
  * default: #1c4ce0
  * dark: #74b9ff
@@ -1253,9 +1258,13 @@ interface AliasMap {
  */
   "full": "9999px";
 /**
- * 1rem
+ * 0.75rem
  */
-  "card": "1rem";
+  "card": "0.75rem";
+/**
+ * 1.5rem
+ */
+  "panel": "1.5rem";
 /**
  * 999px
  */

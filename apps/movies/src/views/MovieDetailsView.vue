@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useMotionPreferences } from '../composables/useMotionPreferences';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { getBackdropUrl, getPosterUrl } from '../api/tmdb';
@@ -7,7 +8,10 @@ import {
   getMovieYear,
 } from '../composables/useMovieFormatting';
 import { useMovieDetailsQuery } from '../composables/useTmdbQueries';
+import AppSkeleton from '../components/AppSkeleton.vue';
 import MovieTrailerDialog from '../components/MovieTrailerDialog.vue';
+
+const { allowViewTransition } = useMotionPreferences();
 
 const route = useRoute();
 const movieId = computed(() => Number(route.params.id));
@@ -17,8 +21,18 @@ const movie = computed(() => detailsQuery.data.value ?? null);
 </script>
 
 <template>
-  <main vb-p="sp-4" :vb-sm="{ p: 'sp-6' }">
+  <main
+    id="main-content"
+    tabindex="-1"
+    vb-max-w="100rem"
+    vb-mx="auto"
+    vb-outline="none"
+    vb-p="sp-4"
+    :vb-sm="{ p: 'sp-6' }"
+    :vb-lg="{ px: 'sp-10' }"
+  >
     <router-link
+      :view-transition="allowViewTransition"
       to="/"
       vb-color="cl-accent"
       vb-text-decoration="none"
@@ -49,7 +63,8 @@ const movie = computed(() => detailsQuery.data.value ?? null);
         :alt="`Poster for ${movie.title}`"
         vb-w="100%"
         vb-max-w="18rem"
-        vb-h="auto"
+        vb-aspect-ratio="2 / 3"
+        vb-object-fit="cover"
         vb-border-radius="br-card"
       />
 
@@ -103,7 +118,8 @@ const movie = computed(() => detailsQuery.data.value ?? null);
           :src="getBackdropUrl(movie.backdrop_path, 'w1280')"
           :alt="`Backdrop image for ${movie.title}`"
           vb-w="100%"
-          vb-h="38rem"
+          vb-aspect-ratio="16 / 9"
+          vb-h="auto"
           vb-object-fit="cover"
           vb-object-position="center top"
           vb-border-radius="br-card"
@@ -121,11 +137,12 @@ const movie = computed(() => detailsQuery.data.value ?? null);
       vb-bg="var(--color-canvas-soft)"
       vb-border="1px solid color-mix(in oklab, var(--color-ink) 14%, transparent)"
       vb-border-radius="br-card"
+      role="status"
+      aria-label="Loading movie details"
       aria-busy="true"
       aria-live="polite"
     >
-      <div
-        class="movie-skeleton"
+      <AppSkeleton
         vb-w="100%"
         vb-max-w="18rem"
         vb-h="26rem"
@@ -133,95 +150,41 @@ const movie = computed(() => detailsQuery.data.value ?? null);
       />
 
       <div vb-display="grid" vb-gap="sp-3">
-        <div
-          class="movie-skeleton"
-          vb-h="2.75rem"
-          vb-w="70%"
-          vb-border-radius="0.75rem"
-        />
-        <div
-          class="movie-skeleton"
-          vb-h="1.35rem"
-          vb-w="40%"
-          vb-border-radius="0.75rem"
-        />
-        <div
-          class="movie-skeleton"
-          vb-h="1rem"
-          vb-w="96%"
-          vb-border-radius="0.5rem"
-        />
-        <div
-          class="movie-skeleton"
-          vb-h="1rem"
-          vb-w="92%"
-          vb-border-radius="0.5rem"
-        />
-        <div
-          class="movie-skeleton"
-          vb-h="1rem"
-          vb-w="80%"
-          vb-border-radius="0.5rem"
-        />
-        <div
-          class="movie-skeleton"
-          vb-h="1rem"
-          vb-w="50%"
-          vb-border-radius="0.5rem"
-        />
+        <AppSkeleton vb-h="2.75rem" vb-w="70%" vb-border-radius="0.75rem" />
+        <AppSkeleton vb-h="1.35rem" vb-w="40%" vb-border-radius="0.75rem" />
+        <AppSkeleton vb-h="1rem" vb-w="96%" vb-border-radius="0.5rem" />
+        <AppSkeleton vb-h="1rem" vb-w="92%" vb-border-radius="0.5rem" />
+        <AppSkeleton vb-h="1rem" vb-w="80%" vb-border-radius="0.5rem" />
+        <AppSkeleton vb-h="1rem" vb-w="50%" vb-border-radius="0.5rem" />
 
         <div vb-display="flex" vb-flex-wrap="wrap" vb-gap="sp-2" vb-mt="sp-2">
-          <div
-            class="movie-skeleton"
-            vb-h="2rem"
-            vb-w="5rem"
-            vb-border-radius="999px"
-          />
-          <div
-            class="movie-skeleton"
-            vb-h="2rem"
-            vb-w="6rem"
-            vb-border-radius="999px"
-          />
-          <div
-            class="movie-skeleton"
-            vb-h="2rem"
-            vb-w="4.5rem"
-            vb-border-radius="999px"
-          />
+          <AppSkeleton vb-h="2rem" vb-w="5rem" vb-border-radius="999px" />
+          <AppSkeleton vb-h="2rem" vb-w="6rem" vb-border-radius="999px" />
+          <AppSkeleton vb-h="2rem" vb-w="4.5rem" vb-border-radius="999px" />
         </div>
 
-        <div
-          class="movie-skeleton"
+        <AppSkeleton
           vb-w="100%"
-          vb-h="38rem"
+          vb-aspect-ratio="16 / 9"
+          vb-h="auto"
           vb-border-radius="br-card"
           vb-mt="sp-3"
         />
       </div>
     </section>
-    <p v-else vb-color="cl-ink">Movie details unavailable.</p>
+    <section
+      v-else
+      role="status"
+      vb-bg="cl-canvas-soft"
+      vb-border-radius="br-panel"
+      vb-p="sp-8"
+      vb-border="1px solid color-mix(in oklab, var(--color-ink) 14%, transparent)"
+    >
+      <h1 vb-m="0" vb-fs="fs-2xl">Movie details unavailable.</h1>
+      <p vb-mb="0" vb-color="cl-muted" vb-lh="1.6">
+        We couldn't load this title. Head back home to find something else to
+        watch.
+      </p>
+    </section>
   </main>
 </template>
-
-<style scoped>
-.movie-skeleton {
-  background: linear-gradient(
-    100deg,
-    color-mix(in oklab, var(--color-ink) 8%, transparent) 20%,
-    color-mix(in oklab, var(--color-ink) 16%, transparent) 35%,
-    color-mix(in oklab, var(--color-ink) 8%, transparent) 50%
-  );
-  background-size: 200% 100%;
-  animation: movie-skeleton-shimmer 1.2s linear infinite;
-}
-
-@keyframes movie-skeleton-shimmer {
-  0% {
-    background-position: 150% 0;
-  }
-  100% {
-    background-position: -150% 0;
-  }
-}
-</style>

@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
-import gsap from 'gsap';
+import { computed } from 'vue';
 import { getBackdropUrl } from '../api/tmdb';
 import {
   getMovieRating,
@@ -14,49 +13,29 @@ const props = defineProps<{
   movie: TmdbMovie | null;
 }>();
 
-const heroRef = ref<HTMLElement | null>(null);
-const contentRef = ref<HTMLElement | null>(null);
-
 const backdrop = computed(() =>
   props.movie?.backdrop_path
     ? getBackdropUrl(props.movie.backdrop_path, 'original')
     : 'https://placehold.co/1400x800/0B1020/FFFFFF?text=VBox+Movies',
 );
-
-onMounted(() => {
-  if (!heroRef.value || !contentRef.value) return;
-
-  gsap.fromTo(
-    heroRef.value,
-    { opacity: 0, scale: 1.02 },
-    { opacity: 1, scale: 1, duration: 0.8, ease: 'power2.out' },
-  );
-
-  gsap.fromTo(
-    contentRef.value.children,
-    { y: 18, opacity: 0 },
-    { y: 0, opacity: 1, duration: 0.7, stagger: 0.08, ease: 'power2.out' },
-  );
-});
 </script>
 
 <template>
   <section
-    ref="heroRef"
     vb-position="relative"
-    vb-min-h="60vh"
+    vb-min-h="32rem"
+    :vb-md="{ minHeight: '36rem', padding: 'sp-10' }"
     vb-display="grid"
     vb-align-items="end"
-    vb-p="sp-5"
+    vb-p="sp-6"
     vb-border-radius="br-card"
     vb-overflow="hidden"
     vb-border="1px solid color-mix(in oklab, var(--color-ink) 14%, transparent)"
-    vb-shadow="bs-card"
-    :vb-bg-image="`linear-gradient(to top, color-mix(in oklab, var(--color-canvas) 92%, transparent), color-mix(in oklab, var(--color-canvas) 24%, transparent)), url(${backdrop})`"
+    :vb-bg-image="`linear-gradient(90deg, var(--color-canvas) 0%, color-mix(in oklab, var(--color-canvas) 92%, transparent) 35%, transparent 100%), linear-gradient(to top, var(--color-canvas), transparent), url(${backdrop})`"
     vb-bg-size="cover"
     vb-bg-position="center"
   >
-    <div ref="contentRef" vb-display="grid" vb-gap="sp-3" vb-max-w="42rem">
+    <div vb-display="grid" vb-gap="sp-3" vb-max-w="36rem">
       <p
         vb-m="0"
         vb-fs="fs-sm"
@@ -68,14 +47,24 @@ onMounted(() => {
         Featured Tonight
       </p>
 
-      <h1 vb-m="0" vb-fs="clamp(2rem,6vw,4rem)" vb-lh="1.02" vb-color="cl-ink">
+      <h1
+        vb-m="0"
+        vb-fs="clamp(3rem,7vw,6rem)"
+        vb-fw="800"
+        vb-ls="-0.055em"
+        vb-overflow-wrap="anywhere"
+        vb-lh="1.05"
+        vb-color="cl-ink"
+      >
         {{ movie?.title ?? 'Discover your next obsession' }}
       </h1>
 
       <p
         vb-m="0"
         vb-fs="fs-base"
-        vb-color="color-mix(in oklab, var(--color-ink) 86%, transparent)"
+        vb-lh="1.7"
+        vb-max-w="48ch"
+        vb-color="cl-muted"
       >
         {{
           movie?.overview ?? 'Set your TMDB key to unlock live recommendations.'
@@ -86,7 +75,13 @@ onMounted(() => {
         {{ getMovieYear(movie) }} • ★ {{ getMovieRating(movie) }}
       </p>
 
-      <div vb-display="flex" vb-gap="sp-3" vb-mt="sp-2">
+      <div
+        vb-display="flex"
+        vb-flex-wrap="wrap"
+        vb-align-items="center"
+        vb-gap="sp-3"
+        vb-mt="sp-4"
+      >
         <MovieTrailerDialog
           v-if="movie"
           :movie-id="movie.id"
@@ -100,7 +95,6 @@ onMounted(() => {
           as="router-link"
           :to="`/movie/${movie.id}`"
           variant="solid"
-          size="sm"
         >
           View Details
         </AppButton>

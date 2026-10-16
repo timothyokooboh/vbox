@@ -5,6 +5,7 @@ import { VBoxPlugin } from '@veebox/vue';
 import App from './App.vue';
 import { router } from './router';
 import vboxConfig from '../vbox.config';
+import '@fontsource-variable/manrope';
 import './styles.css';
 
 const app = createApp(App);

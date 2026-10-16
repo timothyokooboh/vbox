@@ -21,10 +21,16 @@ const featuredMovie = computed(
 
 <template>
   <main
+    id="main-content"
+    tabindex="-1"
+    vb-max-w="100rem"
+    vb-mx="auto"
+    vb-outline="none"
     vb-display="grid"
-    vb-gap="sp-8"
+    vb-gap="sp-10"
     vb-p="sp-4"
     :vb-sm="{ p: 'sp-6' }"
+    :vb-lg="{ px: 'sp-10' }"
     role="main"
   >
     <HeroBanner :movie="featuredMovie" />
@@ -33,24 +39,28 @@ const featuredMovie = computed(
       title="Trending This Week"
       :movies="trendingQuery.data.value?.results ?? []"
       :loading="trendingQuery.isLoading.value"
+      :error="trendingQuery.isError.value"
     />
 
     <MovieRow
       title="Popular"
       :movies="popularQuery.data.value?.results ?? []"
       :loading="popularQuery.isLoading.value"
+      :error="popularQuery.isError.value"
     />
 
     <MovieRow
       title="Top Rated"
       :movies="topRatedQuery.data.value?.results ?? []"
       :loading="topRatedQuery.isLoading.value"
+      :error="topRatedQuery.isError.value"
     />
 
     <MovieRow
       title="Now Playing"
       :movies="nowPlayingQuery.data.value?.results ?? []"
       :loading="nowPlayingQuery.isLoading.value"
+      :error="nowPlayingQuery.isError.value"
     />
   </main>
 </template>
