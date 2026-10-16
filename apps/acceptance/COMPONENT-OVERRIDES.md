@@ -48,9 +48,9 @@ integration and diagnostics are covered by the explicit-target ticket.
 
 The published polymorphic VBox engine retains its existing raw CSS collection
 path. Its integration with new owner metadata is the later legacy-composition
-ticket. This slice's override examples use native styling internally and at the
-call site. Nested ownership/lifetime tests and full SSR/hydration hardening are
-also subsequent slices, not claimed complete here.
+ticket. These override examples use native styling internally and at the call
+site. Nested ownership/lifetime examples are now in `NESTED-OWNERSHIP.md`; full
+SSR/hydration hardening remains a subsequent slice.
 
 ## Evidence
 
