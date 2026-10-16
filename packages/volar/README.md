@@ -1,25 +1,65 @@
 # @veebox/volar
 
-Volar plugin that provides hover previews and completion assistance for VBox style usage inside Vue templates.
+Contextual Vue template completions and design-token previews for VBox.
 
-Examples:
-
-- `fs="fs-lg"` -> `VBox token preview fs-lg => 1.125rem`
-- `border="1px solid cl-brand"` -> hover on `cl-brand`
-- `:pseudos="{ ':hover': { bg: 'cl-emerald-400' } }"` -> hover on `cl-emerald-400`
-- `color=""` -> token value suggestions (for example `cl-*`)
-- `fs=""` -> token value suggestions (for example `fs-*`)
-- style attribute names/aliases receive completion support on parsed elements
-
-## Install
-
-```bash
-pnpm add -D @veebox/volar
+```vue
+<template>
+  <button
+    type="button"
+    vb-font-size="fs-lg"
+    vb-border="1px solid cl-brand"
+    :vb-hover="{ color: 'cl-brand' }"
+  >
+    Save
+  </button>
+</template>
 ```
 
 ## Setup
 
-Add the plugin to your tsconfig / jsconfig used by Vue language tools:
+Install `@veebox/volar` as a development dependency. Enable it in the tsconfig
+or jsconfig used by Vue language tools, not in `package.json`:
+
+```json
+{
+  "vueCompilerOptions": {
+    "plugins": ["@veebox/volar"]
+  }
+}
+```
+
+Use Vue - Official in VS Code, or an editor integration supporting Vue language
+tools plugins. Restart the Vue/TypeScript service after first enabling the
+plugin. It supplies editor assistance; install `@veebox/unplugin` separately to
+compile native styling. No completion switches, extra language server or
+editor-specific VBox extension are required.
+
+## Completions and previews
+
+- Complete `vb-*` properties, aliases and object groups on HTML, SVG and Vue
+  component instances. Static camelCase spellings work too.
+- Empty `vb-font-size` / `vb-fs` values suggest font-size tokens, token
+  variables and raw CSS values. Color properties, including `vb-border-color`,
+  use color vocabulary instead.
+- Nested `:vb` / condition / query / selector objects use their leaf property.
+  Compound values complete individual token segments.
+- Ordinary semantic bindings and PVA function arguments retain Vue/TypeScript
+  behavior. The published `<VBox>` interface remains supported.
+- Hover recognized tokens for their configured raw values. Hover improvements
+  are tracked separately from this completion update.
+
+Use `defineConfig` from `@veebox/core` to preserve literal config types and
+enable config-only completion updates without editing the Vue document. Plain
+config exports work too; values widened by TypeScript refresh their inferred
+meaning on the next Vue document edit. Broad config type annotations also widen
+token and alias keys; prefer `defineConfig` for live literal-key tracking.
+Included generated `vbox.d.ts` declarations continue to contribute tokens and
+aliases; regenerate them after config changes.
+
+## Config locations
+
+By default, config is discovered from the consumer tsconfig directory. For a
+nonstandard location:
 
 ```json
 {
@@ -27,14 +67,19 @@ Add the plugin to your tsconfig / jsconfig used by Vue language tools:
     "plugins": [
       {
         "name": "@veebox/volar",
-        "configPath": "./vbox.config.ts",
-        "parseAllComponents": false,
-        "forceSemanticAttrs": ["src"],
-        "forceStyleAttrs": ["myCustomStyleAttr"]
+        "rootDir": ".",
+        "configPath": "./theme/vbox.config.ts"
       }
     ]
   }
 }
 ```
 
-Then restart the TypeScript server in your IDE.
+Optional `aliases: ["brandColor"]` replaces discovered custom alias keys, rather
+than merging them. Default aliases still follow the runtime config's alias
+strategy. Keep compiler and editor metadata aligned.
+
+Verified with Vue language-core/vue-tsc 3.2.5 and TypeScript 5.9.3. Incomplete
+tags work when Vue can recover the outer template block. The repository's
+`apps/acceptance/EDITOR.md` documents executable consumer checks and
+limitations.

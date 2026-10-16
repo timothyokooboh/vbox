@@ -1,4 +1,7 @@
 export interface VBoxVolarPluginConfig {
+  /** Replaces discovered custom alias keys; default aliases still follow config strategy. */
+  aliases?: string[];
+
   /**
    * Project root used to resolve `vbox.config.*` and `@veebox/core`.
    * Defaults to the tsconfig directory when available.

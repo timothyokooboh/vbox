@@ -41,7 +41,8 @@
   "dependencies": {
     "@veebox/core": "workspace:*",
     "jiti": "^2.6.1",
-    "known-css-properties": "^0.37.0"
+    "known-css-properties": "^0.37.0",
+    "typescript": "~5.9.3"
   },
   "devDependencies": {
     "@vue/compiler-dom": "^3.5.24"

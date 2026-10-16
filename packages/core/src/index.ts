@@ -58,7 +58,9 @@ export type {
 export type { StyleCollector } from './helpers/styleRegistry';
 export type { CssPriority } from './helpers/styleRegistry';
 
-export function defineConfig(config: VBoxPluginOptions) {
+export function defineConfig<const Config extends VBoxPluginOptions>(
+  config: Config,
+) {
   resolveBreakpoints(config.breakpoints);
   validateAliasKeys(Object.keys(config.aliases?.values ?? {}));
   return config;
