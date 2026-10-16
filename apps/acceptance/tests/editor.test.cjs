@@ -351,3 +351,14 @@ test('quoted CSS content values cannot corrupt editor-generated TypeScript', (t)
   t.after(() => editor.dispose());
   assert.deepEqual(editor.diagnostics(), []);
 });
+
+test('single-root component props remain semantic alongside independent namespaced styling', (t) => {
+  const source = `<script setup lang="ts">import '@veebox/vue'; import { defineComponent } from 'vue'; import type { VBoxStyles } from '@veebox/core'; const StyledButton = defineComponent({ props: { color: String, width: Number } }); const styles: VBoxStyles = { color: 'yellow', hover: { color: 'red' } };</script><template><StyledButton color="semantic" :width="123" :vb="styles" vb-width="250px">Button</StyledButton></template>`;
+  const editor = createEditor(source);
+  t.after(() => editor.dispose());
+  assert.deepEqual(editor.diagnostics(), []);
+  editor.update(source.replace(':width="123"', ':width="\'invalid\'"'));
+  assert.ok(
+    editor.diagnostics().some((item) => /number/.test(item.messageText)),
+  );
+});

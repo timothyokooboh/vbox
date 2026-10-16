@@ -1,12 +1,18 @@
-import { inject, useSSRContext, mergeProps, type ComponentOptions } from 'vue';
+import {
+  inject,
+  getCurrentInstance,
+  useSSRContext,
+  mergeProps,
+  type ComponentOptions,
+} from 'vue';
 import {
   type AliasMap,
   DefaultAliases,
   DefaultBreakpoints,
   createDjb2Hash,
-  injectCSS,
+  injectStyleBundle,
   composeStyleSources,
-  renderStyleDeclarations,
+  renderStyleRules,
 } from '@veebox/core';
 import {
   aliasKey,
@@ -17,6 +23,9 @@ import { getSSRCollector, type VBoxSSRContext } from '../ssr';
 
 /** Compiler runtime: class bindings participate in Vue rendering and hydration. */
 export const useVBoxStyleBinding = () => {
+  let ownerDepth = 0;
+  for (let owner = getCurrentInstance()?.parent; owner; owner = owner.parent)
+    ownerDepth++;
   const aliases = inject<AliasMap>(aliasKey, DefaultAliases);
   const breakpoints =
     inject(breakpointsKey, DefaultBreakpoints) ?? DefaultBreakpoints;
@@ -30,11 +39,17 @@ export const useVBoxStyleBinding = () => {
     grouped?: unknown,
   ) => {
     const styles = composeStyleSources(grouped, direct, aliases);
-    const hash = createDjb2Hash(JSON.stringify([styles, aliases, breakpoints]));
+    const hash = createDjb2Hash(
+      JSON.stringify([styles, aliases, breakpoints, ownerDepth]),
+    );
     const className = `${prefix ? `${prefix}-` : ''}css-${hash}`;
-    const css = renderStyleDeclarations(styles, className, breakpoints);
-    if (context) getSSRCollector(context).collect(css);
-    else injectCSS(css);
+    const bundle = {
+      key: className,
+      ownerDepth,
+      rules: renderStyleRules(styles, className, breakpoints),
+    };
+    if (context) getSSRCollector(context).collectStyleBundle(bundle);
+    else injectStyleBundle(bundle);
     return mergeProps(semanticProps ?? {}, { class: className });
   };
 };
