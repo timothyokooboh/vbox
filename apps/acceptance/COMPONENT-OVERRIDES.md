@@ -43,13 +43,12 @@ normalized contexts/selectors. External CSS/inline/important behavior is unchang
 Unprefixed component props, attrs, listeners, refs, slots, model bindings, class
 arrays/objects and style arrays continue through Vue's own machinery. VBox adds
 no wrapper and does not replace the component's root. Fragment/multiple-root and
-`inheritAttrs: false` components must choose their own forwarding target; that
-integration and diagnostics are covered by the explicit-target ticket.
+`inheritAttrs: false` components must choose their own forwarding target; the
+patterns and diagnostics are documented in `EXPLICIT-TARGETS.md`.
 
-The published polymorphic VBox engine retains its existing raw CSS collection
-path. Its integration with new owner metadata is the later legacy-composition
-ticket. These override examples use native styling internally and at the call
-site. Nested ownership/lifetime examples are now in `NESTED-OWNERSHIP.md`; full
+The published polymorphic VBox now feeds its legacy style props into the same
+structured collection path; `EXPLICIT-TARGETS.md` covers mixed old/new bindings.
+These override examples use native styling internally and at the call site. Nested ownership/lifetime examples are now in `NESTED-OWNERSHIP.md`; full
 SSR/hydration hardening remains a subsequent slice.
 
 ## Evidence
