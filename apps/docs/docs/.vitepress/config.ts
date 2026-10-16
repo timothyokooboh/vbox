@@ -1,8 +1,10 @@
+import { vboxSsgHooks } from './vbox-ssg';
 import { defineConfig } from 'vitepress';
 import { vboxVitePlugin } from '@veebox/unplugin/vite';
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  ...vboxSsgHooks,
   vite: {
     plugins: [vboxVitePlugin()],
   },
@@ -32,14 +34,23 @@ export default defineConfig({
         items: [
           { text: 'Introduction', link: '/guide/introduction' },
           { text: 'Installation', link: '/guide/installation' },
+          { text: 'Migration', link: '/guide/migration' },
         ],
       },
       {
         text: 'Essentials',
         items: [
-          { text: 'Polymorphism', link: '/guide/essentials/polymorphism' },
+          {
+            text: 'Supported legacy VBox',
+            link: '/guide/essentials/polymorphism',
+          },
           { text: 'Native syntax', link: '/guide/essentials/native-syntax' },
-          { text: 'Style props', link: '/guide/essentials/style-props' },
+          { text: 'Style bindings', link: '/guide/essentials/style-props' },
+          { text: 'Style priority', link: '/guide/essentials/style-priority' },
+          {
+            text: 'Component targets',
+            link: '/guide/essentials/component-targets',
+          },
           {
             text: 'CSS property aliases',
             link: '/guide/essentials/css-properties-alias',
@@ -102,14 +113,14 @@ export default defineConfig({
         ],
       },
       {
-        text: 'Up Next',
+        text: 'Integrations',
         items: [
           {
-            text: 'Full SSR Support',
+            text: 'SSR and hydration',
             link: '/up-next/ssr-support',
           },
           {
-            text: 'Enhanced DX',
+            text: 'Editor and types',
             link: '/up-next/enhanced-dx',
           },
         ],

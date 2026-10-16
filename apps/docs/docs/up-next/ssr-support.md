@@ -1,74 +1,101 @@
-# Full SSR Support
+# SSR and Hydration
 
-VBox currently works out of the box in client-rendered Vue applications. For SSR
-setups (for example, Nuxt with SSR enabled), styles must be collected during the
-server render and injected into the HTML head to avoid a flash of unstyled
-content.
+VBox renders without browser globals. SSR safety still requires **collecting CSS
+per request and embedding it before the rendered content**. An SSR-safe runtime
+alone cannot prevent a flash if the host omits the stylesheet or chooses the
+initial theme only after mounting.
 
-## How SSR Works
-
-During SSR, `VBox` does not inject styles into the DOM. Instead it collects the
-generated CSS into the Vue SSR context. After rendering, you can read the
-collected CSS and insert it into the HTML response.
-
-This approach is build-tool agnostic and works with any SSR setup.
-
-## Vue SSR Usage
+## Vue SSR
 
 ```ts
 import { createSSRApp } from 'vue';
 import { renderToString } from '@vue/server-renderer';
-import { VBoxPlugin, VBOX_SSR_COLLECTOR_KEY } from '@veebox/vue';
+import { VBoxPlugin, getSSRStyles } from '@veebox/vue';
 import App from './App.vue';
+import config from './vbox.config';
 
-const app = createSSRApp(App);
-app.use(VBoxPlugin);
-
-const ctx = {};
-const html = await renderToString(app, ctx);
-const css = ctx[VBOX_SSR_COLLECTOR_KEY]?.getCss() ?? '';
-
-// Inject into the HTML head
-const head = `<style id="vbox-ssr">${css}</style>`;
+export async function render() {
+  const app = createSSRApp(App).use(VBoxPlugin, config);
+  const context = {};
+  const html = await renderToString(app, context);
+  const css = getSSRStyles(context);
+  return { html, css }; // put CSS in the response head before sending the body
+}
 ```
 
-You can also use `getSSRStyles(ctx)` from `@veebox/vue` to read the CSS.
+Create a fresh app/context per request. Never reuse a global collector across
+requests. `getSSRCollector(context)` exposes the collector when explicitly
+needed; `getSSRStyles(context)` reads it. Reset/theme CSS precedes structured
+declarations. Use the same config, initial data and component-owner tree on both
+sides.
 
-## Nux.js
+## Nuxt
 
-In Nuxt, you can read the SSR context in a server plugin or renderer hook and
-append the collected CSS into the head. The key is the same:
-`VBOX_SSR_COLLECTOR_KEY`.
+These are the files used by the executable workspace Nuxt consumer. Keep helper
+modules in `server/utils`, not `server/plugins`, where Nitro expects a default
+plugin export. Use Nuxt's `defineNitroPlugin` auto-import rather than importing
+Nitro internal runtime/virtual modules.
 
-### Nuxt Server Plugin Example
+### Compiler and editor configuration
 
-```ts
-// server/plugins/vbox-ssr.ts
-import { defineNitroPlugin } from 'nitropack/runtime';
-import { VBOX_SSR_COLLECTOR_KEY } from '@veebox/vue';
+<<< @/../../vboxssr/nuxt.config.ts
 
-export default defineNitroPlugin((nitroApp) => {
-  nitroApp.hooks.hook('render:html', (html, { event }) => {
-    const ctx = event?.context as Record<string, unknown> | undefined;
-    const css =
-      (
-        ctx?.[VBOX_SSR_COLLECTOR_KEY] as { getCss?: () => string } | undefined
-      )?.getCss?.() ?? '';
+The absolute config path anchors editor resolution even though Nuxt generates
+its app tsconfig under `.nuxt`. Install matching workspace/beta packages for
+core, Vue, unplugin and Volar. Nuxt's normal TypeScript dependencies still
+apply.
 
-    if (css) {
-      html.head.push(`<style id="vbox-ssr">${css}</style>`);
-    }
-  });
-});
-```
+### Shared Vue plugin
 
-The collector is also mirrored onto `event.context` automatically, so you can
-read it directly in the `render:html` hook as shown above.
+<<< @/../../vboxssr/app/plugins/vbox.ts
 
-## SSR Checklist
+### Server collector reader
 
-- Ensure the Vue app installs `VBoxPlugin` during SSR.
-- Render with a fresh SSR context per request.
-- Read styles from `ctx[VBOX_SSR_COLLECTOR_KEY]`.
-- Inject the resulting CSS into the HTML `<head>` before sending the response.
-- Make sure the style tag is included before hydration to avoid FOUC.
+<<< @/../../vboxssr/server/utils/vbox-ssr-shared.mjs
+
+### Head injection
+
+<<< @/../../vboxssr/server/plugins/vbox-ssr.ts
+
+The Vue integration mirrors its request collector onto the Nitro event context.
+No extra `vue:setup` bridge, client-only wrapper, UMD alias or blanket
+`ssr.noExternal` workaround is required for the tested package exports.
+
+## VitePress
+
+This docs site is also a real SSG consumer. Its theme installs `VBoxPlugin`, and
+its build uses these hooks to move page-local collected CSS into the HTML head:
+
+<<< @/.vitepress/vbox-ssg.ts
+
+Spread `vboxSsgHooks` into `defineConfig`, and register `vboxVitePlugin()` in
+the config's `vite.plugins`. `postRender` receives the Vue SSR context;
+`transformHtml` receives the final HTML, not that same context. The per-page
+transport avoids a shared process-global CSS accumulator and keeps style tags
+out of the hydrated app tree. These hooks target the tested VitePress
+2.0.0-alpha.15 API; adapt the host integration if its rendering hooks change.
+
+## Checklist and limits
+
+- Install `VBoxPlugin` on both server and client; use a stateful/SFC application
+  shell. A purely functional root with no stateful descendants does not run the
+  automatic prelude lifecycle hook.
+- Put request-local collected CSS in the initial head. Inline CSS must follow
+  your CSP/nonce policy and come from trusted authored styles, not unsanitized
+  user input. This integration is not an HTML/CSS sanitizer.
+- Set initial `html.dark` before first paint from server-readable state or an
+  appropriate pre-paint bootstrap; keep hydration state consistent. A
+  mounted-only theme change can still flash.
+- Collect keyframes with the same request collector; see
+  [keyframes](../guide/essentials/keyframes.md).
+- Verify with JavaScript disabled, delayed hydration, navigation,
+  responsive/theme interactions and caller override withdrawal. `CSS.supports`
+  being absent or returning a different answer must not change generated
+  identity.
+- Evidence covers buffered Vue SSR with Vite/webpack, Nuxt 4's tested Node Nitro
+  server, and this VitePress SSG integration. It does not establish streaming,
+  every deployment preset, edge workers or every third-party component library.
+
+The repository commands `pnpm --filter @vbox/acceptance test:nuxt` and
+`pnpm --filter @vbox/acceptance test:consumers` exercise the actual Nuxt and
+playground applications. No publication or deployment is necessary.

@@ -1,10 +1,10 @@
 <template>
   <p
-    text-align="center"
-    padding="1rem"
-    color="#fff"
-    background-color="#000"
-    :dark="{
+    vb-text-align="center"
+    vb-padding="1rem"
+    vb-color="#fff"
+    vb-background-color="#000"
+    :vb-dark="{
       backgroundColor: '#fff',
       color: '#000',
     }"

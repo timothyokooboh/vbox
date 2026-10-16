@@ -105,6 +105,9 @@ importers:
       '@veebox/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@veebox/property-variance-authority':
+        specifier: workspace:*
+        version: link:../../packages/property-variance-authority
       '@veebox/unplugin':
         specifier: workspace:*
         version: link:../../packages/unplugin

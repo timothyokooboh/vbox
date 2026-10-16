@@ -1,7 +1,7 @@
 <template>
   <!-- on hover, change the color of the next sibling -->
   <span
-    :hover="{
+    :vb-hover="{
       '& + [data-scope=sibling]': {
         color: 'tomato',
       },
