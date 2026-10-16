@@ -1,10 +1,15 @@
 import { parse, babelParse, type SFCTemplateBlock } from '@vue/compiler-sfc';
 import MagicString, { type Bundle } from 'magic-string';
-import { hasRuntimeImport, wrapOptionsScript } from './scriptBinding.js';
+import {
+  hasRuntimeImport,
+  wrapOptionsScript,
+  wrapExternalScript,
+} from './scriptBinding.js';
 import { createStyleError } from './diagnostics.js';
 import { createExpressionMapper } from './expressionMap.js';
 import {
   getStyleBindingKey,
+  getConditionKey,
   kebabToCamelCase,
   ObjectStyleKeys,
   toKebabCase,
@@ -85,11 +90,24 @@ export const transformExplicitStyles = (
 ): VBoxSfcTransformPayload | null => {
   const { descriptor, errors } = parse(code, { filename: id });
   if (descriptor.template?.lang && descriptor.template.lang !== 'html') {
-    throw createStyleError(
-      id,
-      descriptor.template.loc.start,
-      `Native styling requires an HTML template; ${descriptor.template.lang} preprocessing is not supported.`,
+    const template = descriptor.template;
+    // Preprocessors own their syntax. This advisory detects likely explicit
+    // styling only; never parse or rewrite their source as HTML.
+    const hasExplicitStyle = /\bvb(?:-[\w-]+|[A-Z]\w*)\s*=|:vb\s*=/.test(
+      template.content,
     );
+    return {
+      code,
+      map: null,
+      warnings: hasExplicitStyle
+        ? [
+            {
+              message: `[VBox] ${id}:${template.loc.start.line} Native styling requires an HTML template; ${template.lang} preprocessing is not supported. This block was left unchanged.`,
+              loc: template.loc.start,
+            },
+          ]
+        : [],
+    };
   }
   if (!descriptor.template?.ast) return null;
   const output = new MagicString(code);
@@ -171,7 +189,7 @@ export const transformExplicitStyles = (
           `Invalid style property name ${JSON.stringify(name)}.`,
         );
       }
-      const identity = name === 'vb' ? ':vb' : key;
+      const identity = name === 'vb' ? ':vb' : (getConditionKey(key) ?? key);
       if (seen.has(identity))
         throw createStyleError(
           id,
@@ -251,13 +269,9 @@ export const transformExplicitStyles = (
     if (descriptor.scriptSetup) {
       output.appendLeft(descriptor.scriptSetup.loc.start.offset, statement);
     } else {
-      if (descriptor.script?.src)
-        throw createStyleError(
-          id,
-          descriptor.script.loc.start,
-          'Explicit native styling requires an inline script; move the component export into this SFC. External script integration is not supported.',
-        );
-      if (descriptor.script) {
+      if (descriptor.script?.src) {
+        wrapExternalScript(output, descriptor.script, bindingName);
+      } else if (descriptor.script) {
         mappedOutput = wrapOptionsScript(
           output,
           descriptor.script,

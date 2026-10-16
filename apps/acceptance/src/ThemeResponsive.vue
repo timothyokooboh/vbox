@@ -58,7 +58,7 @@ const named: VBoxStyles = {
     <p
       data-testid="clean-2xl"
       :vb-2xl="{ color: 'red' }"
-      :vb-_2xl="{ opacity: 0.5 }"
+      :vb="{ _2xl: { opacity: 0.5 } }"
     >
       2xl spellings
     </p>
