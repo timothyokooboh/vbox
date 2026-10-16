@@ -22,8 +22,8 @@ pnpm --filter @vbox/acceptance benchmark
 ```
 
 The `test` script builds independent Vite/webpack production clients and SSR
-entries, then builds the real Nuxt fixture and runs its browser checks.
-After a build, focus without rebuilding:
+entries, then builds the real Nuxt fixture and runs its browser checks. After a
+build, focus without rebuilding:
 
 ```sh
 pnpm --filter @vbox/acceptance run test:browser --project=vite-chromium -g hover
@@ -46,6 +46,9 @@ The editor test invokes the TypeScript/Vue service adapter and public quick-info
 requests, including a live edit; it does not call VBox private `_test` exports.
 The `vue-tsc` fixture consumes the actual package declarations. Wider completion
 and diagnostic assertions are added alongside the corresponding feature slices.
+
+See [Vue editing and builds](./BUILDS.md) for the supported template forms,
+source-map handoff, actual HMR coverage and installed-artifact checks.
 
 ## Expansion plan
 

@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import http from 'node:http';
+import WebpackDevServer from 'webpack-dev-server';
 import { createRequire } from 'node:module';
 import { createServer } from 'vite';
 import vue from '@vitejs/plugin-vue';
@@ -12,6 +12,11 @@ const require = createRequire(import.meta.url);
 const config = (property: string, color: string) =>
   `export default { enableDefaultTheme: false, aliases: { values: { accent: '${property}' } }, theme: { color: { brand: '${color}' } } };`;
 
+const appSource = (
+  size = '32px',
+) => `<script setup>import { ref } from 'vue'; const count = ref(0);</script>
+<template><p vb-accent="${size}" vb-color="cl-brand">Live config</p><button @click="count++">Count {{ count }}</button></template>`;
+
 export async function startDevFixture(driver: 'vite' | 'webpack') {
   const root = await fs.mkdtemp(path.resolve('.dev-case-'));
   const file = path.join(root, 'vbox.config.js');
@@ -20,10 +25,7 @@ export async function startDevFixture(driver: 'vite' | 'webpack') {
   await fs.writeFile(path.join(root, 'package.json'), '{"type":"module"}');
   await fs.writeFile(path.join(root, 'index.html'), index);
   await fs.writeFile(file, config('width', 'red'));
-  await fs.writeFile(
-    path.join(root, 'App.vue'),
-    '<template><p vb-accent="32px" vb-color="cl-brand">Live config</p></template>',
-  );
+  await fs.writeFile(path.join(root, 'App.vue'), appSource());
   await fs.writeFile(
     path.join(root, 'main.js'),
     `import { createApp } from 'vue'; import { VBoxPlugin } from '@veebox/vue'; import App from './App.vue'; import config from './vbox.config.js'; createApp(App).use(VBoxPlugin, config).mount('#app');`,
@@ -48,6 +50,8 @@ export async function startDevFixture(driver: 'vite' | 'webpack') {
     return {
       url: `http://127.0.0.1:${address.port}`,
       update: () => fs.writeFile(file, config('height', 'blue')),
+      updateSource: () =>
+        fs.writeFile(path.join(root, 'App.vue'), appSource('64px')),
       close: async () => {
         await server.close();
         await remove();
@@ -73,54 +77,34 @@ export async function startDevFixture(driver: 'vite' | 'webpack') {
       }),
     ],
   });
-  let resolveBuild: () => void;
-  let rejectBuild: (error: Error) => void;
-  const nextBuild = () =>
-    new Promise<void>((resolve, reject) => {
-      resolveBuild = resolve;
-      rejectBuild = reject;
-    });
-  const first = nextBuild();
-  const watcher = compiler.watch({}, (error, stats) => {
-    if (error || stats?.hasErrors())
-      rejectBuild(error ?? new Error(stats!.toString('errors-only')));
-    else resolveBuild();
-  });
-  const server = http.createServer(async (request, response) => {
-    try {
-      if (request.url === '/main.js') {
-        response.setHeader('Content-Type', 'text/javascript');
-        response.end(await fs.readFile(path.join(output, 'main.js')));
-      } else response.end(index);
-    } catch (error) {
-      response.statusCode = 500;
-      response.end(String(error));
-    }
-  });
+  const server = new WebpackDevServer(
+    {
+      host: '127.0.0.1',
+      port: 0,
+      hot: true,
+      static: { directory: root, watch: false },
+      devMiddleware: { stats: 'errors-only' },
+      client: { logging: 'none', overlay: false },
+    },
+    compiler,
+  );
   const close = async () => {
-    await new Promise<void>((resolve) => watcher.close(() => resolve()));
+    await server.stop();
     await new Promise<void>((resolve) => compiler.close(() => resolve()));
-    server.closeAllConnections();
-    await new Promise<void>((resolve) => server.close(() => resolve()));
     await remove();
   };
   try {
-    await first;
-    await new Promise<void>((resolve) =>
-      server.listen(0, '127.0.0.1', resolve),
-    );
+    await server.start();
   } catch (error) {
     await close();
     throw error;
   }
-  const address = server.address() as { port: number };
+  const address = server.server!.address() as { port: number };
   return {
     url: `http://127.0.0.1:${address.port}`,
-    update: async () => {
-      const built = nextBuild();
-      await fs.writeFile(file, config('height', 'blue'));
-      await built;
-    },
+    update: () => fs.writeFile(file, config('height', 'blue')),
+    updateSource: () =>
+      fs.writeFile(path.join(root, 'App.vue'), appSource('64px')),
     close,
   };
 }

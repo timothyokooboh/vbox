@@ -1,4 +1,8 @@
-import MagicString, { SourceMap, type SourceMapSegment } from 'magic-string';
+import MagicString, {
+  SourceMap,
+  type Bundle,
+  type SourceMapSegment,
+} from 'magic-string';
 
 type Location = { start: { offset: number }; end: { offset: number } };
 const lineStarts = (text: string) => {
@@ -56,10 +60,10 @@ export const createExpressionMapper = (source: string) => {
       bindings.push({ text, offsets });
       return text;
     },
-    generateMap(output: MagicString, id: string) {
+    generateMap(output: MagicString | Bundle, id: string) {
       const code = output.toString();
       const map = output.generateDecodedMap({
-        source: id,
+        ...(output instanceof MagicString ? { source: id } : {}),
         includeContent: true,
         hires: true,
       });

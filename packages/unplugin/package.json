@@ -43,10 +43,12 @@
     "test": "pnpm build && node --test tests/**/*.test.mjs"
   },
   "dependencies": {
+    "@jridgewell/remapping": "^2.3.5",
     "@veebox/core": "workspace:*",
+    "@vue/compiler-dom": "^3.5.24",
+    "@vue/compiler-sfc": "^3.5.24",
     "jiti": "^2.6.1",
     "known-css-properties": "^0.37.0",
-    "@vue/compiler-sfc": "^3.5.24",
     "magic-string": "^0.30.21"
   },
   "devDependencies": {
