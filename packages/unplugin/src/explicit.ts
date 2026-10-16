@@ -1,10 +1,7 @@
-import {
-  parse,
-  babelParse,
-  rewriteDefault,
-  type SFCTemplateBlock,
-} from '@vue/compiler-sfc';
-import MagicString from 'magic-string';
+import { parse, babelParse, type SFCTemplateBlock } from '@vue/compiler-sfc';
+import MagicString, { type Bundle } from 'magic-string';
+import { hasRuntimeImport, wrapOptionsScript } from './scriptBinding.js';
+import { createStyleError } from './diagnostics.js';
 import { createExpressionMapper } from './expressionMap.js';
 import {
   getStyleBindingKey,
@@ -86,9 +83,17 @@ export const transformExplicitStyles = (
   code: string,
   id: string,
 ): VBoxSfcTransformPayload | null => {
-  const { descriptor } = parse(code, { filename: id });
+  const { descriptor, errors } = parse(code, { filename: id });
+  if (descriptor.template?.lang && descriptor.template.lang !== 'html') {
+    throw createStyleError(
+      id,
+      descriptor.template.loc.start,
+      `Native styling requires an HTML template; ${descriptor.template.lang} preprocessing is not supported.`,
+    );
+  }
   if (!descriptor.template?.ast) return null;
   const output = new MagicString(code);
+  let mappedOutput: MagicString | Bundle = output;
   let changed = false;
   let literalRegion = false;
   let bindingName = '__vboxStyles';
@@ -149,8 +154,10 @@ export const transformExplicitStyles = (
           'title',
         ].includes(node.tag)
       ) {
-        throw new SyntaxError(
-          `[VBox] ${name} needs a rendered element; put the binding on the intended HTML/SVG element or component, not <${node.tag}>.`,
+        throw createStyleError(
+          id,
+          prop.loc.start,
+          `${name} needs a rendered element; put the binding on the intended HTML/SVG element or component, not <${node.tag}>.`,
         );
       }
       if (
@@ -158,24 +165,39 @@ export const transformExplicitStyles = (
           key,
         )
       ) {
-        throw new SyntaxError(
-          `[VBox] ${id}:${prop.loc.start.line}:${prop.loc.start.column} Invalid style property name ${JSON.stringify(name)}.`,
+        throw createStyleError(
+          id,
+          prop.loc.start,
+          `Invalid style property name ${JSON.stringify(name)}.`,
         );
       }
       const identity = name === 'vb' ? ':vb' : key;
       if (seen.has(identity))
-        throw new SyntaxError(
-          `[VBox] Duplicate style binding for ${key}; keep one spelling.`,
+        throw createStyleError(
+          id,
+          prop.loc.start,
+          `Duplicate style binding for ${key}; keep one spelling.`,
         );
       seen.add(identity);
       if (prop.type === 7 && prop.modifiers.length) {
-        throw new SyntaxError(
-          `[VBox] ${id}:${prop.loc.start.line}:${prop.loc.start.column} Style binding modifiers are not supported; remove the modifier from ${name}.`,
+        throw createStyleError(
+          id,
+          prop.loc.start,
+          `Style binding modifiers are not supported; remove the modifier from ${name}.`,
         );
       }
       if (prop.type === 6 && (name === 'vb' || objectKeys.has(key))) {
-        throw new SyntaxError(
-          `[VBox] ${id}:${prop.loc.start.line}:${prop.loc.start.column} ${name} requires an object binding; use :${name}="{ ... }".`,
+        throw createStyleError(
+          id,
+          prop.loc.start,
+          `${name} requires an object binding; use :${name}="{ ... }".`,
+        );
+      }
+      if (prop.type === 7 && prop.exp?.type === 4 && !prop.exp.content.trim()) {
+        throw createStyleError(
+          id,
+          prop.loc.start,
+          `${name} requires a non-empty expression; omit the equals sign for Vue same-name shorthand.`,
         );
       }
       const value =
@@ -216,37 +238,46 @@ export const transformExplicitStyles = (
   };
   for (const node of descriptor.template.ast.children) visit(node);
   if (changed) {
+    const error = errors[0];
+    if (error) {
+      const start = 'loc' in error ? error.loc?.start : undefined;
+      throw createStyleError(
+        id,
+        start ?? descriptor.template.loc.start,
+        error.message,
+      );
+    }
     const statement = `import { useVBoxStyleBinding as ${bindingName}Factory } from '@veebox/vue';\nconst ${bindingName} = ${bindingName}Factory();\n`;
     if (descriptor.scriptSetup) {
       output.appendLeft(descriptor.scriptSetup.loc.start.offset, statement);
     } else {
       if (descriptor.script?.src)
-        throw new SyntaxError(
-          '[VBox] Explicit native styling currently requires an inline script; external script integration is not supported yet.',
+        throw createStyleError(
+          id,
+          descriptor.script.loc.start,
+          'Explicit native styling requires an inline script; move the component export into this SFC. External script integration is not supported.',
         );
-      const language = descriptor.script?.lang;
       if (descriptor.script) {
-        const componentName = `${bindingName}Component`;
-        const original = rewriteDefault(
-          descriptor.script.content,
-          componentName,
-          language === 'ts' ? ['typescript'] : [],
-        );
-        output.overwrite(
-          descriptor.script.loc.start.offset,
-          descriptor.script.loc.end.offset,
-          `import { withVBoxStyleBinding as ${bindingName}Factory } from '@veebox/vue';\n${original}\nexport default ${bindingName}Factory(${componentName}, '${bindingName}');\n`,
+        mappedOutput = wrapOptionsScript(
+          output,
+          descriptor.script,
+          id,
+          bindingName,
         );
       } else {
         output.append(`\n<script setup>\n${statement}</script>\n`);
       }
     }
   }
-  return changed || warnings.length || literalRegion
+  return changed ||
+    warnings.length ||
+    literalRegion ||
+    hasRuntimeImport(descriptor.script) ||
+    hasRuntimeImport(descriptor.scriptSetup)
     ? {
         warnings,
-        code: output.toString(),
-        map: mapper.generateMap(output, id),
+        code: mappedOutput.toString(),
+        map: mapper.generateMap(mappedOutput, id),
       }
     : null;
 };

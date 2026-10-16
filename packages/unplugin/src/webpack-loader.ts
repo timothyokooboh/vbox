@@ -1,3 +1,4 @@
+import { recordWebpackMap } from './webpackMaps.js';
 import { transformVueSfc } from './transform.js';
 import type { VBoxNativePluginOptions } from './types.js';
 
@@ -15,7 +16,16 @@ export const vboxWebpackLoader = function vboxWebpackLoader(
 ) {
   const id = this.resourcePath ?? '';
   const options = this.getOptions?.() ?? {};
+  // Vue loader receives the full SFC on its language-block requests too, so
+  // deliberately transform resourcePath rather than skipping resourceQuery.
   const out = transformVueSfc(source, id, options);
+  if (out?.map && out.code !== source) {
+    recordWebpackMap(this, {
+      id,
+      code: out.code,
+      map: JSON.parse(out.map.toString()),
+    });
+  }
   for (const file of out?.dependencies ?? []) this.addDependency?.(file);
   for (const warning of out?.warnings ?? [])
     this.emitWarning?.(new Error(warning.message));

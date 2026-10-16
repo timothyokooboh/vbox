@@ -351,6 +351,7 @@ const transformTemplateContent = (
 ) => {
   let cursor = 0;
   let transformed = '';
+  let changed = false;
   let ignoreDepth = 0;
 
   const stack = [];
@@ -394,6 +395,7 @@ const transformTemplateContent = (
 
     const hasExplicitMarker = opening.attrs.some(isVBoxMarker);
     const hasIgnoreMarker = opening.attrs.some(isVBoxIgnoreMarker);
+    changed ||= hasExplicitMarker || hasIgnoreMarker;
 
     const isNativeTag = isNativeHtmlTag(opening.name);
     const isCustomComponent = !isNativeTag && !isVBoxComponentTag(opening.name);
@@ -433,6 +435,7 @@ const transformTemplateContent = (
         fullCode,
         isStyleKey,
       );
+      changed ||= styleExpression !== null;
       rewritten = stringifyStartTag(
         opening.name,
         keptAttrs,
@@ -463,7 +466,7 @@ const transformTemplateContent = (
     }
   }
 
-  return transformed;
+  return changed ? transformed : templateSource;
 };
 
 const TemplateRegex = /<template\b[^>]*>([\s\S]*?)<\/template>/i;
@@ -473,7 +476,7 @@ export const transformVueSfc = (
   id: string,
   options: VBoxNativePluginOptions = {},
 ): VBoxSfcTransformResult => {
-  if (id.includes('?')) return null;
+  if (id.includes('?') || id.includes('\0')) return null;
   const normalizedId = normalizeIdPath(id);
 
   // only run on project .vue files
