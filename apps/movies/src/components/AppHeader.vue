@@ -43,56 +43,56 @@ const searchQuery = useMovieSearchQuery(debouncedSearchValue);
 
 <template>
   <header
-    position="sticky"
-    top="0"
-    z-index="z-header"
-    display="flex"
-    flex-direction="column"
-    :sm="{
+    vb-position="sticky"
+    vb-top="0"
+    vb-z-index="z-header"
+    vb-display="flex"
+    vb-flex-direction="column"
+    :vb-sm="{
       flexDirection: 'row',
       alignItems: 'center',
       paddingInline: 'var(--spacing-6)',
     }"
-    justify-content="space-between"
-    align-items="flex-start"
-    gap="sp-2"
-    px="sp-4"
-    py="sp-3"
-    bg="color-mix(in oklab, var(--color-canvas) 75%, transparent)"
-    glass="blur(18px)"
-    border-bottom="1px solid color-mix(in oklab, var(--color-ink) 12%, transparent)"
+    vb-justify-content="space-between"
+    vb-align-items="flex-start"
+    vb-gap="sp-2"
+    vb-px="sp-4"
+    vb-py="sp-3"
+    vb-bg="color-mix(in oklab, var(--color-canvas) 75%, transparent)"
+    vb-glass="blur(18px)"
+    vb-border-bottom="1px solid color-mix(in oklab, var(--color-ink) 12%, transparent)"
   >
     <router-link
       to="/"
-      color="cl-brand"
-      fs="clamp(1.55rem,8vw,2.4rem)"
-      :sm="{ fontSize: 'clamp(1.8rem, 4vw, 2.6rem)' }"
-      fw="900"
-      ls="0.02em"
-      text-decoration="none"
-      lh="1"
-      white-space="nowrap"
+      vb-color="cl-brand"
+      vb-fs="clamp(1.55rem,8vw,2.4rem)"
+      :vb-sm="{ fontSize: 'clamp(1.8rem, 4vw, 2.6rem)' }"
+      vb-fw="900"
+      vb-ls="0.02em"
+      vb-text-decoration="none"
+      vb-lh="1"
+      vb-white-space="nowrap"
     >
       VBox Movies
     </router-link>
 
     <nav
-      display="flex"
-      align-items="center"
-      gap="sp-2"
-      :sm="{ gap: 'var(--spacing-3)', width: 'auto' }"
-      flex-wrap="wrap"
-      justify-content="space-between"
-      row-gap="sp-2"
-      width="100%"
+      vb-display="flex"
+      vb-align-items="center"
+      vb-gap="sp-2"
+      :vb-sm="{ gap: 'var(--spacing-3)', width: 'auto' }"
+      vb-flex-wrap="wrap"
+      vb-justify-content="space-between"
+      vb-row-gap="sp-2"
+      vb-width="100%"
       aria-label="Top navigation"
     >
       <p
-        display="none"
-        :md="{ display: 'block' }"
-        color="color-mix(in oklab, var(--color-ink) 80%, transparent)"
-        fs="fs-sm"
-        m="0"
+        vb-display="none"
+        :vb-md="{ display: 'block' }"
+        vb-color="color-mix(in oklab, var(--color-ink) 80%, transparent)"
+        vb-fs="fs-sm"
+        vb-m="0"
       >
         {{
           tmdbApi.hasApiKey
@@ -106,16 +106,16 @@ const searchQuery = useMovieSearchQuery(debouncedSearchValue);
           <button
             type="button"
             aria-label="Open movie search"
-            bg="var(--color-canvas-soft)"
-            color="cl-ink"
-            border="1px solid color-mix(in oklab, var(--color-ink) 14%, transparent)"
-            px="sp-3"
-            py="sp-2"
-            :sm="{ paddingInline: '0.875rem', paddingBlock: '0.625rem' }"
-            border-radius="br-pill"
-            cursor="pointer"
-            fw="600"
-            :hover="{
+            vb-bg="var(--color-canvas-soft)"
+            vb-color="cl-ink"
+            vb-border="1px solid color-mix(in oklab, var(--color-ink) 14%, transparent)"
+            vb-px="sp-3"
+            vb-py="sp-2"
+            :vb-sm="{ paddingInline: '0.875rem', paddingBlock: '0.625rem' }"
+            vb-border-radius="br-pill"
+            vb-cursor="pointer"
+            vb-fw="600"
+            :vb-hover="{
               backgroundColor:
                 'color-mix(in oklab, var(--color-canvas-soft) 80%, white)',
             }"
@@ -126,44 +126,44 @@ const searchQuery = useMovieSearchQuery(debouncedSearchValue);
 
         <DialogPortal>
           <DialogOverlay
-            position="fixed"
-            inset="0"
-            bg="color-mix(in oklab, black 65%, transparent)"
-            z="1000"
+            vb-position="fixed"
+            vb-inset="0"
+            vb-bg="color-mix(in oklab, black 65%, transparent)"
+            vb-z-index="1000"
           >
           </DialogOverlay>
           <DialogContent
-            pos="fixed"
-            top="50%"
-            left="50%"
-            transform="translate(-50%, -50%)"
-            w="min(62rem, 94vw)"
-            max-h="84vh"
-            overflow-y="auto"
-            p="sp-5"
-            bg="var(--color-canvas)"
-            border="1px solid color-mix(in oklab, var(--color-ink) 16%, transparent)"
-            border-radius="br-card"
-            shadow="bs-card"
-            z="1001"
+            vb-pos="fixed"
+            vb-top="50%"
+            vb-left="50%"
+            vb-transform="translate(-50%, -50%)"
+            vb-w="min(62rem, 94vw)"
+            vb-max-h="84vh"
+            vb-overflow-y="auto"
+            vb-p="sp-5"
+            vb-bg="var(--color-canvas)"
+            vb-border="1px solid color-mix(in oklab, var(--color-ink) 16%, transparent)"
+            vb-border-radius="br-card"
+            vb-shadow="bs-card"
+            vb-z-index="1001"
           >
-            <DialogTitle fs="fs-xl" m="0" color="cl-ink"
+            <DialogTitle vb-fs="fs-xl" vb-m="0" vb-color="cl-ink"
               >Search Movies</DialogTitle
             >
             <DialogDescription
-              mt="sp-2"
-              mb="sp-4"
-              color="color-mix(in oklab, var(--color-ink) 70%, transparent)"
+              vb-mt="sp-2"
+              vb-mb="sp-4"
+              vb-color="color-mix(in oklab, var(--color-ink) 70%, transparent)"
             >
               Find titles and jump into details.
             </DialogDescription>
 
             <label
-              display="block"
-              mb="sp-4"
+              vb-display="block"
+              vb-mb="sp-4"
               for="movie-search-input"
-              color="cl-ink"
-              fw="600"
+              vb-color="cl-ink"
+              vb-fw="600"
             >
               Search Query
             </label>
@@ -174,22 +174,22 @@ const searchQuery = useMovieSearchQuery(debouncedSearchValue);
               type="search"
               autocomplete="off"
               placeholder="Try: Dune, Batman, Matrix..."
-              w="100%"
-              bg="var(--color-canvas-soft)"
-              color="cl-ink"
-              border="1px solid color-mix(in oklab, var(--color-ink) 16%, transparent)"
-              border-radius="br-card"
-              px="sp-4"
-              py="sp-3"
-              :focus-visible="{ outline: '3px solid var(--color-ring)' }"
+              vb-w="100%"
+              vb-bg="var(--color-canvas-soft)"
+              vb-color="cl-ink"
+              vb-border="1px solid color-mix(in oklab, var(--color-ink) 16%, transparent)"
+              vb-border-radius="br-card"
+              vb-px="sp-4"
+              vb-py="sp-3"
+              :vb-focus-visible="{ outline: '3px solid var(--color-ring)' }"
             />
 
             <section
-              mt="sp-5"
+              vb-mt="sp-5"
               aria-live="polite"
               :aria-busy="searchQuery.isFetching.value"
             >
-              <p v-if="searchQuery.isFetching.value" color="cl-ink" m="0">
+              <p v-if="searchQuery.isFetching.value" vb-color="cl-ink" vb-m="0">
                 Searching...
               </p>
 
@@ -198,17 +198,17 @@ const searchQuery = useMovieSearchQuery(debouncedSearchValue);
                   searchQuery.data.value &&
                   searchQuery.data.value.results.length === 0
                 "
-                color="cl-ink"
-                m="0"
+                vb-color="cl-ink"
+                vb-m="0"
               >
                 No matching movies found.
               </p>
 
               <div
                 v-else-if="searchQuery.data.value"
-                display="grid"
-                gap="sp-4"
-                grid-template-columns="repeat(auto-fill,minmax(11rem,1fr))"
+                vb-display="grid"
+                vb-gap="sp-4"
+                vb-grid-template-columns="repeat(auto-fill,minmax(11rem,1fr))"
               >
                 <MovieCard
                   v-for="movie in searchQuery.data.value.results.slice(0, 12)"
@@ -222,14 +222,14 @@ const searchQuery = useMovieSearchQuery(debouncedSearchValue);
             <DialogClose as-child>
               <button
                 type="button"
-                mt="sp-5"
-                px="sp-3"
-                py="sp-2"
-                border="1px solid color-mix(in oklab, var(--color-ink) 14%, transparent)"
-                border-radius="br-pill"
-                bg="transparent"
-                color="cl-ink"
-                cursor="pointer"
+                vb-mt="sp-5"
+                vb-px="sp-3"
+                vb-py="sp-2"
+                vb-border="1px solid color-mix(in oklab, var(--color-ink) 14%, transparent)"
+                vb-border-radius="br-pill"
+                vb-bg="transparent"
+                vb-color="cl-ink"
+                vb-cursor="pointer"
               >
                 Close
               </button>
@@ -239,33 +239,33 @@ const searchQuery = useMovieSearchQuery(debouncedSearchValue);
       </DialogRoot>
 
       <label
-        display="inline-flex"
-        align-items="center"
-        gap="sp-2"
-        color="cl-ink"
+        vb-display="inline-flex"
+        vb-align-items="center"
+        vb-gap="sp-2"
+        vb-color="cl-ink"
       >
-        <span fs="fs-sm">{{ isDark ? 'Dark' : 'Light' }}</span>
+        <span vb-fs="fs-sm">{{ isDark ? 'Dark' : 'Light' }}</span>
         <SwitchRoot :checked="isDark" @update:checked="toggleTheme" as-child>
           <button
             type="button"
             aria-label="Toggle color scheme"
-            w="3rem"
-            h="1.75rem"
-            border-radius="br-pill"
-            bg="color-mix(in oklab, var(--color-ink) 25%, transparent)"
-            position="relative"
-            border="1px solid color-mix(in oklab, var(--color-ink) 12%, transparent)"
-            cursor="pointer"
+            vb-w="3rem"
+            vb-h="1.75rem"
+            vb-border-radius="br-pill"
+            vb-bg="color-mix(in oklab, var(--color-ink) 25%, transparent)"
+            vb-position="relative"
+            vb-border="1px solid color-mix(in oklab, var(--color-ink) 12%, transparent)"
+            vb-cursor="pointer"
           >
             <SwitchThumb
-              display="block"
-              w="1.35rem"
-              h="1.35rem"
-              border-radius="999px"
-              bg="cl-brand"
-              transform="translateX(-3px)"
-              transition="transform 5s ease"
-              :declarations="{
+              vb-display="block"
+              vb-w="1.35rem"
+              vb-h="1.35rem"
+              vb-border-radius="999px"
+              vb-bg="cl-brand"
+              vb-transform="translateX(-3px)"
+              vb-transition="transform 5s ease"
+              :vb-declarations="{
                 '&[data-state=checked]': {
                   transform: 'translateX(16px)',
                 },

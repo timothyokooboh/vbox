@@ -43,50 +43,50 @@ onMounted(() => {
 <template>
   <section
     ref="heroRef"
-    position="relative"
-    min-h="60vh"
-    display="grid"
-    align-items="end"
-    p="sp-5"
-    border-radius="br-card"
-    overflow="hidden"
-    border="1px solid color-mix(in oklab, var(--color-ink) 14%, transparent)"
-    shadow="bs-card"
-    :bg-image="`linear-gradient(to top, color-mix(in oklab, var(--color-canvas) 92%, transparent), color-mix(in oklab, var(--color-canvas) 24%, transparent)), url(${backdrop})`"
-    bg-size="cover"
-    bg-position="center"
+    vb-position="relative"
+    vb-min-h="60vh"
+    vb-display="grid"
+    vb-align-items="end"
+    vb-p="sp-5"
+    vb-border-radius="br-card"
+    vb-overflow="hidden"
+    vb-border="1px solid color-mix(in oklab, var(--color-ink) 14%, transparent)"
+    vb-shadow="bs-card"
+    :vb-bg-image="`linear-gradient(to top, color-mix(in oklab, var(--color-canvas) 92%, transparent), color-mix(in oklab, var(--color-canvas) 24%, transparent)), url(${backdrop})`"
+    vb-bg-size="cover"
+    vb-bg-position="center"
   >
-    <div ref="contentRef" display="grid" gap="sp-3" max-w="42rem">
+    <div ref="contentRef" vb-display="grid" vb-gap="sp-3" vb-max-w="42rem">
       <p
-        m="0"
-        fs="fs-sm"
-        fw="700"
-        ls="0.1em"
-        text-transform="uppercase"
-        color="cl-accent"
+        vb-m="0"
+        vb-fs="fs-sm"
+        vb-fw="700"
+        vb-ls="0.1em"
+        vb-text-transform="uppercase"
+        vb-color="cl-accent"
       >
         Featured Tonight
       </p>
 
-      <h1 m="0" fs="clamp(2rem,6vw,4rem)" lh="1.02" color="cl-ink">
+      <h1 vb-m="0" vb-fs="clamp(2rem,6vw,4rem)" vb-lh="1.02" vb-color="cl-ink">
         {{ movie?.title ?? 'Discover your next obsession' }}
       </h1>
 
       <p
-        m="0"
-        fs="fs-base"
-        color="color-mix(in oklab, var(--color-ink) 86%, transparent)"
+        vb-m="0"
+        vb-fs="fs-base"
+        vb-color="color-mix(in oklab, var(--color-ink) 86%, transparent)"
       >
         {{
           movie?.overview ?? 'Set your TMDB key to unlock live recommendations.'
         }}
       </p>
 
-      <p v-if="movie" m="0" fs="fs-sm" fw="700" color="cl-ink">
+      <p v-if="movie" vb-m="0" vb-fs="fs-sm" vb-fw="700" vb-color="cl-ink">
         {{ getMovieYear(movie) }} • ★ {{ getMovieRating(movie) }}
       </p>
 
-      <div display="flex" gap="sp-3" mt="sp-2">
+      <div vb-display="flex" vb-gap="sp-3" vb-mt="sp-2">
         <MovieTrailerDialog
           v-if="movie"
           :movie-id="movie.id"
@@ -111,8 +111,8 @@ onMounted(() => {
           target="_blank"
           rel="noreferrer noopener"
           variant="outline"
-          display="none"
-          :sm="{ display: 'block' }"
+          vb-display="none"
+          :vb-sm="{ display: 'block' }"
         >
           TMDB Attribution
         </AppButton>

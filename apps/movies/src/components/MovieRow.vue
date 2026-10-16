@@ -10,13 +10,13 @@ defineProps<{
 </script>
 
 <template>
-  <section aria-label="Movie row" display="grid" gap="sp-4">
-    <h2 m="0" fs="fs-xl" color="cl-ink">{{ title }}</h2>
+  <section aria-label="Movie row" vb-display="grid" vb-gap="sp-4">
+    <h2 vb-m="0" vb-fs="fs-xl" vb-color="cl-ink">{{ title }}</h2>
 
     <p
       v-if="loading"
-      m="0"
-      color="color-mix(in oklab, var(--color-ink) 75%, transparent)"
+      vb-m="0"
+      vb-color="color-mix(in oklab, var(--color-ink) 75%, transparent)"
     >
       Loading {{ title.toLowerCase() }}...
     </p>
@@ -24,9 +24,9 @@ defineProps<{
     <div
       v-else
       class="movie-row-track"
-      display="grid"
-      grid-template-columns="repeat(auto-fill,minmax(14.5rem,1fr))"
-      gap="sp-4"
+      vb-display="grid"
+      vb-grid-template-columns="repeat(auto-fill,minmax(14.5rem,1fr))"
+      vb-gap="sp-4"
     >
       <MovieCard
         v-for="movie in movies.slice(0, 10)"
