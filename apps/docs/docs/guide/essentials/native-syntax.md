@@ -1,150 +1,88 @@
-# Native Syntax
+# Native Styling
 
-VBox supports native semantic tags with VBox-style attributes through a
-compile-time transform.
-
-## Why
-
-This syntax keeps templates readable and improves static accessibility analysis,
-since the source still contains real HTML tags like `<p>`, `<section>`, and
-`<button>`.
-
-## Setup
-
-Install the transform package:
-
-```bash
-pnpm add @veebox/unplugin
-```
-
-Enable it in Vite:
-
-```ts
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
-import { vboxVitePlugin } from '@veebox/unplugin/vite';
-import vboxConfig from './vbox.config';
-
-export default defineConfig({
-  plugins: [
-    vboxVitePlugin({
-      aliases: Object.keys(vboxConfig.aliases?.values ?? {}),
-    }),
-    vue(),
-  ],
-});
-```
-
-Enable it in Nuxt:
-
-```ts
-import { vboxVitePlugin } from '@veebox/unplugin/vite';
-
-export default defineNuxtConfig({
-  vite: {
-    plugins: [vboxVitePlugin()],
-  },
-});
-```
-
-## Usage (Global Native Parsing)
+Use `vb-*` for individual style bindings and `:vb` for grouped style objects.
+Enable the [compiler plugin](../installation.md) once. No per-element marker,
+wrapper, component opt-in list or scope container is needed.
 
 ```vue
 <template>
-  <section>
-    <h2 color="cl-blue-700" fs="fs-2xl">Native VBox Syntax</h2>
-    <p color="cl-slate-800">Styled native paragraph.</p>
-    <button
-      aria-label="save"
-      bg="cl-emerald-600"
-      color="white"
-      :hover="{ backgroundColor: 'var(--color-emerald-700)' }"
-    >
-      Save
-    </button>
-  </section>
+  <button
+    type="button"
+    translate="no"
+    vb-translate="8px"
+    vb-color="white"
+    :vb-hover="{ color: 'red' }"
+  >
+    Save
+  </button>
+  <img
+    src="/poster.jpg"
+    alt="Film poster"
+    width="160"
+    height="240"
+    vb-width="20rem"
+    vb-height="auto"
+  />
+  <BaseButton color="primary" size="large" vb-color="yellow"
+    >Continue</BaseButton
+  >
 </template>
 ```
 
-Framework link components are parsed by default:
+HTML `translate="no"` is unrelated to the CSS transform. The image retains its
+intrinsic dimensions. `BaseButton` receives its own `color` and `size` props;
+only `vb-color` contributes VBox styling. The same boundary applies to SVG,
+RouterLink and NuxtLink. Component classes must reach a real
+[style target](./component-targets.md).
+
+## Static names and values
+
+- Prefer kebab-case: `vb-font-size`, `:vb-focus-visible`, `:vb-2xl`. Vue SFC
+  camelCase forms such as `vbFontSize` and `:vbFocusVisible` also work.
+- Prefix only template bindings, not keys inside objects. Use
+  `:vb-hover="{ fontSize: 'fs-lg' }"`, not an object containing `vb-font-size`.
+- Bind objects as Vue expressions. `vb-hover="{ color: 'red' }"` is an invalid
+  string, not a style object. The valid form is `:vb-hover="{ color: 'red' }"`.
+- Clean `disabled` and `2xl` style keys coexist with `_disabled` and `_2xl`
+  compatibility spellings. An ordinary `disabled` binding still controls the
+  button's disabled state.
+- CSS custom properties are case-sensitive: `vb---accent="red"` supplies
+  `--accent`; `vb---Accent` is a different property. Grouped objects are often
+  clearer: `:vb="{ '--accent': 'red', color: 'var(--accent)' }"`.
+- An unfamiliar `vb-*` name remains an explicit style declaration, even when not
+  recognized. The current compiler does not warn for every unknown property. A
+  CSS dataset cannot silently turn it into a semantic prop. Browsers decide
+  whether future CSS declarations are supported.
+- Duplicate equivalent individual names, style-binding modifiers, invalid object
+  values and non-rendering targets receive diagnostics. Do not style `template`,
+  `slot`, script/style blocks or rely on a fragment receiving classes.
+
+## Ordinary Vue bindings stay ordinary
 
 ```vue
+<script setup lang="ts">
+import type { VBoxStyles } from '@veebox/core';
+const semantic = { type: 'button' as const, translate: 'no' as const };
+const styles: VBoxStyles = { translate: '8px', padding: '12px' };
+const attributeName = 'title';
+</script>
 <template>
-  <router-link color="blue" to="/">Parsed</router-link>
-  <nuxt-link color="blue" to="/">Parsed</nuxt-link>
+  <button v-bind="semantic" :[attributeName]="'Save your work'" :vb="styles">
+    Save
+  </button>
 </template>
 ```
 
-By default, all custom components are parsed:
+Argumentless `v-bind` and dynamic attribute names are not style spreads. Even a
+runtime key called `vb-color` inside an ordinary spread remains Vue data; it is
+not reinterpreted as compiler syntax. Put dynamic styling keys in `:vb` instead.
+Detectable misuse receives guidance. Existing listeners, `v-if`, `v-for`, slots,
+`v-model`, refs and keys continue to belong to Vue.
 
-```vue
-<template>
-  <BaseButton color="blue" fs="fs-lg">Parsed</BaseButton>
-</template>
-```
+The transform handles HTML Vue SFC templates. Non-HTML preprocessors such as Pug
+are passed through with guidance for detectable explicit bindings, not rewritten
+as HTML. Vite and webpack share the same transform; no browser CSS validation
+API is needed to compile or server-render.
 
-If you set `parseAllComponents: false`, custom components become opt-in via `vbox`:
-
-```vue
-<template>
-  <BaseButton color="blue">Not parsed</BaseButton>
-  <BaseButton vbox color="blue" fs="fs-lg">Parsed</BaseButton>
-</template>
-```
-
-## Rules
-
-1. Native HTML tags are parsed globally in Vue templates.
-2. Object style props must use bound expressions.
-3. Invalid: `hover="{ color: 'red' }"`.
-4. Valid: `:hover="{ color: 'red' }"`.
-5. `router-link`, `nuxt-link`, and other custom components are parsed by default.
-6. Set `parseAllComponents: false` if you want custom components to require the `vbox` marker.
-7. Use `vbox-ignore` to skip transform on an element subtree.
-8. `vbox-ignore` prevents transform, but Volar token hover hints still appear on custom component token literals.
-9. Custom aliases are auto-loaded from nearest `vbox.config.*`. Use explicit `aliases`/`configPath` only as fallback:
-
-```ts
-vboxVitePlugin({
-  // Optional fallback for non-standard config location:
-  // aliases: Object.keys(vboxConfig.aliases?.values ?? {}),
-  // configPath: './config/vbox.config.ts',
-  parseAllComponents: false, // optional: make custom components opt-in via `vbox`
-  forceStyleAttrs: ['src'],
-  forceSemanticAttrs: ['width'],
-});
-```
-
-Use overrides only for edge-cases:
-
-1. `forceSemanticAttrs`: keep attributes semantic even if they collide with CSS-like keys.
-2. `forceStyleAttrs`: force attributes into VBox style parsing.
-
-Supported object style keys:
-
-- `mq`
-- `cq`
-- `dark`
-- `declarations`
-- `pseudos`
-- `hover`
-- `focus`
-- `focusVisible`
-- `focusWithin`
-- `active`
-- `_disabled`
-- `sm`
-- `md`
-- `lg`
-- `xl`
-- `_2xl`
-
-## Notes
-
-1. This feature is global opt-in via plugin setup.
-2. Existing `<v-box>` usage remains fully supported.
-3. Legacy per-element marker mode is still available: `<p vbox color="red">`.
-4. For custom components, `v-vbox-runtime` works reliably only when the component renders a single root element and allows directive inheritance to root. Components with fragments/multiple roots can break this behavior.
-5. Native tags get VBox IntelliSense when `@veebox/vue` types are included.
-6. Alias keys autocomplete in both `camelCase` and `kebab-case` forms (for example `maxW` and `max-w`).
-7. For hover previews of token values in templates, register `@veebox/volar` in `vueCompilerOptions.plugins`.
+See [migration](../migration.md) for the removed experimental inference
+controls.

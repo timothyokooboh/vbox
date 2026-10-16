@@ -18,12 +18,14 @@ hero:
 
 features:
   - title: Style Props
-    details: Pass CSS properties as attributes with autocompletion.
+    details:
+      Keep native HTML semantics and add explicit vb-* style bindings with
+      contextual completions.
 
   - title: Automatic vendor Prefixing
     details:
-      Automatically adds vendor prefixes to CSS properties to ensure
-      cross-browser compatibility.
+      Adds applicable vendor prefixes; browsers retain control over support for
+      modern CSS.
 
   - title: Light & Dark Mode
     details: Easily implement light and dark themes

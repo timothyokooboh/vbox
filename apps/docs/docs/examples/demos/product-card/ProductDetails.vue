@@ -1,23 +1,23 @@
 <template>
   <div
     data-scope="product-details"
-    position="relative"
-    z="10"
-    mt="-1.5rem"
-    display="flex"
-    flex-direction="column"
-    gap="1rem"
-    border-top-right-radius="1.5rem"
-    border-top-left-radius="1.5rem"
-    px="0.6rem"
-    pt="2rem"
-    pb="1.5rem"
-    shadow="0 -10px 40px -15px rgba(0,0,0,0.3)"
-    bg="#fff"
-    :dark="{
+    vb-position="relative"
+    vb-z-index="10"
+    vb-mt="-1.5rem"
+    vb-display="flex"
+    vb-flex-direction="column"
+    vb-gap="1rem"
+    vb-border-top-right-radius="1.5rem"
+    vb-border-top-left-radius="1.5rem"
+    vb-px="0.6rem"
+    vb-pt="2rem"
+    vb-pb="1.5rem"
+    vb-shadow="0 -10px 40px -15px rgba(0,0,0,0.3)"
+    vb-bg="#fff"
+    :vb-dark="{
       bg: '#23220F',
     }"
-    :md="{
+    :vb-md="{
       px: '1.5rem',
     }"
   >

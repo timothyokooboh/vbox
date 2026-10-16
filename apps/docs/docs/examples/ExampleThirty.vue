@@ -1,9 +1,9 @@
 <template>
   <div
-    :declarations="{
+    :vb-declarations="{
       '--border-input': 'blue',
     }"
   >
-    <v-box is="input" border="1px solid var(--border-input)" />
+    <input vb-border="1px solid var(--border-input)" />
   </div>
 </template>

@@ -1,7 +1,7 @@
 <template>
-  <p v-bind="styles">Same styles</p>
-  <p v-bind="styles">Same styles</p>
-  <p v-bind="styles">Same styles</p>
+  <p :vb="styles">Same styles</p>
+  <p :vb="styles">Same styles</p>
+  <p :vb="styles">Same styles</p>
 </template>
 
 <script setup lang="ts">

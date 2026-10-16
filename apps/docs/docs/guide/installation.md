@@ -1,126 +1,170 @@
 # Installation
 
+::: warning Upcoming beta
+
+This guide describes the upcoming explicit native API. It is not available in
+the currently published stable release. Until the beta is published, use
+matching built workspace packages. The `@beta` commands below are for that
+release; do not mix an older core/Vue package with the new compiler/editor
+packages.
+
+:::
+
+## Packages
+
+Add the runtime packages to an existing Vue 3 application, and the
+compiler/editor packages as development dependencies. Choose one package
+manager:
+
 ::: code-group
 
-```bash [npm]
-npm install @veebox/core @veebox/vue
+```sh [npm]
+npm install @veebox/core@beta @veebox/vue@beta
+npm install -D @veebox/unplugin@beta @veebox/volar@beta
 ```
 
-```bash [pnpm]
-pnpm add @veebox/core @veebox/vue
+```sh [pnpm]
+pnpm add @veebox/core@beta @veebox/vue@beta
+pnpm add -D @veebox/unplugin@beta @veebox/volar@beta
 ```
 
-```bash [yarn]
-yarn add @veebox/core @veebox/vue
+```sh [yarn]
+yarn add @veebox/core@beta @veebox/vue@beta
+yarn add -D @veebox/unplugin@beta @veebox/volar@beta
 ```
 
 :::
 
-Then, import and register the plugin globally.
+The compiler is required for `vb-*` and `:vb`; the runtime plugin alone does not
+teach Vue that syntax. No Tailwind, Sass or special Babel transform is required.
+The supported [legacy VBox component](./essentials/polymorphism.md) can still be
+used without the native compiler. Volar supplies editor behavior, not
+compilation.
 
-```js
-import { createApp } from 'vue';
-import App from './App.vue';
-import { VBoxPlugin } from '@veebox/vue';
+## Shared app setup
 
-const app = createApp(App);
-app.use(VBoxPlugin);
-app.mount('#app');
+The files below are compiled, typechecked and browser-tested with both bundlers.
+This example deliberately uses a nonstandard config location to demonstrate that
+runtime, compiler, editor and type generation must resolve the **same config**.
+For a normal root `vbox.config.ts`, the tools discover it automatically and you
+can omit `configPath` / `rootDir`.
+
+Create `theme/vbox.config.ts`:
+
+<<< @/examples/setup/theme/vbox.config.ts
+
+`cssResets` adds the packaged resets. The color token has light and dark values;
+`html.dark` switches it. Custom aliases describe runtime mappings. The partial
+breakpoint config changes `md` without discarding other defaults.
+
+Register the runtime in `main.ts`:
+
+<<< @/examples/setup/main.ts
+
+Use separate semantic and style bindings in `App.vue`:
+
+<<< @/examples/setup/App.vue
+
+`translate="no"` remains an HTML attribute while `:vb` applies CSS translation.
+`vb-brand-color` and `vb-pad2` use the custom aliases. The theme button is a
+minimal example; an SSR app should choose its initial theme before paint, not
+after mount.
+
+## Vite
+
+Install Vite and its Vue plugin using the versions supported by your app (this
+workspace exercises Vite 7 and Vue plugin 6). Add `vite.config.ts`:
+
+<<< @/examples/setup/vite.config.ts
+
+Keep VBox before Vue so the style namespace is transformed before Vue compiles
+the template. The plugin also declares `enforce: 'pre'`.
+
+A minimal `index.html` points to the shared entry:
+
+<<< @/examples/setup/index.html
+
+Use `vite` for development and `vite build` for production. Existing app scripts
+such as `npm run dev` can keep invoking those commands.
+
+## webpack 5
+
+Install `webpack`, `webpack-cli`, `vue-loader` (17), `ts-loader`,
+`html-webpack-plugin`, TypeScript and Vue's matching `@vue/compiler-sfc` as dev
+dependencies. For a dev server, add `webpack-dev-server`. Configure
+`webpack.config.mjs`:
+
+<<< @/examples/setup/webpack.config.mjs
+
+Use `webpack --config webpack.config.mjs` to build, or
+`webpack serve --config webpack.config.mjs --mode development` to develop. The
+wrapper shares the Vue transform with Vite; no consumer alias to VBox's ESM or
+UMD bundle is needed. `ts-loader` transpiles here; run `vue-tsc --noEmit`
+separately so type errors cannot be hidden by transpile-only builds. The
+JavaScript config passes a path instead of importing a TypeScript config through
+plain Node.
+
+## Editor and type generation
+
+Use Vue (Official) or a compatible Vue language-tools integration, with
+TypeScript and `vue-tsc` installed in the app, plus `@types/node` for the Node
+config imports and the explicit `types: ["node"]` below. Here is the standalone
+example's `tsconfig.json`:
+
+<<< @/examples/setup/tsconfig.json
+
+For a scaffolded Vue app, preserve its existing configuration and add the
+`vueCompilerOptions` block to the app's tsconfig, plus the config/generated
+files to its `include`. Do not place that block in `package.json`.
+
+Generate `vbox.d.ts` using the public CLI after changing aliases or theme
+tokens:
+
+::: code-group
+
+```sh [npm]
+npx vbox-type-gen --config ./theme/vbox.config.ts
+npx vue-tsc --noEmit
 ```
 
-Next, run `npx vbox-type-gen` to generate a `vbox.d.ts` file that provides type
-definitions for the [default theme](./essentials/default-theme.md).
+```sh [pnpm]
+pnpm exec vbox-type-gen --config ./theme/vbox.config.ts
+pnpm exec vue-tsc --noEmit
+```
 
-::: info
-
-If using TypeScript, add `vbox.d.ts` to your `tsconfig.json` under the `include`
-array for type-safety and autocompletion support.
+```sh [yarn]
+yarn vbox-type-gen --config ./theme/vbox.config.ts
+yarn vue-tsc --noEmit
+```
 
 :::
 
-Internally, the plugin registers the `VBox` component globally. Now you can use
-the component in your Vue templates to style elements.
+The compiler discovers custom aliases from the config. If supplied explicitly,
+`aliases: ['brandColor']` **replaces** the discovered custom alias-key list
+rather than adding to it; it does not define the runtime property mapping. See
+[custom aliases](./customization/custom-aliases.md) and
+[editor configuration](../up-next/enhanced-dx.md) for the matching editor
+override and literal/snapshot preview limits.
 
-<<< @/examples/ExampleTwo.vue
+## Standalone dependency checklist
 
-<ExampleTwo />
+The executable starter declares all direct dependencies explicitly. This
+manifest includes **both** bundlers for verification; an app only needs its
+chosen bundler's tooling. Its `beta` package entries are placeholders for the
+upcoming published tag, not evidence that the tag exists today. The tests link
+the declared packages from the built workspace into an isolated project; they do
+not install from npm.
 
-<script lang="ts" setup>
-import ExampleTwo from '../examples/ExampleTwo.vue'
-</script>
+<<< @/examples/setup/package.json
 
-## Optional: Native Syntax Transform
+## Nuxt and VitePress
 
-If you want native tags with VBox attributes (`<p vbox color=\"red\">`), install
-and register the transform plugin:
+Use the [tested SSR/SSG integrations](../up-next/ssr-support.md), including
+request-local critical CSS and initial theme handling. Do not wrap native
+styling in `ClientOnly` merely to avoid SSR setup.
 
-```bash
-pnpm add @veebox/unplugin
-```
-
-```ts
-// vite.config.ts
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
-import { vboxVitePlugin } from '@veebox/unplugin/vite';
-import vboxConfig from './vbox.config';
-
-export default defineConfig({
-  plugins: [
-    vboxVitePlugin({
-      // Optional fallback if config is in non-standard location:
-      // aliases: Object.keys(vboxConfig.aliases?.values ?? {}),
-      // configPath: './config/vbox.config.ts',
-      // Optional: custom components are parsed globally by default.
-      // Set false to require explicit `vbox` marker on custom component instances.
-      // parseAllComponents: false,
-      // Optional safety overrides for edge-case attr collisions:
-      // forceSemanticAttrs: ['src'],
-      // forceStyleAttrs: ['myCustomStyleAttr'],
-    }),
-    vue(),
-  ],
-});
-```
-
-## Optional: IDE Token Hover Previews
-
-If you want hover previews for token values like `fs-xl -> 1.25rem` or
-`cl-brand -> #c52341`, install the Volar plugin:
-
-```bash
-pnpm add -D @veebox/volar
-```
-
-Then register it in your `tsconfig.json`:
-
-```json
-{
-  "vueCompilerOptions": {
-    "plugins": ["@veebox/volar"]
-  }
-}
-```
-
-You can also pass options:
-
-```json
-{
-  "vueCompilerOptions": {
-    "plugins": [
-      {
-        "name": "@veebox/volar",
-        "configPath": "./vbox.config.ts",
-        "parseAllComponents": false
-      }
-    ]
-  }
-}
-```
-
-Current behavior:
-
-1. Works for static token literals in template attributes (for example `color="cl-brand"`).
-2. Works on both native tags and custom component instances.
-3. For custom components, token hover hints still show even when `parseAllComponents: false` or the instance has `vbox-ignore`.
-4. Does not resolve dynamic expressions like `:color="tokenName"` at hover time.
+In this repository, build the workspace packages before running the docs. The
+verification command `pnpm --filter @vbox/acceptance test:docs` runs the public
+starter files and the rendered docs in Chromium, Firefox and WebKit. Package
+installation against published tarballs is a separate release-readiness check;
+these workspace tests do not assert that an unpublished beta already exists.

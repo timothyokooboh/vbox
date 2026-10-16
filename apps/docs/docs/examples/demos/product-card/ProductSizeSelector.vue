@@ -1,61 +1,67 @@
 <template>
   <section data-scope="product-size-selector">
     <div
-      display="flex"
-      align-items="center"
-      justify-content="space-between"
-      mb="0.7rem"
+      vb-display="flex"
+      vb-align-items="center"
+      vb-justify-content="space-between"
+      vb-mb="0.7rem"
     >
-      <h2 my="0" fs="fs-sm" fw="fw-bold" color="cl-text-product" class="vp-raw">
+      <h2
+        vb-my="0"
+        vb-fs="fs-sm"
+        vb-fw="fw-bold"
+        vb-color="cl-text-product"
+        class="vp-raw"
+      >
         Select Size
       </h2>
       <button
-        cursor="pointer"
-        bg="transparent"
-        fs="fs-xs"
-        fw="fw-medium"
-        color="cl-gray-500"
-        text-decoration="underline"
-        border="none"
-        :dark="{
+        vb-cursor="pointer"
+        vb-bg="transparent"
+        vb-fs="fs-xs"
+        vb-fw="fw-medium"
+        vb-color="cl-gray-500"
+        vb-text-decoration="underline"
+        vb-border="none"
+        :vb-dark="{
           color: 'cl-gray-400',
         }"
-        v-bind="outlineStyles"
+        :vb="outlineStyles"
       >
         Size Guide
       </button>
     </div>
 
     <div
-      display="flex"
-      gap="sp-3"
-      py="sp-1"
-      overflow-x="auto"
-      scrollbar-width="none"
-      :declarations="{
+      vb-display="flex"
+      vb-gap="sp-3"
+      vb-py="sp-1"
+      vb-overflow-x="auto"
+      vb-scrollbar-width="none"
+      :vb-declarations="{
         '-ms-overflow-style': 'none',
         '&::-webkit-scrollbar': {
           display: 'none',
         },
       }"
     >
-      <button v-bind="baseSizeSelectionStyles">39</button>
-      <button v-bind="baseSizeSelectionStyles">40</button>
+      <button :vb="baseSizeSelectionStyles">39</button>
+      <button :vb="baseSizeSelectionStyles">40</button>
       <button
-        v-bind="baseSizeSelectionStyles"
-        bg="cl-primary"
-        border="none"
-        shadow="0 4px 12px rgba(249,245,6,0.3)"
-        :dark="{
+        :vb="baseSizeSelectionStyles"
+        vb-bg="cl-primary"
+        vb-border="none"
+        vb-shadow="0 4px 12px rgba(249,245,6,0.3)"
+        :vb-dark="{
           color: '#1c1c0d',
         }"
       >
         41
       </button>
-      <button v-bind="baseSizeSelectionStyles">42</button>
-      <button v-bind="baseSizeSelectionStyles">43</button>
-      <button v-bind="baseSizeSelectionStyles">44</button>
-      <button v-bind="baseSizeSelectionStyles">45</button>
+      <button :vb="baseSizeSelectionStyles">42</button>
+      <button :vb="baseSizeSelectionStyles">43</button>
+      <button :vb="baseSizeSelectionStyles">44</button>
+      <button :vb="baseSizeSelectionStyles">45</button>
     </div>
   </section>
 </template>

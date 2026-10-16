@@ -1,24 +1,24 @@
 <template>
   <div
-    display="grid"
-    gap="1rem"
-    :sm="{
+    vb-display="grid"
+    vb-gap="1rem"
+    :vb-sm="{
       gridTemplateColumns: 'repeat(2, 1fr)',
     }"
-    :md="{
+    :vb-md="{
       gridTemplateColumns: 'repeat(3, 1fr)',
     }"
-    :lg="{
+    :vb-lg="{
       gridTemplateColumns: 'repeat(4, 1fr)',
     }"
   >
     <div
       v-for="n in 8"
       :key="n"
-      w="100%"
-      h="150px"
-      bg="tomato"
-      :sm="{ width: '150px' }"
+      vb-w="100%"
+      vb-h="150px"
+      vb-bg="tomato"
+      :vb-sm="{ width: '150px' }"
     />
   </div>
 </template>

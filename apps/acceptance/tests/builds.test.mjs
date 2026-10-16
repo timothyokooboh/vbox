@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
-import webpack from 'webpack';
+import { compileWebpack } from './support/webpack.mjs';
 import { build as viteBuild } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import { vboxVitePlugin, vboxWebpackPlugin } from '@veebox/unplugin';
@@ -15,21 +15,6 @@ import { renderToString } from '@vue/server-renderer';
 import { VBoxPlugin, getSSRStyles } from '@veebox/vue';
 
 const require = createRequire(import.meta.url);
-
-async function compile(config) {
-  const compiler = webpack(config);
-  try {
-    return await new Promise((resolve, reject) =>
-      compiler.run((error, stats) => {
-        if (error || stats.hasErrors())
-          reject(error ?? new Error(stats.toString('errors-only')));
-        else resolve(stats);
-      }),
-    );
-  } finally {
-    await new Promise((resolve) => compiler.close(resolve));
-  }
-}
 
 function webpackComponentConfig(root, plugin = vboxWebpackPlugin()) {
   return {
@@ -89,7 +74,7 @@ test('installed webpack artifact resolves its loader inside a project path conta
     path.join(root, 'App.vue'),
     '<template><p vb-color="red" title="semantic">Installed artifact</p></template>',
   );
-  await compile(webpackComponentConfig(root, vboxWebpackPlugin()));
+  await compileWebpack(webpackComponentConfig(root, vboxWebpackPlugin()));
   const { default: output } = await import(
     pathToFileURL(path.join(root, 'dist/component.cjs')).href
   );
@@ -133,7 +118,7 @@ export default { data: () => ({ message }) };
       });
     } else {
       const config = webpackComponentConfig(root);
-      await compile({
+      await compileWebpack({
         ...config,
         devtool: 'source-map',
         optimization: { minimize: false },
@@ -187,7 +172,7 @@ for (const driver of ['vite', 'webpack']) {
               plugins: [vboxVitePlugin(), vue()],
               build: { ssr: filename, outDir: path.join(root, 'dist') },
             })
-        : () => compile(webpackComponentConfig(root));
+        : () => compileWebpack(webpackComponentConfig(root));
     await assert.rejects(build, (error) => {
       assert.ok(error.message.includes(`${filename}:3:5`), error.message);
       assert.match(error.message, /requires an object binding/);
@@ -228,7 +213,7 @@ export default { data: () => ({ color: 'red', message: 'External options' }) };`
           pathToFileURL(path.join(root, 'dist/component.mjs')).href
         );
       } else {
-        await compile(webpackComponentConfig(root));
+        await compileWebpack(webpackComponentConfig(root));
         componentModule = require(path.join(root, 'dist/component.cjs'));
       }
       const context = {};

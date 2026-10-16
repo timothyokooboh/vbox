@@ -1,16 +1,16 @@
 <template>
-  <div display="flex" align-items="start" gap="1rem">
+  <div vb-display="flex" vb-align-items="start" vb-gap="1rem">
     <img
       src="/victor-osimhen.jpg"
       alt="Victor Osihmen"
-      height="50px"
-      width="50px"
-      object-fit="cover"
-      border-radius="50%"
+      vb-height="50px"
+      vb-width="50px"
+      vb-object-fit="cover"
+      vb-border-radius="50%"
     />
-    <div display="flex" flex-direction="column" gap="0.2rem">
-      <span font-weight="bold">Victor Osimhen</span>
-      <em font-size="0.8rem">Striker, Nigeria</em>
+    <div vb-display="flex" vb-flex-direction="column" vb-gap="0.2rem">
+      <span vb-font-weight="bold">Victor Osimhen</span>
+      <em vb-font-size="0.8rem">Striker, Nigeria</em>
     </div>
   </div>
 </template>
