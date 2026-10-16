@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import PrimitiveTargets from './targets/PrimitiveTargets.vue';
+import AdoptedTargets from './targets/AdoptedTargets.vue';
+import LegacyComposition from './targets/LegacyComposition.vue';
+import ExplicitTargets from './targets/ExplicitTargets.vue';
 import CachedOwnership from './ownership/CachedOwnership.vue';
 import NumericOwnership from './ownership/NumericOwnership.vue';
 import NestedOwnership from './ownership/NestedOwnership.vue';
@@ -42,6 +46,10 @@ const badge = pva({
     <NestedOwnership />
     <NumericOwnership />
     <CachedOwnership />
+    <ExplicitTargets />
+    <LegacyComposition />
+    <AdoptedTargets />
+    <PrimitiveTargets />
     <NormalSetup />
     <LocalDirective />
     <VBox is="button" type="button" :hover="{ color: 'green' }"

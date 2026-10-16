@@ -362,3 +362,16 @@ test('single-root component props remain semantic alongside independent namespac
     editor.diagnostics().some((item) => /number/.test(item.messageText)),
   );
 });
+
+test('legacy target props keep their types alongside new grouped styling', (t) => {
+  const source = `<script setup lang="ts">import { VBox } from '@veebox/vue'; import type { VBoxStyleProps } from '@veebox/core'; const styles: VBoxStyleProps = { _disabled: { color: 'red' }, _2xl: { padding: '10px' } };</script><template><VBox is="button" :as-child="false" :vb="styles" vb-color="blue">Legacy</VBox></template>`;
+  const editor = createEditor(source);
+  t.after(() => editor.dispose());
+  assert.deepEqual(editor.diagnostics(), []);
+  editor.update(source.replace('is="button"', 'is="not-an-html-element"'));
+  assert.ok(
+    editor
+      .diagnostics()
+      .some((item) => /not-an-html-element/.test(item.messageText)),
+  );
+});
