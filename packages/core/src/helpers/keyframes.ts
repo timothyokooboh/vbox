@@ -2,12 +2,10 @@ import type { AliasProps, AugmentedCSSProperties } from '../types';
 import { injectCSS } from './injectCSS';
 import { toKebabCase } from './toKebabCase';
 import { parseTokens } from './parseTokens';
-import { isValidCssDeclaration } from './isValidCssDeclaration';
 import { normalizeKey } from './parseStyleObject';
 import { DefaultAliases } from '../constants';
 import { createDjb2Hash } from './createDjb2Hash';
 import { __DEV__ } from './isDevelopment';
-import { stableStringify } from './stableStringify';
 import type { StyleCollector } from './styleRegistry';
 
 export type KeyframeStep = 'from' | 'to' | `${number}%`;
@@ -33,8 +31,8 @@ export const keyframes = (
     return;
   }
 
-  // create deterministic hash from definition
-  const defString = stableStringify(resolvedRules);
+  // Preserve nested values and declaration order in the identity.
+  const defString = JSON.stringify(resolvedRules);
   const hashed = createDjb2Hash(defString);
 
   const finalName = `${name}-${hashed}`;
@@ -53,9 +51,7 @@ export const keyframes = (
         styles[prop as keyof typeof styles] as string,
       );
 
-      if (isValidCssDeclaration(propertyInKebabCase, parsedValue)) {
-        css += `    ${propertyInKebabCase}: ${parsedValue};\n`;
-      }
+      css += `    ${propertyInKebabCase}: ${parsedValue};\n`;
     }
 
     css += `  }\n`;

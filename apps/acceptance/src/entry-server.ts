@@ -1,15 +1,9 @@
 import { renderToString } from '@vue/server-renderer';
-import { getSSRStyles, getSSRCollector } from '@veebox/vue';
-import { buildCSSVariables, normalizeTheme } from '@veebox/core';
-import config from '../vbox.config';
-import { createFixture } from './app';
+import { getSSRStyles } from '@veebox/vue';
+import { createFixture, type FixtureName } from './app';
 
-export async function render() {
+export async function render(fixture: FixtureName = 'standard') {
   const context = {};
-  // The server supplies critical theme CSS as well as component declarations.
-  getSSRCollector(context).collect(
-    buildCSSVariables(normalizeTheme(config.theme ?? {})),
-  );
-  const html = await renderToString(createFixture(true), context);
+  const html = await renderToString(createFixture(true, fixture), context);
   return { html, css: getSSRStyles(context) };
 }
