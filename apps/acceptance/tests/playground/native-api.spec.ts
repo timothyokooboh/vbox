@@ -62,7 +62,7 @@ test('grouped sources compose with direct bindings and withdrawal restores the r
   );
 });
 
-test('theme-first hover and compatibility spellings work on ordinary buttons', async ({
+test('theme-first hover survives viewport and theme changes', async ({
   page,
 }) => {
   await page.goto('/');
@@ -82,12 +82,26 @@ test('theme-first hover and compatibility spellings work on ordinary buttons', a
     .click();
   await sample.hover();
   await expect(sample).toHaveCSS('color', 'rgb(255, 0, 0)');
+});
+
+test('clean and compatibility disabled styles match the legacy interface', async ({
+  page,
+}) => {
+  await page.goto('/');
   for (const name of ['clean', 'compatibility', 'legacy']) {
     await expect(page.getByTestId(`playground-${name}`)).toBeDisabled();
     await expect(page.getByTestId(`playground-${name}`)).toHaveCSS(
       'opacity',
       '0.5',
     );
+  }
+});
+
+test('clean and compatibility 2xl groups match the legacy interface', async ({
+  page,
+}) => {
+  await page.goto('/');
+  for (const name of ['clean', 'compatibility', 'legacy']) {
     await expect(page.getByTestId(`playground-${name}`)).toHaveCSS(
       'width',
       '140px',
