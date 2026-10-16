@@ -51,9 +51,10 @@ editor-specific VBox extension are required.
 Use `defineConfig` from `@veebox/core` to preserve literal config types and
 enable config-only completion updates without editing the Vue document. Plain
 config exports work too; values widened by TypeScript refresh their inferred
-meaning on the next Vue document edit. Included generated `vbox.d.ts`
-declarations continue to contribute tokens and aliases; regenerate them after
-config changes.
+meaning on the next Vue document edit. Broad config type annotations also widen
+token and alias keys; prefer `defineConfig` for live literal-key tracking.
+Included generated `vbox.d.ts` declarations continue to contribute tokens and
+aliases; regenerate them after config changes.
 
 ## Config locations
 

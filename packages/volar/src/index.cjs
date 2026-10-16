@@ -1,4 +1,6 @@
 const path = require('node:path');
+// vue-tsc injects a tree-shaken TS facade; parsing uses the full public compiler API.
+const typescript = require('typescript');
 const { collectExpressionCompletions } = require('./styleExpressions.cjs');
 const { buildTokenTypes } = require('./completionTypes.cjs');
 const { scopeCompletionCode } = require('./completionScope.cjs');
@@ -753,7 +755,7 @@ const collectCompletionHints = (
     property,
   ) => {
     if (!Array.isArray(candidates)) return;
-    if (typeof mappedValue !== 'string' || mappedValue.length === 0) return;
+    if (typeof mappedValue !== 'string') return;
     const dedupeKey = `${offset}:${mappedValue.length}:${typedValue}`;
     if (valueHintSeen.has(dedupeKey)) return;
     valueHintSeen.add(dedupeKey);
@@ -860,12 +862,11 @@ const collectCompletionHints = (
             if (value.length > 0) {
               pushValueHint(value, value, offset, candidates, prop.name);
             } else {
-              // For empty quoted values (e.g. font-size=""), map both quotes so
-              // completions trigger when cursor is between them.
+              // A zero-width insertion preserves the authored quote delimiters.
               pushValueHint(
                 '',
-                '""',
-                prop.value.loc.start.offset,
+                '',
+                prop.value.loc.start.offset + 1,
                 candidates,
                 prop.name,
               );
@@ -961,6 +962,7 @@ const buildHoverCode = (hints) => {
 
 // Escape generated literal syntax without shifting the mapped authored characters.
 const mappedCompletionString = (value, offset) => {
+  if (!value.length) return [['', 'template', offset, COMPLETION_FEATURES]];
   const out = [];
   let start = 0;
   for (const match of value.matchAll(/[\\']/g)) {
@@ -1031,7 +1033,8 @@ const buildCompletionCode = (
 
   attrHints.forEach((hint, index) => {
     const type =
-      hint.value === 'vb' || core.getStyleBindingKey(hint.value) !== null
+      !hint.objectKey &&
+      (hint.value === 'vb' || core.getStyleBindingKey(hint.value) !== null)
         ? '__vboxCompletionExplicitAttributes'
         : '__vboxCompletionAttributes';
     if (hint.objectKey && !hint.quoted) {
@@ -1039,7 +1042,7 @@ const buildCompletionCode = (
         `const __vboxAttrCompletion${index}: Partial<Record<${type}, unknown>> = { `,
       );
       out.push([hint.value, 'template', hint.offset, COMPLETION_FEATURES]);
-      out.push(': undefined };\n');
+      out.push(hint.insertion ? ' };\n' : ': undefined };\n');
     } else {
       out.push(`const __vboxAttrCompletion${index}: ${type} = '`);
       out.push(...mappedCompletionString(hint.value, hint.offset));
@@ -1158,7 +1161,7 @@ const createPlugin = (ctx) => {
         getTokenCandidates,
         {
           parseAllComponents: userConfig.parseAllComponents !== false,
-          typescript: ctx.modules?.typescript,
+          typescript,
         },
       );
 
@@ -1186,7 +1189,7 @@ const createPlugin = (ctx) => {
         embeddedFile.content.push('\n/* VBox completions */\n');
         embeddedFile.content.push(
           ...scopeCompletionCode(
-            ctx.modules.typescript,
+            typescript,
             buildCompletionCode(
               completionHints.attrHints,
               completionHints.valueHints,
