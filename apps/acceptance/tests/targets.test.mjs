@@ -64,7 +64,9 @@ test('asChild unwraps one fragment child and ignores comments and whitespace wit
   );
   assert.match(result.html, /^<button/);
   assert.match(result.html, /data-owner="kept"/);
-  assert.match(result.html, /class="[^"]*child[^"]*caller/);
+  const classes = result.html.match(/class="([^"]+)"/)[1].split(/\s+/);
+  assert.ok(classes.includes('child'));
+  assert.ok(classes.includes('caller'));
   assert.match(result.css, /color:purple/);
   assert.deepEqual(result.warnings, []);
 });

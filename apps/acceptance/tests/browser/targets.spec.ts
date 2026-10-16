@@ -134,7 +134,7 @@ test('asChild can be enabled after mount and never silently chooses a root from 
   );
 });
 
-test('real RouterLink and Radix asChild preserve navigation and keyboard state through normal forwarding', async ({
+test('RouterLink and a framework wrapper preserve navigation through normal forwarding', async ({
   page,
 }) => {
   await page.goto('/?ssr');
@@ -155,6 +155,12 @@ test('real RouterLink and Radix asChild preserve navigation and keyboard state t
   await expect(frameworkLink).toHaveCSS('color', 'rgb(0, 128, 0)');
   await frameworkLink.click();
   await expect(page.getByTestId('integration-route')).toHaveText('/framework');
+});
+
+test('Radix asChild preserves keyboard activation and controlled pressed state', async ({
+  page,
+}) => {
+  await page.goto('/?ssr');
   const toggle = page.getByRole('button', {
     name: 'Accessible toggle',
     exact: true,
@@ -166,6 +172,12 @@ test('real RouterLink and Radix asChild preserve navigation and keyboard state t
   await expect(toggle).toHaveAttribute('aria-pressed', 'true');
   await expect(toggle).toHaveAttribute('data-state', 'on');
   await expect(page.getByTestId('integration-toggle')).toHaveText('true');
+});
+
+test('legacy VBox adopts a real accessible primitive without losing its state', async ({
+  page,
+}) => {
+  await page.goto('/?ssr');
   const adopted = page.getByRole('button', {
     name: 'Adopted primitive',
     exact: true,
