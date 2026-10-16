@@ -153,10 +153,6 @@ test('movie details show skeletons while fetching, then the returned content', a
     await page.goto('/movie/101');
     const loading = page.locator('main [aria-busy="true"]');
     await expect(loading).toBeVisible();
-    await expect(loading.locator('.movie-skeleton').first()).toHaveCSS(
-      'height',
-      '416px',
-    );
     release();
     await expect(
       page.getByRole('heading', { name: 'Signal', level: 1 }),

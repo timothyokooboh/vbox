@@ -22,8 +22,8 @@ export async function mockTmdb(page: Page) {
     const endpoint = url.pathname.replace('/3', '');
     if (endpoint === '/search/movie')
       searchQueries.push(url.searchParams.get('query') ?? '');
-    if (/^\/movie\/\d+$/.test(endpoint)) {
-      const selected = endpoint.endsWith('202') ? searchMovie : movie;
+    if (endpoint === '/movie/101' || endpoint === '/movie/202') {
+      const selected = endpoint === '/movie/202' ? searchMovie : movie;
       await route.fulfill({
         json: {
           ...selected,
@@ -33,7 +33,15 @@ export async function mockTmdb(page: Page) {
           tagline: 'Follow the signal.',
         },
       });
-    } else {
+    } else if (
+      [
+        '/trending/movie/week',
+        '/movie/popular',
+        '/movie/top_rated',
+        '/movie/now_playing',
+        '/search/movie',
+      ].includes(endpoint)
+    ) {
       await route.fulfill({
         json: {
           page: 1,
@@ -42,6 +50,9 @@ export async function mockTmdb(page: Page) {
           results: [endpoint === '/search/movie' ? searchMovie : movie],
         },
       });
+    } else {
+      await route.abort();
+      throw new Error(`Unexpected TMDB endpoint: ${endpoint}`);
     }
   });
   await page.addInitScript(() => {
