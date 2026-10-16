@@ -1,10 +1,12 @@
+const { collectTokenHints, buildHoverCode } = require('./tokenPreviews.cjs');
+const { templateElements } = require('./templateElements.cjs');
 const path = require('node:path');
 // vue-tsc injects a tree-shaken TS facade; parsing uses the full public compiler API.
 const typescript = require('typescript');
 const { collectExpressionCompletions } = require('./styleExpressions.cjs');
 const { buildTokenTypes } = require('./completionTypes.cjs');
 const { scopeCompletionCode } = require('./completionScope.cjs');
-const { prioritizeStyleCompletions } = require('./completionMappings.cjs');
+const { prioritizeEditorMappings } = require('./editorMappings.cjs');
 const { createJiti } = require('jiti');
 const knownCssPropertiesModule = require('known-css-properties');
 
@@ -249,15 +251,6 @@ const SEMANTIC_ATTRIBUTES_BY_TAG = {
   image: ['href', 'x', 'y', 'preserveAspectRatio', 'xlink:href'],
 };
 
-const HOVER_FEATURES = {
-  verification: true,
-  completion: false,
-  semantic: true,
-  navigation: true,
-  structure: false,
-  format: false,
-};
-
 const COMPLETION_FEATURES = {
   verification: true,
   completion: true,
@@ -269,15 +262,7 @@ const COMPLETION_FEATURES = {
 
 const VBOX_DEFAULT_ALIAS_KEYS = new Set(Object.keys(core.DefaultAliases));
 
-const isNativeHtmlTag = (tag) => /^[a-z][a-z0-9]*$/.test(tag);
 const isVBoxComponentTag = (tag) => tag === 'v-box' || tag === 'VBox';
-const isFrameworkLinkTag = (tag) => {
-  const normalized = String(tag)
-    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
-    .replace(/^[-_]+/, '')
-    .toLowerCase();
-  return normalized === 'router-link' || normalized === 'nuxt-link';
-};
 const NON_TRANSFORM_NATIVE_TAGS = new Set([
   'script',
   'style',
@@ -598,140 +583,6 @@ const buildAttrCompletionKeys = (
 const escapeTsString = (value) =>
   String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 
-const collectTokenHints = (
-  templateAst,
-  resolveTokenValue,
-  isStyleKey,
-  options = {},
-) => {
-  const hints = [];
-  const pushTokensFromValue = (value, offset) => {
-    let match;
-    TOKEN_IN_VALUE_REGEX.lastIndex = 0;
-    while ((match = TOKEN_IN_VALUE_REGEX.exec(value)) != null) {
-      const token = match[1];
-      if (!token) continue;
-
-      const resolved = resolveTokenValue(token);
-      if (!resolved) continue;
-
-      hints.push({
-        token,
-        resolved,
-        offset: offset + match.index,
-        length: token.length,
-      });
-    }
-  };
-
-  const walk = (node, ignored) => {
-    if (!node) return;
-
-    if (node.type === 0 /* ROOT */) {
-      for (const child of node.children || []) {
-        walk(child, ignored);
-      }
-      return;
-    }
-
-    if (node.type === 9 /* IF */) {
-      for (const branch of node.branches || []) {
-        walk(branch, ignored);
-      }
-      return;
-    }
-
-    if (node.type === 10 /* IF_BRANCH */) {
-      for (const child of node.children || []) {
-        walk(child, ignored);
-      }
-      return;
-    }
-
-    if (node.type === 11 /* FOR */) {
-      for (const child of node.children || []) {
-        walk(child, ignored);
-      }
-      return;
-    }
-
-    if (node.type !== 1 /* ELEMENT */) return;
-
-    const tag = node.tag;
-    const isCustomComponent = !isNativeHtmlTag(tag) && !isVBoxComponentTag(tag);
-    let hasVBoxMarker = false;
-    let hasIgnoreMarker = false;
-
-    for (const prop of node.props) {
-      if (prop.type === 6 /* ATTRIBUTE */) {
-        if (prop.name === 'vbox') hasVBoxMarker = true;
-        if (prop.name === 'vbox-ignore') hasIgnoreMarker = true;
-      }
-    }
-
-    const nativeAutoEligible =
-      !ignored && isNativeHtmlTag(tag) && canProcessNativeTag(tag);
-    const frameworkLinkAutoEligible =
-      !ignored && isCustomComponent && isFrameworkLinkTag(tag);
-    const vboxComponentEligible = !ignored && isVBoxComponentTag(tag);
-    const markedCustomComponentEligible =
-      !ignored && hasVBoxMarker && isCustomComponent;
-    const globalCustomComponentEligible =
-      !ignored && options.parseAllComponents !== false && isCustomComponent;
-
-    const shouldProcessHoverCustomComponent = isCustomComponent;
-
-    const shouldProcessElement =
-      shouldProcessHoverCustomComponent ||
-      (!ignored &&
-        !hasIgnoreMarker &&
-        (nativeAutoEligible ||
-          frameworkLinkAutoEligible ||
-          markedCustomComponentEligible ||
-          globalCustomComponentEligible ||
-          vboxComponentEligible));
-
-    if (shouldProcessElement) {
-      for (const prop of node.props) {
-        if (prop.type === 6 /* ATTRIBUTE */) {
-          if (!prop.value) continue;
-          if (prop.name === 'vbox' || prop.name === 'vbox-ignore') continue;
-          if (!isCustomComponent && !isStyleKey(tag, prop.name)) continue;
-
-          const { content, offset } = getAttrValueContentAndOffset(prop.value);
-          pushTokensFromValue(String(content || ''), offset);
-          continue;
-        }
-
-        if (prop.type !== 7 /* DIRECTIVE */) continue;
-        if (prop.name !== 'bind') continue;
-        if (!prop.arg || prop.arg.type !== 4 || !prop.arg.isStatic) continue;
-        if (!prop.exp || prop.exp.type !== 4) continue;
-
-        const boundKey = prop.arg.content;
-        if (!isCustomComponent && !isStyleKey(tag, boundKey)) continue;
-
-        pushTokensFromValue(
-          String(prop.exp.content || ''),
-          prop.exp.loc.start.offset,
-        );
-      }
-    }
-
-    const nextIgnored = ignored || hasIgnoreMarker;
-
-    for (const child of node.children || []) {
-      walk(child, nextIgnored);
-    }
-  };
-
-  for (const child of templateAst.children || []) {
-    walk(child, false);
-  }
-
-  return hints;
-};
-
 const collectCompletionHints = (
   templateAst,
   isStyleKey,
@@ -768,39 +619,7 @@ const collectCompletionHints = (
     });
   };
 
-  const walk = (node, ignored) => {
-    if (!node) return;
-
-    if (node.type === 0 /* ROOT */) {
-      for (const child of node.children || []) {
-        walk(child, ignored);
-      }
-      return;
-    }
-
-    if (node.type === 9 /* IF */) {
-      for (const branch of node.branches || []) {
-        walk(branch, ignored);
-      }
-      return;
-    }
-
-    if (node.type === 10 /* IF_BRANCH */) {
-      for (const child of node.children || []) {
-        walk(child, ignored);
-      }
-      return;
-    }
-
-    if (node.type === 11 /* FOR */) {
-      for (const child of node.children || []) {
-        walk(child, ignored);
-      }
-      return;
-    }
-
-    if (node.type !== 1 /* ELEMENT */) return;
-
+  for (const node of templateElements(templateAst)) {
     const tag = node.tag;
     const shouldProcessElement =
       canProcessNativeTag(tag) && !['template', 'slot'].includes(tag);
@@ -924,40 +743,12 @@ const collectCompletionHints = (
         }
       }
     }
-
-    const nextIgnored = false;
-    for (const child of node.children || []) {
-      walk(child, nextIgnored);
-    }
-  };
-
-  for (const child of templateAst.children || []) {
-    walk(child, false);
   }
 
   return {
     attrHints,
     valueHints,
   };
-};
-
-const buildHoverCode = (hints) => {
-  const out = [];
-
-  hints.forEach((hint, index) => {
-    const ident = makeMappedIdentifier(index, hint.length);
-    const safeToken = hint.token.replace(/\*\//g, '*\\/');
-    const safeResolved = hint.resolved.replace(/\*\//g, '*\\/');
-
-    out.push(
-      `/** VBox token preview:\n * ${safeToken} => ${safeResolved}\n */\n`,
-    );
-    out.push('const ');
-    out.push([ident, 'template', hint.offset, HOVER_FEATURES]);
-    out.push(' = 0;\n');
-  });
-
-  return out;
 };
 
 // Escape generated literal syntax without shifting the mapped authored characters.
@@ -1149,12 +940,7 @@ const createPlugin = (ctx) => {
       if (!sfc.template?.ast) return;
       refreshVocabulary();
 
-      const hints = collectTokenHints(
-        sfc.template.ast,
-        resolveTokenValue,
-        isStyleKey,
-        { parseAllComponents: userConfig.parseAllComponents !== false },
-      );
+      const hints = collectTokenHints(sfc.template.ast, resolveTokenValue);
       const completionHints = collectCompletionHints(
         sfc.template.ast,
         isStyleKey,
@@ -1174,18 +960,37 @@ const createPlugin = (ctx) => {
       }
 
       if (hints.length > 0) {
+        embeddedFile.content = prioritizeEditorMappings(
+          embeddedFile.content,
+          hints,
+          'semantic',
+        );
         embeddedFile.content.push('\n/* VBox token hovers */\n');
-        embeddedFile.content.push(...buildHoverCode(hints));
+        embeddedFile.content.push(
+          ...scopeCompletionCode(
+            typescript,
+            buildHoverCode(
+              hints,
+              configLoader.findVBoxConfig({
+                rootDir,
+                configPath: userConfig.configPath,
+              }),
+              config,
+              ctx.compilerOptions ?? {},
+            ),
+            sfc.content,
+          ),
+        );
       }
 
       if (
         completionHints.attrHints.length > 0 ||
         completionHints.valueHints.length > 0
       ) {
-        embeddedFile.content = prioritizeStyleCompletions(
-          embeddedFile.content,
-          [...completionHints.attrHints, ...completionHints.valueHints],
-        );
+        embeddedFile.content = prioritizeEditorMappings(embeddedFile.content, [
+          ...completionHints.attrHints,
+          ...completionHints.valueHints,
+        ]);
         embeddedFile.content.push('\n/* VBox completions */\n');
         embeddedFile.content.push(
           ...scopeCompletionCode(
@@ -1237,14 +1042,3 @@ createPlugin._test = {
 
 module.exports = createPlugin;
 module.exports.default = createPlugin;
-const makeMappedIdentifier = (index, length) => {
-  if (length <= 1) return 'v';
-
-  const seed = index.toString(36);
-  const head = `v${seed}`;
-
-  if (head.length === length) return head;
-  if (head.length < length) return `${head}${'_'.repeat(length - head.length)}`;
-
-  return `v${seed.slice(0, Math.max(1, length - 1))}`;
-};

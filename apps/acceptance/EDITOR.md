@@ -75,3 +75,48 @@ generous regression budgets (doubled on CI). These are safety checks, not
 universal latency claims. Completion unions are shared per document rather than
 repeated at every element; only completion mappings inside style ranges are
 replaced, not Vue's type verification or semantic expression mappings.
+
+## Live Token Previews - Ticket #13
+
+Previews explain recognized tokens in both style bindings and semantic HTML or
+component props. A preview on `title="cl-brand"` does not imply that the
+compiler transforms `title`. Tests cover branches, loops, slots, nested
+templates, grouped sources and query/selector objects, compound strings, literal
+template segments, HTML entities (including every cursor position within an
+encoded token) and recoverable incomplete expressions. Compiler-excluded
+metadata tags and components named `Title` or `Style` still receive
+informational previews. Unknown tokens and unrelated scripts, text, comments,
+event handlers, object keys and non-string expressions do not acquire a VBox
+preview. The editor inspects expression ASTs; it does not run application
+expressions to discover values.
+
+The hover displays the token's property name and configured value, without an
+invented variable declaration or unused-variable warning. Configured colors with
+default/dark appearances show both; color references show their CSS variable,
+while non-color references resolve as the core does, even across color-reference
+chains. Preview resolution and default-theme typing now live in core alongside
+the runtime theme parser, rather than as generated policy inside Volar. This is
+configuration information, not a browser-computed style or a promise about the
+currently active appearance. Circular references are described as unresolved.
+
+With `defineConfig` or equivalent literal-preserving types, adding, changing or
+removing tokens, toggling the default theme and editing imported literal
+metadata updates previews in the same service without a Vue document edit. The
+generated hover types import configuration dependencies rather than capturing
+raw JSDoc values indefinitely. The consumer's normal TypeScript project watcher
+still needs to observe those files.
+
+Widened config values use a labelled snapshot which refreshes on the next
+template edit. The same applies to JavaScript config imports that the consumer
+has not included in its TypeScript model (`allowJs` or declarations). Such
+imports cause TypeScript's error-any to propagate through conditional types; the
+plugin detects that case and explicitly labels the current runtime snapshot
+instead. Use typed, literal-preserving metadata for config-only updates. VBox
+loads trusted project configuration, as the compiler already does; this is not
+an arbitrary-code sandbox.
+
+Run `pnpm --filter @vbox/acceptance test:editor` for hover correctness, exact
+public source ranges, suggestion/semantic diagnostics, cross-project isolation
+and cold/warm/incremental latency checks. Snapshot fallbacks and the
+outer-template recovery limit above are intentional documented limitations, not
+reload fixes.

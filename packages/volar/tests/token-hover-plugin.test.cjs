@@ -211,7 +211,7 @@ test('collectTokenHints finds tokens inside bound object-style props', () => {
   );
 });
 
-test('collectTokenHints skips denylisted native tags even with marker', () => {
+test('collectTokenHints explains attribute tokens independently of compiler tag exclusions', () => {
   const ast = baseParse(
     `<v-box><script vbox color="cl-brand"></script><p color="cl-brand">Hello</p></v-box>`,
   );
@@ -221,7 +221,7 @@ test('collectTokenHints skips denylisted native tags even with marker', () => {
     () => true,
   );
 
-  assert.equal(hints.length, 1);
+  assert.equal(hints.length, 2);
   assert.equal(hints[0].token, 'cl-brand');
 });
 

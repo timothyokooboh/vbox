@@ -552,6 +552,9 @@ importers:
       '@veebox/core':
         specifier: workspace:*
         version: link:../core
+      entities:
+        specifier: ^7.0.1
+        version: 7.0.1
       jiti:
         specifier: ^2.6.1
         version: 2.6.1

@@ -45,8 +45,11 @@ editor-specific VBox extension are required.
   Compound values complete individual token segments.
 - Ordinary semantic bindings and PVA function arguments retain Vue/TypeScript
   behavior. The published `<VBox>` interface remains supported.
-- Hover recognized tokens for their configured raw values. Hover improvements
-  are tracked separately from this completion update.
+- Hover recognized tokens in style bindings **and semantic props**. Previews
+  show configured values, including both default/dark colors and token
+  references; they do not imply that semantic bindings are transformed or that a
+  value is the browser's computed style. Compound and nested literal values work
+  too.
 
 Use `defineConfig` from `@veebox/core` to preserve literal config types and
 enable config-only completion updates without editing the Vue document. Plain
@@ -55,6 +58,13 @@ meaning on the next Vue document edit. Broad config type annotations also widen
 token and alias keys; prefer `defineConfig` for live literal-key tracking.
 Included generated `vbox.d.ts` declarations continue to contribute tokens and
 aliases; regenerate them after config changes.
+
+Token previews also update on config-only edits when literal metadata is
+available. Widened config values, and untyped JavaScript config imports outside
+the consumer's TypeScript model, use a labelled snapshot refreshed on template
+edits. Prefer `defineConfig` and typed imports (or configured `allowJs`) for
+live dependency updates. The plugin inspects template expressions without
+executing application code; project configuration itself must be trusted.
 
 ## Config locations
 

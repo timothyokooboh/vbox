@@ -86,3 +86,8 @@ export type {
   StyleRule,
   StyleBundle,
 } from './styles/types';
+
+export type {
+  VBoxDefaultThemeEnabled,
+  VBoxTokenPreview,
+} from './helpers/themePreviewTypes';
