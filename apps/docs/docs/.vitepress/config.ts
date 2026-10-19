@@ -102,6 +102,7 @@ export default defineConfig({
       {
         text: 'Demos',
         items: [
+          { text: 'Application showcases', link: '/demos/applications' },
           {
             text: 'Product Card',
             link: '/demos/product-card',
