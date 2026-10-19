@@ -1,0 +1,30 @@
+:root {
+  --font-display: 'Newsreader Variable', Georgia, serif;
+  font-family: 'Manrope Variable', sans-serif;
+  color-scheme: light;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+:root.dark {
+  color-scheme: dark;
+}
+a {
+  color: inherit;
+}
+:focus-visible {
+  outline: 3px solid var(--color-ring);
+  outline-offset: 4px;
+}
+::selection {
+  background: var(--color-brand);
+  color: var(--color-onBrand);
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

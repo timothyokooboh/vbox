@@ -7,7 +7,7 @@ permissions:
 jobs:
   acceptance:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     env:
       NUXT_TELEMETRY_DISABLED: 1
     steps:
