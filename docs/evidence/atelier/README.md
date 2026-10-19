@@ -38,7 +38,7 @@ behavior and computed CSS, not generated class identifiers.
 
 ## Recorded verification
 
-Local run, 2026-10-19, Node 22.14.0 / pnpm 10.14.0:
+Local run, 2026-10-19, Node 22.14.0 / local pnpm 9.9.0 (CI pins 10.14.0):
 
 | Check                                            | Result                                                  |
 | ------------------------------------------------ | ------------------------------------------------------- |
