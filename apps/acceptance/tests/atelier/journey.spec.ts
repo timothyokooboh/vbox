@@ -5,7 +5,9 @@ test('search, inspect and return preserves the gallery and trigger focus', async
   page,
 }) => {
   await mockMuseum(page);
+  await page.setViewportSize({ width: 390, height: 700 });
   await page.goto('/');
+  await page.evaluate(() => document.fonts.ready);
   await expect(
     page.getByRole('heading', { name: 'A little room for wonder.', level: 1 }),
   ).toBeVisible();
@@ -20,19 +22,49 @@ test('search, inspect and return preserves the gallery and trigger focus', async
     exact: true,
   });
   await expect(card).toBeVisible();
-  await card.click();
-  const dialog = page.getByRole('dialog', { name: 'Water Garden' });
-  await expect(dialog).toBeVisible();
-  await expect(
-    dialog.getByText('Oil on canvas', { exact: true }),
-  ).toBeVisible();
-  await expect(
-    dialog.getByRole('link', { name: 'View museum record' }),
-  ).toHaveAttribute('href', 'https://www.artic.edu/artworks/42');
-  await page.keyboard.press('Escape');
-  await expect(dialog).toHaveCount(0);
-  await expect(card).toBeFocused();
-  await expect(page.getByRole('searchbox')).toHaveValue('Monet');
+  const titles = page.getByRole('heading', { level: 3 });
+  const results = await titles.allTextContents();
+  for (const dismissal of ['Escape', 'Close']) {
+    // Fully expose the target before recording position; WebKit can scroll a
+    // partly visible target again while dispatching a pointer click.
+    await card.evaluate((el) =>
+      el.scrollIntoView({ block: 'center', behavior: 'instant' }),
+    );
+    await expect
+      .poll(async () => Math.abs((await card.boundingBox())!.y - 175))
+      .toBeLessThanOrEqual(4);
+    const scroll = await page.evaluate(() => window.scrollY);
+    expect(scroll).toBeGreaterThan(0);
+    const target = (await card.boundingBox())!;
+    // Use a real pointer at the visible target, without Locator.click's
+    // additional engine-specific scroll-into-view step.
+    await page.mouse.click(
+      target.x + target.width / 2,
+      target.y + target.height / 2,
+    );
+    const dialog = page.getByRole('dialog', { name: 'Water Garden' });
+    await expect(dialog).toBeVisible();
+    await expect(
+      dialog.getByText('Oil on canvas', { exact: true }),
+    ).toBeVisible();
+    await expect(
+      dialog.getByRole('link', { name: 'View museum record' }),
+    ).toHaveAttribute('href', 'https://www.artic.edu/artworks/42');
+    if (dismissal === 'Escape') await page.keyboard.press('Escape');
+    else
+      await dialog
+        .getByRole('button', { name: 'Close artwork details' })
+        .click();
+    await expect(dialog).toHaveCount(0);
+    await expect(card).toBeFocused();
+    await expect(page.getByRole('searchbox')).toHaveValue('Monet');
+    await expect(titles).toHaveText(results);
+    await expect
+      .poll(async () =>
+        Math.abs((await page.evaluate(() => window.scrollY)) - scroll),
+      )
+      .toBeLessThanOrEqual(1);
+  }
 });
 
 test('empty results retain the query and can reset to discovery', async ({

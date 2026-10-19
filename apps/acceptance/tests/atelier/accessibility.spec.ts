@@ -17,6 +17,10 @@ for (const width of [320, 390, 768, 1440]) {
     for (const theme of ['light', 'dark']) {
       if (theme === 'dark')
         await page.getByRole('switch', { name: 'Dark theme' }).click();
+      await expect(page.getByRole('main')).toHaveCSS(
+        'color',
+        theme === 'dark' ? 'rgb(237, 236, 225)' : 'rgb(35, 56, 45)',
+      );
       expect(
         await page.evaluate(
           () => document.documentElement.scrollWidth <= innerWidth,
@@ -48,6 +52,13 @@ for (const width of [320, 390, 768, 1440]) {
     await expect(
       page.getByRole('switch', { name: 'Dark theme' }),
     ).toHaveAttribute('aria-checked', 'true');
+    await page.getByRole('button', { name: 'Monet', exact: true }).click();
+    const titles = page.getByRole('heading', { level: 3 });
+    await expect(titles).toHaveText(['Water Garden', 'Morning Light']);
+    await page.getByRole('switch', { name: 'Dark theme' }).click();
+    await expect(page.getByRole('main')).toHaveCSS('color', 'rgb(35, 56, 45)');
+    await expect(page.getByRole('searchbox')).toHaveValue('Monet');
+    await expect(titles).toHaveText(['Water Garden', 'Morning Light']);
   });
 }
 
@@ -77,6 +88,13 @@ test('keyboard users can skip, search, inspect and close a focus-trapped dialog'
   for (const theme of ['light', 'dark']) {
     // Operating-system theme changes must not dismiss an open dialog.
     if (theme === 'dark') await page.emulateMedia({ colorScheme: 'dark' });
+    await expect(dialog).toHaveCSS(
+      'background-color',
+      theme === 'dark' ? 'rgb(19, 28, 24)' : 'rgb(244, 241, 233)',
+    );
+    await expect(
+      dialog.getByText('Oil on canvas', { exact: true }),
+    ).toBeVisible();
     const scan = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
       .analyze();
