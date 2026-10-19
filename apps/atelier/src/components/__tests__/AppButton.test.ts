@@ -1,4 +1,5 @@
 import { expect, it } from 'vitest';
+import { nextTick } from 'vue';
 import { render, screen } from '@testing-library/vue';
 import { VBoxPlugin } from '@veebox/vue';
 import config from '../../../vbox.config';
@@ -15,6 +16,8 @@ it('keeps semantic props and native disabled interaction separate from caller st
   button.click();
   await rerender({ disabled: true });
   expect(screen.getByRole('status').textContent).toBe('Saved 1');
+  expect((button as HTMLButtonElement).disabled).toBe(true);
   button.click();
+  await nextTick();
   expect(screen.getByRole('status').textContent).toBe('Saved 1');
 });
