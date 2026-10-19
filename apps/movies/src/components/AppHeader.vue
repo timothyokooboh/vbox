@@ -201,15 +201,17 @@ const searchQuery = useMovieSearchQuery(debouncedSearchValue);
                 Searching...
               </p>
 
-              <p
-                v-else-if="searchQuery.isError.value"
-                vb-color="cl-muted"
-                vb-m="0"
-              >
-                Search is unavailable right now. Please try again later.
+              <p v-if="searchQuery.isError.value" vb-color="cl-muted" vb-m="0">
+                {{
+                  searchQuery.data.value?.results.length
+                    ? 'Could not refresh your search. Showing saved results.'
+                    : 'Search is unavailable right now. Please try again later.'
+                }}
               </p>
               <p
-                v-else-if="
+                v-if="
+                  !searchQuery.isFetching.value &&
+                  !searchQuery.isError.value &&
                   searchQuery.data.value &&
                   searchQuery.data.value.results.length === 0
                 "
@@ -220,7 +222,7 @@ const searchQuery = useMovieSearchQuery(debouncedSearchValue);
               </p>
 
               <div
-                v-else-if="searchQuery.data.value"
+                v-if="searchQuery.data.value?.results.length"
                 vb-display="grid"
                 vb-gap="sp-4"
                 vb-grid-template-columns="repeat(auto-fill,minmax(11rem,1fr))"
@@ -232,7 +234,15 @@ const searchQuery = useMovieSearchQuery(debouncedSearchValue);
                   @select="setSearchOpen(false)"
                 />
               </div>
-              <p v-else vb-color="cl-muted" vb-m="0">
+              <p
+                v-if="
+                  !searchQuery.data.value &&
+                  !searchQuery.isFetching.value &&
+                  !searchQuery.isError.value
+                "
+                vb-color="cl-muted"
+                vb-m="0"
+              >
                 Start with a movie title. Your next great watch is out there.
               </p>
             </section>

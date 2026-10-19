@@ -6,6 +6,7 @@ import {
   getMovieRating,
   getMovieYear,
 } from '../composables/useMovieFormatting';
+import { movieMetadataStyles } from './movieStyles';
 import type { TmdbMovie } from '../types/tmdb';
 
 const { allowViewTransition } = useMotionPreferences();
@@ -61,7 +62,7 @@ const posterSrc = computed(() => getPosterUrl(props.movie.poster_path));
         loading="lazy"
       />
 
-      <div vb-p="sp-3" vb-display="grid" vb-gap="sp-1">
+      <div :vb="movieMetadataStyles">
         <h3
           vb-m="0"
           vb-fs="fs-base"

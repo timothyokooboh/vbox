@@ -2,6 +2,7 @@
 import type { TmdbMovie } from '../types/tmdb';
 import AppSkeleton from './AppSkeleton.vue';
 import MovieCard from './MovieCard.vue';
+import { movieGridStyles, movieMetadataStyles } from './movieStyles';
 
 defineProps<{
   title: string;
@@ -18,26 +19,29 @@ defineProps<{
     </h2>
 
     <div
-      v-if="loading"
+      v-if="loading && !movies.length"
       role="status"
       :aria-label="`Loading ${title.toLowerCase()}`"
       aria-busy="true"
-      vb-display="grid"
-      vb-grid-template-columns="repeat(2, minmax(0, 1fr))"
-      :vb-sm="{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }"
-      :vb-lg="{ gridTemplateColumns: 'repeat(5, minmax(0, 1fr))' }"
-      vb-gap="sp-4"
+      :vb="movieGridStyles"
     >
-      <AppSkeleton
-        v-for="placeholder in 5"
+      <div
+        v-for="placeholder in 10"
         :key="placeholder"
-        vb-aspect-ratio="2 / 3"
-        vb-h="auto"
+        aria-hidden="true"
         vb-border-radius="br-card"
-      />
+        vb-overflow="hidden"
+        vb-border="1px solid color-mix(in oklab, var(--color-ink) 10%, transparent)"
+      >
+        <AppSkeleton vb-aspect-ratio="2 / 3" vb-h="auto" vb-border-radius="0" />
+        <div :vb="movieMetadataStyles">
+          <AppSkeleton vb-width="80%" vb-height="1rem" />
+          <AppSkeleton vb-width="50%" vb-height="0.75rem" />
+        </div>
+      </div>
     </div>
     <p
-      v-else-if="error || !movies.length"
+      v-else-if="!movies.length"
       role="status"
       vb-m="0"
       vb-p="sp-6"
@@ -52,14 +56,10 @@ defineProps<{
       }}
     </p>
 
-    <div
-      v-else
-      vb-display="grid"
-      vb-grid-template-columns="repeat(2, minmax(0, 1fr))"
-      :vb-sm="{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }"
-      :vb-lg="{ gridTemplateColumns: 'repeat(5, minmax(0, 1fr))' }"
-      vb-gap="sp-4"
-    >
+    <p v-if="error && movies.length" role="status" vb-m="0" vb-color="cl-muted">
+      Could not refresh these titles. Showing saved results.
+    </p>
+    <div v-if="movies.length" :vb="movieGridStyles">
       <MovieCard
         v-for="movie in movies.slice(0, 10)"
         :key="movie.id"
