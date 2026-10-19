@@ -62,3 +62,8 @@ reviewed release stack is merged.
 A public browser regression first failed because the page did not exist. The
 implementation adds the page and sidebar entry; VitePress's accessible heading
 name includes its permalink label, which the assertion accounts for.
+
+Verification on 2026-10-19: `pnpm --filter @vbox/acceptance test:docs` passed
+(type checks, production VitePress build, 26 executable snippet checks, and 27
+browser checks across Chromium/Firefox/WebKit). No post-retirement install or
+consumer result is claimed: removal is still awaiting acceptance.
