@@ -1,6 +1,11 @@
 declare global {
   interface Window {
     __moviesTransitionCalls: number;
+    __moviesTransitionResults: Promise<{
+      ready: boolean;
+      animated: boolean;
+      finished: boolean;
+    }>[];
   }
 }
 
@@ -209,11 +214,39 @@ test('pointer navigation uses progressive view transitions without duplicate nam
   await mockTmdb(page);
   await page.addInitScript(() => {
     const start = document.startViewTransition?.bind(document);
-    window.__moviesTransitionCalls = 0;
+    window.__moviesTransitionResults = [];
     if (start)
       document.startViewTransition = ((update) => {
-        window.__moviesTransitionCalls++;
-        return start(update);
+        const transition = start(update);
+        window.__moviesTransitionResults.push(
+          (async () => {
+            try {
+              await transition.ready;
+              const animated = document.getAnimations().some((animation) => {
+                const effect = animation.effect;
+                if (
+                  !(effect instanceof KeyframeEffect) ||
+                  effect.target !== document.documentElement
+                )
+                  return false;
+                const opacity = effect
+                  .getKeyframes()
+                  .map((frame) => frame.opacity)
+                  .filter((value) => value !== undefined);
+                return (
+                  animation.playState === 'running' &&
+                  new Set(opacity).size > 1 &&
+                  Number(effect.getTiming().duration) > 0
+                );
+              });
+              await transition.finished;
+              return { ready: true, animated, finished: true };
+            } catch {
+              return { ready: false, animated: false, finished: false };
+            }
+          })(),
+        );
+        return transition;
       }) as typeof document.startViewTransition;
   });
   await page.goto('/');
@@ -232,9 +265,14 @@ test('pointer navigation uses progressive view transitions without duplicate nam
   await expect(
     page.getByText('Follow the signal.', { exact: true }),
   ).toBeVisible();
-  expect(await page.evaluate(() => window.__moviesTransitionCalls)).toBe(
-    supported ? 1 : 0,
+  const transitions = await page.evaluate(() =>
+    Promise.all(window.__moviesTransitionResults),
   );
+  if (supported)
+    expect(transitions).toEqual([
+      { ready: true, animated: true, finished: true },
+    ]);
+  else expect(transitions).toEqual([]);
   await page.getByRole('link', { name: /Back to Home/ }).click();
   await expect(
     page.getByRole('heading', { name: 'Signal', level: 1 }),

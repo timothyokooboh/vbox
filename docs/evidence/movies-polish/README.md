@@ -36,6 +36,15 @@ Before/after tests exercise public UI rather than generated class names:
   tween hiding actionable content. Both themes pass the automated checks.
 - Details loading: previously anonymous decorative blocks; now a named loading
   status with aria-hidden placeholders. Empty collections have visible feedback.
+- Review regression: failed background collection/search refreshes retain usable
+  cached results and show non-blocking feedback rather than replacing the grid.
+- Collection skeletons reserve ten cards and the same metadata area as loaded
+  cards. Tests hold the HTTP response and compare the next section's position at
+  390/1440 px (within 1 px for a full response). Short responses and unusually
+  long titles can still change the final height.
+- View transitions: tests verify native readiness, an actual root opacity
+  animation, successful completion and navigation in all three browsers. A
+  temporary disabled-animation mutation correctly failed the stronger check.
 - Cards: transform-only 180 ms hover feedback, smooth reversal, stable
   neighboring geometry, fine-pointer gating and no motion on keyboard focus.
 - Existing 1500 ms debounce, search result navigation/closure, trailer iframe
