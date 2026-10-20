@@ -8,6 +8,9 @@ test('finite style reuse plateaus across updates, withdrawal and remount; unique
   await page.goto('/?ssr');
   const width = page.getByRole('spinbutton', { name: 'Resource width' });
   const toggle = page.getByRole('button', { name: 'Toggle resource target' });
+  const contribution = page.getByRole('button', {
+    name: 'Toggle resource contribution',
+  });
   const target = page.getByTestId('resource-target');
   const shared = page.getByTestId('resource-shared');
   const snapshot = () =>
@@ -35,10 +38,19 @@ test('finite style reuse plateaus across updates, withdrawal and remount; unique
     const cycle = async () => {
       await width.fill('21');
       await expect(target).toHaveCSS('width', '21px');
+      await contribution.click();
+      await expect(target).toHaveCount(1);
+      await expect(target).toHaveCSS('width', '10px');
+      await expect(target).toHaveCSS('color', 'rgb(0, 0, 0)');
+      await contribution.click();
+      await expect(target).toHaveCSS('width', '21px');
+      await expect(target).toHaveCSS('color', 'rgb(255, 0, 0)');
+      await width.fill('20');
+      await expect(target).toHaveCSS('width', '20px');
       await toggle.click();
       await expect(target).toHaveCount(0);
       await expect(shared).toHaveCSS('color', 'rgb(255, 0, 0)');
-      await width.fill('20');
+      await expect(shared).toHaveCSS('width', '20px');
       await toggle.click();
       await expect(target).toHaveCSS('width', '20px');
       await expect(target).toHaveCSS('color', 'rgb(255, 0, 0)');
