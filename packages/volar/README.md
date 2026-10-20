@@ -93,3 +93,10 @@ Verified with Vue language-core/vue-tsc 3.2.5 and TypeScript 5.9.3. Incomplete
 tags work when Vue can recover the outer template block. The repository's
 `apps/acceptance/EDITOR.md` documents executable consumer checks and
 limitations.
+
+## Prepared beta runtime
+
+The native beta is not yet published. Its editor-host Node baseline is 22.14.0+.
+The package ships prebuilt CJS and declarations; installing it does not invoke
+pnpm or rebuild unpublished source. Use it alongside the matching native beta
+compiler/runtime and include generated `vbox.d.ts` in the project's tsconfig.

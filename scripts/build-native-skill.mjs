@@ -34,14 +34,19 @@ const references = new Map(
 
 // A fresh destination prevents accidental overwrites of an installed/user-edited skill.
 await fs.mkdir(destination);
-await fs.cp(path.join(repository, 'skills/vbox-native'), destination, {
-  recursive: true,
-});
-await fs.cp(
-  path.join(repository, 'apps/acceptance/src/skill-examples'),
-  path.join(destination, 'examples'),
-  { recursive: true },
+await fs.copyFile(
+  path.join(repository, 'skills/vbox-native/SKILL.md'),
+  path.join(destination, 'SKILL.md'),
 );
+const examples = path.join(repository, 'apps/acceptance/src/skill-examples');
+await fs.mkdir(path.join(destination, 'examples'));
+for (const entry of await fs.readdir(examples, { withFileTypes: true })) {
+  if (!entry.isFile() || !entry.name.endsWith('.vue')) continue;
+  await fs.copyFile(
+    path.join(examples, entry.name),
+    path.join(destination, 'examples', entry.name),
+  );
+}
 await fs.mkdir(path.join(destination, 'references'));
 const sources = {};
 const includedSources = {};
@@ -143,6 +148,13 @@ for (const name of [
   );
   sourceVersions[pkg.name] = pkg.version;
 }
+const release = JSON.parse(
+  await fs.readFile(path.join(repository, 'release/native-beta.json'), 'utf8'),
+);
+for (const [name, version] of Object.entries(release.packages)) {
+  if (sourceVersions[name] !== version)
+    throw new Error(`Skill/package release mismatch: ${name}`);
+}
 await fs.writeFile(
   path.join(destination, 'compatibility.json'),
   JSON.stringify(
@@ -152,6 +164,7 @@ await fs.writeFile(
       supportedPublishedRange: null,
       sourceRevision,
       sourceVersions,
+      candidatePackageVersions: release.packages,
       canonicalSources: sources,
       includedSources,
       workingTreeDirty: Boolean(
@@ -163,6 +176,7 @@ await fs.writeFile(
             '--untracked-files=normal',
             '--',
             'skills',
+            'release',
             'scripts',
             'apps/acceptance/src/skill-examples',
             'apps/docs/docs',
@@ -175,7 +189,7 @@ await fs.writeFile(
           { cwd: repository, encoding: 'utf8' },
         ).trim(),
       ),
-      note: 'Source versions identify this workspace only; existing published versions do not implement this native contract. Release ranges must be set and verified before distribution.',
+      note: 'Source versions identify this workspace only; candidatePackageVersions are tested prerelease targets, not a claim of publication. Distribute only alongside the matching verified release.',
     },
     null,
     2,

@@ -25,6 +25,11 @@ test('prepared skill is self-contained, source-aligned, and ships compilable nat
   assert.equal(manifest.contract, 'explicit-native-v1');
   assert.equal(manifest.releaseStatus, 'unreleased');
   assert.equal(manifest.supportedPublishedRange, null);
+  assert.equal(
+    manifest.candidatePackageVersions['@veebox/core'],
+    '2.0.0-beta.0',
+  );
+  assert.deepEqual(manifest.candidatePackageVersions, manifest.sourceVersions);
   assert.match(manifest.sourceRevision, /^[a-f0-9]{40}$/);
   for (const [relative, digest] of Object.entries(manifest.canonicalSources)) {
     const canonical = fs.readFileSync(path.join(repository, relative), 'utf8');
@@ -109,4 +114,45 @@ test('prepared skill is self-contained, source-aligned, and ships compilable nat
     });
     assert.deepEqual(template.errors, [], name);
   }
+});
+
+test('prepared skill excludes incidental local files and linked examples', (t) => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'vbox-skill-safety-'));
+  const files = [
+    path.join(repository, 'skills/vbox-native/.artifact-secret-canary'),
+    path.join(
+      repository,
+      'apps/acceptance/src/skill-examples/.artifact-secret-canary',
+    ),
+  ];
+  const linked = path.join(
+    repository,
+    'apps/acceptance/src/skill-examples/ExternalCanary.vue',
+  );
+  t.after(() => {
+    for (const file of [...files, linked]) fs.rmSync(file, { force: true });
+    fs.rmSync(root, { recursive: true, force: true });
+  });
+  for (const file of files)
+    fs.writeFileSync(file, 'DO NOT DISTRIBUTE', { flag: 'wx' });
+  fs.symlinkSync(files[0], linked);
+  const output = path.join(root, 'vbox-native');
+  const result = spawnSync(
+    process.execPath,
+    [path.join(repository, 'scripts/build-native-skill.mjs'), output],
+    { encoding: 'utf8' },
+  );
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.equal(
+    fs.existsSync(path.join(output, '.artifact-secret-canary')),
+    false,
+  );
+  assert.equal(
+    fs.existsSync(path.join(output, 'examples/.artifact-secret-canary')),
+    false,
+  );
+  assert.equal(
+    fs.existsSync(path.join(output, 'examples/ExternalCanary.vue')),
+    false,
+  );
 });

@@ -1,7 +1,7 @@
 {
   "name": "@veebox/vue",
-  "version": "1.1.1",
-  "description": "A polymorphic Vue.js component with a runtime styling engine.",
+  "version": "2.0.0-beta.0",
+  "description": "Explicit native-template styling and a polymorphic component for Vue.",
   "type": "module",
   "license": "MIT",
   "publishConfig": {
@@ -13,7 +13,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/timothyokooboh/vbox.git"
+    "url": "git+https://github.com/timothyokooboh/vbox.git",
+    "directory": "packages/vue"
   },
   "main": "dist/index.cjs",
   "module": "dist/index.es.js",
@@ -29,7 +30,7 @@
     }
   },
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && node ../../scripts/declaration-specifiers.mjs dist/types",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
@@ -70,5 +71,8 @@
   },
   "volta": {
     "node": "22.14.0"
+  },
+  "engines": {
+    "node": ">=22.14.0"
   }
 }

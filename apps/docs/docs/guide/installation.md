@@ -10,6 +10,19 @@ packages.
 
 :::
 
+## Runtime and tooling baseline
+
+The prepared beta targets Node **22.14.0+** for build tools and editor hosts.
+The clean-install gate covers npm, pnpm and Yarn Classic; Plug'n'Play is not yet
+verified. Core/Vue provide ESM and real CJS entries, with separate UMD
+artifacts. Unplugin/PVA ship ESM; named `require()` usage relies on the
+supported Node baseline's synchronous ESM interop. Installing VBox does not run
+a pnpm build or require unpublished source files.
+
+The unpublished candidate versions are core/Vue `2.0.0-beta.0` and
+unplugin/Volar/PVA `0.1.0-beta.0`. Use matching artifacts until the maintainer
+publishes them; a version listed here is not evidence of npm availability.
+
 ## Packages
 
 Add the runtime packages to an existing Vue 3 application, and the

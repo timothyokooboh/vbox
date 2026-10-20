@@ -1,7 +1,7 @@
 {
   "name": "@veebox/volar",
-  "version": "0.0.1",
-  "description": "Volar plugin for VBox token hover previews in Vue templates.",
+  "version": "0.1.0-beta.0",
+  "description": "Vue language tooling for VBox style completions, diagnostics and token previews.",
   "keywords": [
     "vue",
     "volar",
@@ -12,7 +12,8 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/timothyokooboh/vbox.git"
+    "url": "git+https://github.com/timothyokooboh/vbox.git",
+    "directory": "packages/volar"
   },
   "publishConfig": {
     "access": "public"
@@ -33,8 +34,7 @@
   ],
   "scripts": {
     "build": "node ./scripts/build.mjs",
-    "postinstall": "pnpm build",
-    "prepack": "pnpm build",
+    "prepack": "node ./scripts/build.mjs",
     "lint": "echo \"No lint script yet\"",
     "test": "pnpm build && node --test tests/**/*.test.cjs"
   },
@@ -49,6 +49,6 @@
     "@vue/compiler-dom": "^3.5.24"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22.14.0"
   }
 }
