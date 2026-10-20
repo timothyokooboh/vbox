@@ -81,3 +81,21 @@ A browser regression also reproduced a malformed docs warning container. Its
 standalone delimiters now survive formatting, and the three-engine check passes.
 The refined artifact regression passes. Final full-gate and re-review results
 will follow; no previous green run is being used to hide these discovered gaps.
+
+## Final result
+
+The refined source at `0f6849839e74bcb44e919c2a4fc549171a9e0e90` passed the
+complete serial workspace gate: **14/14 tasks, 938 browser cases and four
+intentional CDP-only skips**, in 10m48s. Public consumer typechecking and the
+artifact regression are included in that gate. Both independent review axes
+rechecked the refinements: **Standards: zero remaining findings; Spec: zero
+remaining findings**.
+
+The prepared local archive is
+`/private/tmp/vbox-skill-0f68498/vbox-native-0f68498.tgz` with SHA256
+`989ecfda32efc9556c25ae0aeacd7caa90c7c3732c919fd10f03a2423899f282`.
+Its manifest records the source commit above, 18 included source hashes and
+`workingTreeDirty: false`. Skill-creator validation passed. This checksum
+identifies this archive; tar timestamps are not claimed to be reproducible.
+The archive remains local and unpublished. The next ticket must align release
+versions and validate clean installed artifacts before a beta can be approved.
