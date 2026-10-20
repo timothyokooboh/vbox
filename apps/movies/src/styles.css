@@ -1,0 +1,50 @@
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  font-family: 'Manrope Variable', sans-serif;
+  color-scheme: light;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+}
+:root.dark {
+  color-scheme: dark;
+}
+html,
+body,
+#app {
+  min-height: 100%;
+}
+a {
+  color: inherit;
+}
+button,
+input {
+  font: inherit;
+}
+:focus-visible {
+  outline: 3px solid var(--color-ring);
+  outline-offset: 4px;
+}
+::selection {
+  background: var(--color-ink);
+  color: var(--color-canvas);
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 200ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+/* Keyboard interaction is immediate; focus rings remain visible throughout. */
+:root[data-input='keyboard'] *,
+:root[data-input='keyboard'] *::before,
+:root[data-input='keyboard'] *::after {
+  transition: none !important;
+  animation: none !important;
+}

@@ -5,36 +5,23 @@
 
 import path from 'node:path';
 import fs from 'fs-extra';
-import { createJiti } from 'jiti';
-import { DefaultTheme, ThemeCategories } from '../constants.js';
-import { deepMerge } from '../helpers/mergeTheme.js';
-import type { VBoxPluginOptions, Theme, ThemeKeys } from '../types.js';
+import { ThemeCategories } from '../constants.js';
+import { kebabToCamelCase } from '../helpers/kebabToCamelCase.js';
+import { resolveVBoxConfig } from '../helpers/resolveConfig.js';
+import { loadVBoxConfig } from '../config.js';
+import type { Theme, ThemeKeys } from '../types.js';
 import { parseReferencePath } from '../helpers/themeConfigParser.js';
 
-const jiti = createJiti(import.meta.url, { debug: true });
-const root = process.cwd();
-const configs = [
-  path.resolve(root, 'vbox.config.ts'),
-  path.resolve(root, 'vbox.config.js'),
-  path.resolve(root, 'vbox.config.cjs'),
-  path.resolve(root, 'vbox.config.mjs'),
-];
-
-const loadConfig = async () => {
-  for (const config of configs) {
-    if (await fs.pathExists(config)) {
-      try {
-        const modDefault = (await jiti.import(config, {
-          default: true,
-        })) as VBoxPluginOptions;
-        return modDefault;
-      } catch (err) {
-        console.error('Failed to load config:', config, err);
-      }
-    }
-  }
-  return null;
+const args = process.argv.slice(2);
+const option = (name: string) => {
+  const index = args.indexOf(name);
+  if (index < 0) return undefined;
+  const value = args[index + 1];
+  if (!value || value.startsWith('--'))
+    throw new Error(`[vbox-type-gen] ${name} needs a path.`);
+  return value;
 };
+const root = path.resolve(option('--root') ?? process.cwd());
 
 // type ThemeShape = VBoxPluginOptions['theme'];
 
@@ -210,7 +197,7 @@ const buildAliasDts = (aliases = {}) => {
   if (Object.keys(aliases).length === 0) return '';
 
   const entries = Object.entries(aliases)
-    .map(([k, v]) => `    ${k}: "${v}";`)
+    .map(([k, v]) => `    ${JSON.stringify(k)}: ${JSON.stringify(v)};`)
     .join('\n');
   return `
 interface AliasMap {
@@ -220,7 +207,10 @@ ${entries || '    // no user aliases'}
 };
 
 const main = async () => {
-  const config = await loadConfig();
+  const { config } = loadVBoxConfig({
+    rootDir: root,
+    configPath: option('--config'),
+  });
 
   if (!config) {
     console.log(
@@ -228,11 +218,19 @@ const main = async () => {
     );
   }
 
-  const enableDefaultTheme = config?.enableDefaultTheme !== false;
-  const base = enableDefaultTheme ? DefaultTheme : {};
-  const mergedTheme = deepMerge(base, config?.theme ?? {});
-
-  const aliases = config?.aliases?.values ?? config?.aliases?.values ?? {};
+  const { theme: mergedTheme, aliases: effectiveAliases } =
+    resolveVBoxConfig(config);
+  const aliases = Object.fromEntries(
+    Object.keys(config.aliases?.values ?? {}).flatMap((key) => {
+      const canonical = kebabToCamelCase(key);
+      const property =
+        effectiveAliases[canonical as keyof typeof effectiveAliases];
+      return [
+        [key, property],
+        [canonical, property],
+      ];
+    }),
+  );
   const color = mergedTheme?.color ?? {};
   const fontSizes = mergedTheme?.fontSize ?? {};
   const fontWeights = mergedTheme?.fontWeight ?? {};

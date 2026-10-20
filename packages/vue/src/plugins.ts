@@ -1,13 +1,6 @@
-import type { App } from 'vue';
-import {
-  DefaultAliases,
-  DefaultBreakpoints,
-  DefaultTheme,
-  injectCSS,
-  normalizeTheme,
-  buildCSSVariables,
-  deepMerge,
-} from '@veebox/core';
+import { useSSRContext, type App } from 'vue';
+import { getSSRCollector, type VBoxSSRContext } from './ssr';
+import { injectCSS, resolveVBoxConfig } from '@veebox/core';
 import type { VBoxPluginOptions } from '@veebox/core';
 import cssResets from '@veebox/core/styles/resets.css?inline';
 import VBox from '@/components/VBox.vue';
@@ -16,35 +9,30 @@ import {
   aliasKey,
   breakpointsKey,
 } from './injectionSymbols';
+import { vboxRuntimeDirective } from './directives/vboxRuntime';
 
 export type AliasStrategy = 'merge' | 'replace';
 
 export default {
   install(app: App<Element>, options?: VBoxPluginOptions) {
-    const enableDefaults = options?.enableDefaultTheme !== false;
-    const baseTheme = enableDefaults ? DefaultTheme : {};
-    const mergedTheme = deepMerge(baseTheme, options?.theme ?? {});
-
-    if (Object.keys(mergedTheme).length > 0) {
-      const { normalized, colorDarkMap } = normalizeTheme(mergedTheme);
-      const css = buildCSSVariables({ normalized, colorDarkMap });
-      injectCSS(css);
+    const config = resolveVBoxConfig(options);
+    const initialCss = [
+      options?.cssResets ? cssResets : '',
+      Object.keys(config.theme).length > 0 ? config.themeCss : '',
+    ].filter(Boolean).join('\n');
+    if (initialCss) {
+      if (typeof window !== 'undefined') injectCSS(initialCss, 'prelude');
+      else app.mixin({
+        beforeCreate() {
+          const context = useSSRContext<VBoxSSRContext>();
+          if (context) getSSRCollector(context).collect(initialCss, 'prelude');
+        },
+      });
     }
-
-    if (options?.cssResets) {
-      injectCSS(cssResets);
-    }
-
-    const userDefinedAlias = options?.aliases?.values ?? {};
-    const strategy = options?.aliases?.strategy ?? 'merge';
-    const finalAlias =
-      strategy === 'replace'
-        ? Object.assign({}, userDefinedAlias)
-        : Object.assign({}, DefaultAliases, userDefinedAlias);
-
-    app.provide(breakpointsKey, options?.breakpoints ?? DefaultBreakpoints);
-    app.provide(aliasKey, finalAlias);
-    app.provide(classNamePrefixKey, options?.classNamePrefix);
+    app.provide(breakpointsKey, config.breakpoints);
+    app.provide(aliasKey, config.aliases);
+    app.provide(classNamePrefixKey, config.classNamePrefix);
     app.component('VBox', VBox);
+    app.directive('vbox-runtime', vboxRuntimeDirective);
   },
 };

@@ -1,11 +1,10 @@
 <template>
-  <v-box
-    is="a"
+  <a
     href="https://google.com"
     target="_blank"
-    :active="{
+    :vb-active="{
       color: 'red !important',
     }"
     >Press this link for long
-  </v-box>
+  </a>
 </template>

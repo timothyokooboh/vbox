@@ -50,6 +50,7 @@ Below is a table of the default CSS property aliases provided by VBox:
 | `bgOrigin`     | `backgroundOrigin`     |
 | `radius`       | `borderRadius`         |
 | `shadow`       | `boxShadow`            |
+| `pos`          | `position`             |
 
 You can also
 [provide your own custom aliases](../customization/custom-aliases.md).

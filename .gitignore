@@ -4,4 +4,3 @@ node_modules
 .DS_STORE
 tsconfig.tsbuildinfo
 .turbo
-apps/playground

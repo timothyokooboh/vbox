@@ -1,18 +1,17 @@
 <template>
   <div data-scope="banner-body">
-    <v-box
-      is="p"
-      my="0"
-      fs="fs-sm"
-      display="flex"
-      flex-direction="column"
-      gap="0.2rem"
-      text-wrap="pretty"
-      color="#000"
+    <p
+      vb-my="0"
+      vb-fs="fs-sm"
+      vb-display="flex"
+      vb-flex-direction="column"
+      vb-gap="0.2rem"
+      vb-text-wrap="pretty"
+      vb-color="#000"
       class="vp-raw"
     >
       You’ve used up your free quota. Upgrade to continue, or come back after
       3:00 PM when it resets.
-    </v-box>
+    </p>
   </div>
 </template>

@@ -1,54 +1,49 @@
 <template>
-  <v-box
+  <div
+    role="group"
+    aria-label="Quantity"
     data-scope="product-qty-selector"
-    display="flex"
-    h="3.5rem"
-    flex-shrink="0"
-    align-items="center"
-    radius="br-full"
-    bg="cl-gray-100"
-    border="1px solid transparent"
-    px="0.25rem"
-    :dark="{
+    vb-display="flex"
+    vb-h="3.5rem"
+    vb-flex-shrink="0"
+    vb-align-items="center"
+    vb-radius="br-full"
+    vb-bg="cl-gray-100"
+    vb-border="1px solid transparent"
+    vb-px="0.25rem"
+    :vb-dark="{
       bg: '#2f2e1a',
       borderColor: 'rgba(255,255,255,0.05)',
     }"
   >
     <!-- remove -->
-    <v-box
-      is="button"
-      v-bind="qtySelectorStyles"
+    <button
+      :vb="qtySelectorStyles"
       @click="updateQty('remove')"
       :disabled="qty <= 1"
     >
-      <v-box is="span" fs="1.25rem" class="material-symbols-outlined">
-        remove
-      </v-box>
-    </v-box>
+      <span vb-fs="1.25rem" class="material-symbols-outlined"> remove </span>
+    </button>
 
-    <v-box
-      is="span"
-      w="1.5rem"
-      text-align="center"
-      fs="fs-base"
-      fw="fw-bold"
-      color="cl-text-product"
+    <span
+      vb-w="1.5rem"
+      vb-text-align="center"
+      vb-fs="fs-base"
+      vb-fw="fw-bold"
+      vb-color="cl-text-product"
     >
       {{ qty }}
-    </v-box>
+    </span>
 
     <!-- add -->
-    <v-box
-      is="button"
-      v-bind="qtySelectorStyles"
+    <button
+      :vb="qtySelectorStyles"
       @click="updateQty('add')"
       :disabled="qty >= 5"
     >
-      <v-box is="span" fs="1.25rem" class="material-symbols-outlined">
-        add
-      </v-box>
-    </v-box>
-  </v-box>
+      <span vb-fs="1.25rem" class="material-symbols-outlined"> add </span>
+    </button>
+  </div>
 </template>
 
 <script setup lang="ts">

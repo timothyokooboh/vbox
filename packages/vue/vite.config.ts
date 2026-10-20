@@ -27,8 +27,11 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),
       name: 'VBoxVue',
-      fileName: (format) => `index.${format}.js`,
-      formats: ['es', 'umd'],
+      fileName: (format) => {
+        if (format === 'cjs') return 'index.cjs';
+        return `index.${format}.js`;
+      },
+      formats: ['es', 'cjs', 'umd'],
     },
     rollupOptions: {
       external: ['vue'],

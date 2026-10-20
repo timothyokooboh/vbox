@@ -2,9 +2,7 @@
 
 This product card is styled 100% with VBox :tada:
 
-<ClientOnly>
-    <ProductCard />
-</ClientOnly>
+<ProductCard />
 
 <<< @/examples/demos/product-card/ProductCard.vue
 

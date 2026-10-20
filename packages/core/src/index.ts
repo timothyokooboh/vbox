@@ -1,3 +1,5 @@
+import { resolveBreakpoints } from './helpers/resolveBreakpoints';
+import { validateAliasKeys } from './helpers/resolveConfig';
 import type { VBoxPluginOptions } from './types';
 
 export { isValidCssDeclaration } from './helpers/isValidCssDeclaration';
@@ -16,10 +18,21 @@ export {
 export { getCss, createStyleCollector } from './helpers/styleRegistry';
 export { keyframes } from './helpers/keyframes';
 export { __DEV__ } from './helpers/isDevelopment';
-export { DefaultAliases, DefaultBreakpoints, DefaultTheme } from './constants';
+export { toKebabCase } from './helpers/toKebabCase';
+export { kebabToCamelCase } from './helpers/kebabToCamelCase';
+export {
+  DefaultAliases,
+  DefaultBreakpoints,
+  DefaultTheme,
+  ObjectStyleKeys,
+  TokenCategories,
+} from './constants';
 export type {
   VBoxProps,
   VBoxStyleProps,
+  VBoxStyles,
+  VBoxStyleInput,
+  VBoxNativeTemplateProps,
   VBoxPluginOptions,
   AliasStrategy,
   Breakpoints,
@@ -43,7 +56,38 @@ export type {
   CssProperties,
 } from './types';
 export type { StyleCollector } from './helpers/styleRegistry';
+export type { CssPriority } from './helpers/styleRegistry';
 
-export function defineConfig(config: VBoxPluginOptions) {
+export function defineConfig<const Config extends VBoxPluginOptions>(
+  config: Config,
+) {
+  resolveBreakpoints(config.breakpoints);
+  validateAliasKeys(Object.keys(config.aliases?.values ?? {}));
   return config;
 }
+
+export { getStyleBindingKey } from './helpers/styleBindingName';
+
+export {
+  resolveVBoxConfig,
+  validateAliasKeys,
+  isConditionKey,
+  getConditionKey,
+} from './helpers/resolveConfig';
+
+export { readStyleObject } from './helpers/readStyleObject';
+
+export { composeStyleSources } from './styles/sources';
+export { renderStyleDeclarations, renderStyleRules } from './styles/render';
+export { injectStyleBundle } from './helpers/injectCSS';
+export type {
+  StyleContext,
+  StyleDeclaration,
+  StyleRule,
+  StyleBundle,
+} from './styles/types';
+
+export type {
+  VBoxDefaultThemeEnabled,
+  VBoxTokenPreview,
+} from './helpers/themePreviewTypes';

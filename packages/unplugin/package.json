@@ -1,0 +1,59 @@
+{
+  "name": "@veebox/unplugin",
+  "version": "0.0.1",
+  "description": "Compile-time transform for native VBox syntax in Vue templates.",
+  "type": "module",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./vite": {
+      "types": "./dist/vite.d.ts",
+      "import": "./dist/vite.js",
+      "require": "./dist/vite.js"
+    },
+    "./webpack": {
+      "types": "./dist/webpack.d.ts",
+      "import": "./dist/webpack.js",
+      "require": "./dist/webpack.js"
+    },
+    "./transform": {
+      "types": "./dist/transform.d.ts",
+      "import": "./dist/transform.js",
+      "require": "./dist/transform.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "lint": "echo \"No lint script yet\"",
+    "build": "tsc -p tsconfig.json",
+    "postinstall": "pnpm build",
+    "test": "pnpm build && node --test tests/**/*.test.mjs"
+  },
+  "dependencies": {
+    "@jridgewell/remapping": "^2.3.5",
+    "@veebox/core": "workspace:*",
+    "@vue/compiler-dom": "^3.5.24",
+    "@vue/compiler-sfc": "^3.5.24",
+    "jiti": "^2.6.1",
+    "known-css-properties": "^0.37.0",
+    "magic-string": "^0.30.21"
+  },
+  "devDependencies": {
+    "@jridgewell/trace-mapping": "^0.3.31",
+    "@types/node": "^24.10.1",
+    "typescript": "~5.9.3"
+  }
+}

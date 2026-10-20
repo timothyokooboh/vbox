@@ -1,6 +1,11 @@
 {
   "files": [],
-  "references": [{ "path": "./packages/core" }, { "path": "./packages/vue" }],
+  "references": [
+    { "path": "./packages/core" },
+    { "path": "./packages/vue" },
+    { "path": "./packages/unplugin" },
+    { "path": "./packages/volar" }
+  ],
   "compilerOptions": {
     "target": "ESNext",
     "useDefineForClassFields": true,

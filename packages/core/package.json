@@ -15,7 +15,7 @@
     "url": "git+https://github.com/timothyokooboh/vbox.git"
   },
   "type": "module",
-  "main": "dist/index.umd.js",
+  "main": "dist/index.cjs",
   "module": "dist/index.es.js",
   "types": "dist/types/index.d.ts",
   "files": [
@@ -25,9 +25,14 @@
     ".": {
       "types": "./dist/types/index.d.ts",
       "import": "./dist/index.es.js",
-      "require": "./dist/index.umd.js"
+      "require": "./dist/index.cjs"
     },
-    "./styles/resets.css": "./dist/styles/resets.css"
+    "./styles/resets.css": "./dist/styles/resets.css",
+    "./config": {
+      "types": "./dist/types/config.d.ts",
+      "import": "./dist/cli/config.js",
+      "default": "./dist/cli/config.js"
+    }
   },
   "bin": {
     "vbox-type-gen": "dist/cli/cli/generate-types.js"
@@ -35,7 +40,7 @@
   "scripts": {
     "build": "vite build && pnpm copy:assets && tsc -p tsconfig.cli.json",
     "copy:assets": "cpx src/styles/resets.css dist/styles/",
-    "test": "vitest",
+    "test": "vitest run",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint ."
@@ -63,6 +68,7 @@
   "dependencies": {
     "fs-extra": "^11.3.2",
     "jiti": "^2.6.1",
+    "postcss-selector-parser": "7.1.1",
     "stylis": "^4.3.6"
   }
 }

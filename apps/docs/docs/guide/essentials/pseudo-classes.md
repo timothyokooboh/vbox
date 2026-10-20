@@ -4,6 +4,11 @@ VBox supports styling elements based on their state using pseudo-class props.
 You can apply styles for various states such as hover, focus, active, and
 disabled by using the corresponding pseudo-class props.
 
+On native elements, bind these groups as `:vb-hover`, `:vb-focus`,
+`:vb-focus-visible`, `:vb-focus-within`, `:vb-active`, `:vb-disabled` and
+`:vb-pseudos`. Object keys stay unprefixed. See
+[style priority](./style-priority.md) for overlapping states.
+
 ## hover
 
 You can use the `hover` prop to apply styles when the element is hovered over.
@@ -47,11 +52,12 @@ state (e.g., being clicked).
 
 <ExampleEleven />
 
-## \_disabled
+## disabled
 
 You can use the `_disabled` prop to apply styles when the element is disabled.
-The prop is prefixed with an underscore to avoid conflicts with the native
-`disabled` attribute.
+The template style binding is `:vb-disabled`; ordinary `disabled` keeps its HTML
+meaning. `_disabled` remains a supported compatibility spelling in reusable
+objects and on the legacy component.
 
 <<< @/examples/ExampleTwelve.vue
 

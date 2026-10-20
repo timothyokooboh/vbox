@@ -15,7 +15,7 @@
     "type": "git",
     "url": "git+https://github.com/timothyokooboh/vbox.git"
   },
-  "main": "dist/index.umd.js",
+  "main": "dist/index.cjs",
   "module": "dist/index.es.js",
   "types": "dist/types/index.d.ts",
   "files": [
@@ -25,7 +25,7 @@
     ".": {
       "types": "./dist/types/index.d.ts",
       "import": "./dist/index.es.js",
-      "require": "./dist/index.umd.js"
+      "require": "./dist/index.cjs"
     }
   },
   "scripts": {
@@ -33,7 +33,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
-    "test": "vitest"
+    "test": "vitest run"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.1",
@@ -42,9 +42,9 @@
     "@types/jsdom": "^27.0.0",
     "@types/node": "^24.10.0",
     "@vitejs/plugin-vue": "^6.0.3",
-    "@vue/server-renderer": "^3.5.24",
     "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/eslint-config-typescript": "^14.6.0",
+    "@vue/server-renderer": "^3.5.24",
     "@vue/tsconfig": "^0.8.1",
     "eslint": "^9.39.2",
     "eslint-plugin-oxlint": "^1.35.0",
@@ -61,7 +61,8 @@
     "vue": "^3.5.24"
   },
   "dependencies": {
-    "@veebox/core": "workspace:*"
+    "@veebox/core": "workspace:*",
+    "known-css-properties": "0.37.0"
   },
   "peerDependencies": {
     "vue": "^3.5.0"

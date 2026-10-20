@@ -1,12 +1,12 @@
 <template>
-  <v-box
-    :focus-within="{
+  <div
+    :vb-focus-within="{
       outline: '2px solid tomato',
       outlineOffset: '4px',
     }"
   >
     <p>Focus on the input</p>
 
-    <v-box is="input" border="1px solid indigo" />
-  </v-box>
+    <input vb-border="1px solid indigo" />
+  </div>
 </template>

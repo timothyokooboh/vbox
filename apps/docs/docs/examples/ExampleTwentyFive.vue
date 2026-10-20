@@ -1,24 +1,24 @@
 <template>
   <!-- prefixing the token with sp -->
-  <v-box
-    w="250px"
-    bg="tomato"
-    color="#fff"
-    text-align="center"
-    padding="sp-2"
-    mb="sp-3"
+  <div
+    vb-w="250px"
+    vb-bg="tomato"
+    vb-color="#fff"
+    vb-text-align="center"
+    vb-padding="sp-2"
+    vb-mb="sp-3"
   >
     A box
-  </v-box>
+  </div>
 
   <!-- or via CSS custom properties -->
-  <v-box
-    w="250px"
-    bg="tomato"
-    color="#fff"
-    text-align="center"
-    padding="var(--spacing-6)"
+  <div
+    vb-w="250px"
+    vb-bg="tomato"
+    vb-color="#fff"
+    vb-text-align="center"
+    vb-padding="var(--spacing-6)"
   >
     A box
-  </v-box>
+  </div>
 </template>

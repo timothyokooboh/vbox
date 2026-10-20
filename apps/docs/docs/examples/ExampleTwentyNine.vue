@@ -1,6 +1,6 @@
 <template>
-  <v-box
-    :declarations="{
+  <div
+    :vb-declarations="{
       color: 'tomato',
       padding: '0.5rem',
       '&:has(p)': {
@@ -9,5 +9,5 @@
     }"
   >
     <p>Just for convenience</p>
-  </v-box>
+  </div>
 </template>
