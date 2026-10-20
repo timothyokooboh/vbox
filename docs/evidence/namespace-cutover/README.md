@@ -121,3 +121,19 @@ bytes / 211 rules; unmount reduced live elements to 225 without evicting CSS.
 This replaces the narrower initial sample for lifecycle coverage. Both
 independent review axes now have zero outstanding code findings; the complete
 GitHub gate remains in progress.
+
+## Completed remote gate
+
+The clean Ubuntu GitHub runner passed the complete expanded gate at `e906b38`:
+[acceptance run](https://github.com/timothyokooboh/vbox/actions/runs/39434385052/job/118667428991).
+It ran frozen installation, all package builds, public acceptance/core/Vue type
+checks, all 81 editor tests, and `pnpm run test --concurrency=1` successfully.
+The workspace gate finished 14/14 tasks with 887 browser cases passing and four
+intentional CDP-only skips. Local reviewed resource cases also passed 6/6.
+
+CI used Node 22.14.0 / pnpm 10.14.0; local commands used Node 22.14.0 / pnpm
+9.9.0. Playwright was 1.64.1, Vue language-core/vue-tsc 3.2.5, TypeScript 5.9.3,
+and webpack 5.105.4. Subsequent changes only correct migration/evidence prose.
+Standards and Spec reviews have no outstanding findings. Package-artifact,
+installable-guidance and final quality gates remain separate tickets. The
+independent Vercel preview check failed; no manual deployment was attempted.
