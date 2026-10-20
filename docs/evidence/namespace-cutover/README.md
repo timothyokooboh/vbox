@@ -108,3 +108,16 @@ mounted null-withdraw/reapply phase and removal while sharing the same complete
 style contributions. The resource fixture now includes these phases with
 computed internal-default and shared-survivor assertions. Updated browser
 measurements and final gate results remain pending sufficient disk space.
+
+### Reviewed lifecycle follow-up
+
+After some space became available, the refined fixture passed all six
+browser/bundler cases locally. It now withdraws and reapplies a caller
+contribution while keeping the target mounted, verifies black/10px internal
+defaults, restores red/20px, and unmounts while the survivor shares those
+contributions. Finite CSS reuse stayed at one sheet / 11,962 bytes / 191
+top-level rules / 226 live elements. Twenty unique widths grew CSS to 12,922
+bytes / 211 rules; unmount reduced live elements to 225 without evicting CSS.
+This replaces the narrower initial sample for lifecycle coverage. Both
+independent review axes now have zero outstanding code findings; the complete
+GitHub gate remains in progress.
