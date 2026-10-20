@@ -102,13 +102,12 @@ test('collectTokenHints supports unmarked custom components by default', () => {
   assert.equal(hints[0].token, 'cl-brand');
 });
 
-test('collectTokenHints supports custom component hovers when parseAllComponents is false', () => {
+test('collectTokenHints supports custom component hovers without compiler opt-in', () => {
   const ast = baseParse(`<BaseButton color="cl-brand">Save</BaseButton>`);
   const hints = collectTokenHints(
     ast,
     (token) => (token === 'cl-brand' ? '#c52341' : null),
     () => true,
-    { parseAllComponents: false },
   );
 
   assert.equal(hints.length, 1);
@@ -123,7 +122,6 @@ test('collectTokenHints still shows custom component hovers with vbox-ignore', (
     ast,
     (token) => (token === 'cl-brand' ? '#c52341' : null),
     () => true,
-    { parseAllComponents: false },
   );
 
   assert.equal(hints.length, 1);
@@ -225,26 +223,36 @@ test('collectTokenHints explains attribute tokens independently of compiler tag 
   assert.equal(hints[0].token, 'cl-brand');
 });
 
-test('style key matcher excludes semantic attributes', () => {
-  const isStyleKey = createStyleKeyMatcher({});
-
-  assert.equal(isStyleKey('img', 'src'), false);
-  assert.equal(isStyleKey('a', 'href'), false);
-  assert.equal(isStyleKey('p', 'color'), true);
-  assert.equal(isStyleKey('section', 'max-w'), true);
+test('style vocabulary recognizes explicit CSS, aliases, and conditions without semantic inference', () => {
+  const known = createStyleKeyMatcher({});
+  for (const key of [
+    'color',
+    'max-w',
+    'translate',
+    'src',
+    'width',
+    '--accent',
+    '_disabled',
+    'disabled',
+    '_2xl',
+    '2xl',
+  ]) {
+    assert.equal(known('img', key), true, key);
+  }
+  assert.equal(known('p', 'colro'), false);
 });
 
-test('style key matcher supports semantic/style overrides', () => {
-  const isStyleKey = createStyleKeyMatcher(
-    {},
-    {
-      forceStyleAttrs: ['src'],
-      forceSemanticAttrs: ['width'],
-    },
-  );
-
-  assert.equal(isStyleKey('img', 'src'), true);
-  assert.equal(isStyleKey('img', 'width'), false);
+test('retired editor inference options give actionable migration errors', () => {
+  for (const key of [
+    'parseAllComponents',
+    'forceStyleAttrs',
+    'forceSemanticAttrs',
+  ]) {
+    assert.throws(
+      () => createPlugin({ config: { [key]: false } }),
+      /removed.*vb-/,
+    );
+  }
 });
 
 test('buildAttrCompletionKeys explicit aliases replace config aliases', () => {
