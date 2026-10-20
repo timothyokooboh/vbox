@@ -76,5 +76,17 @@ preceded retirement; post-retirement checks are recorded below.
 `pnpm install --ignore-scripts --no-frozen-lockfile` regenerated the workspace
 lockfile; `pnpm install --frozen-lockfile --ignore-scripts --offline` then
 passed. The change removes the SpaceHub importer without changing shared
-dependency versions. Full consumer verification is running and will be recorded
-before this PR is marked ready.
+dependency versions. Post-retirement verification on 2026-10-20 passed:
+
+- `CI=true NUXT_TELEMETRY_DISABLED=1 pnpm run test --concurrency=1`: 14/14 tasks
+  successful in 8m42s; five build outputs cached, tests executed.
+- Browser matrices: 881 passed, four intentional Movies non-Chromium CDP skips.
+  Includes shared webpack/Vite, Nuxt, playground, docs and both showcases.
+- Core `tsc`, Vue/acceptance `vue-tsc`: passed.
+- `pnpm --filter @vbox/acceptance test:editor`: 76 passed.
+- Independent read-only Standards and Spec reviews: no actionable findings.
+
+Local Node 22.14.0 / pnpm 9.9.0; CI pins pnpm 10.14.0. Atelier's preceding
+[GitHub acceptance job](https://github.com/timothyokooboh/vbox/actions/runs/39330256121/job/118326332869)
+also passed. Its separate Vercel preview check failed; no claim is made that all
+external deployment checks pass and no deployment was performed here.
