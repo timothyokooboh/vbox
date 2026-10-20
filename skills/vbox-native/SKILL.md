@@ -12,7 +12,7 @@ description:
 
 Read [compatibility.json](compatibility.json) before changing a consumer. This
 artifact targets the unreleased explicit-native contract, not the currently
-published 1.1.1 API. Match the artifact's source revision or an explicitly
+older published API. Match the artifact's source revision or an explicitly
 listed future beta range. A package version alone cannot distinguish this
 workspace source from the older published artifact. If the consumer has only
 published VBox, retain its polymorphic API instead of silently introducing

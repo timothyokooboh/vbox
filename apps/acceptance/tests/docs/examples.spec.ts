@@ -117,3 +117,16 @@ test.describe('documented keyframes', () => {
     await expect(example).toHaveCSS('animation-name', 'none');
   });
 });
+
+test('agent guidance warning ends before preparation and installation instructions', async ({
+  page,
+}) => {
+  await page.goto('/up-next/agent-skills.html');
+  const warning = page.locator('.custom-block.warning');
+  await expect(warning).toContainText('No skill package');
+  await expect(warning).not.toContainText('Maintainers can prepare');
+  await expect(warning).not.toContainText('For Codex');
+  await expect(
+    page.getByRole('link', { name: 'skill preparation guide' }),
+  ).toBeVisible();
+});

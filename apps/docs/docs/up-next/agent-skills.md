@@ -5,9 +5,13 @@ explicit styling boundary, reusable/PVA composition, conditional priority,
 component forwarding, SSR integration and accessibility limits using the same
 canonical documentation as this site.
 
-::: warning Unreleased No skill package, registry entry, or supported published
-version range is available yet. The draft belongs to the unreleased native-API
-source revision, not the currently published polymorphic-only packages. :::
+::: warning Unreleased
+
+No skill package, registry entry, or supported published version range is
+available yet. The draft belongs to the unreleased native-API source revision,
+not the currently published polymorphic-only packages.
+
+:::
 
 Maintainers can prepare and validate an artifact using the repository's
 [skill preparation guide](https://github.com/timothyokooboh/vbox/blob/main/skills/README.md).
