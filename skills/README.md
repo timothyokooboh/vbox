@@ -69,3 +69,10 @@ routing aligned when the contract changes.
 A separate forward-test asks an agent to perform representative consumer tasks
 using only the prepared skill and task context. Record the output and failures;
 frontmatter validation alone does not establish useful agent behavior.
+
+The prepared beta versions live in `release/native-beta.json`. The builder
+checks workspace alignment and records them as `candidatePackageVersions`.
+`supportedPublishedRange` remains null while the release is unpublished. This
+separates tested candidate compatibility from an assertion that npm already
+contains those versions. Rebuild/revalidate both archives if any version
+changes.

@@ -1,0 +1,50 @@
+name: Packed package readiness
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  installed-consumer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - node: 22.14.0
+            manager: npm
+          - node: 22.14.0
+            manager: pnpm
+          - node: 22.14.0
+            manager: yarn
+          - node: 24
+            manager: npm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.14.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '${{ matrix.node }}'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm --filter '@veebox/*' build
+      - if: matrix.manager == 'yarn'
+        run: npm install --global yarn@1.22.22
+      - run: node scripts/release/pack.mjs '${{ runner.temp }}/vbox-packed'
+      - run: node --test scripts/release/tests/artifacts.test.mjs
+        env:
+          VBOX_TARBALL_DIR: '${{ runner.temp }}/vbox-packed'
+      - run:
+          pnpm --filter @vbox/acceptance exec playwright install --with-deps
+          chromium
+      - run:
+          node scripts/release/verify-consumer.mjs '${{ runner.temp
+          }}/vbox-packed' '${{ matrix.manager }}'
+      - uses: actions/upload-artifact@v4
+        with:
+          name:
+            'unpublished-tarballs-node-${{ matrix.node }}-${{ matrix.manager }}'
+          path: '${{ runner.temp }}/vbox-packed'

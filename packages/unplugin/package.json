@@ -1,6 +1,6 @@
 {
   "name": "@veebox/unplugin",
-  "version": "0.0.1",
+  "version": "0.1.0-beta.0",
   "description": "Compile-time transform for native VBox syntax in Vue templates.",
   "type": "module",
   "license": "MIT",
@@ -39,7 +39,6 @@
   "scripts": {
     "lint": "echo \"No lint script yet\"",
     "build": "tsc -p tsconfig.json",
-    "postinstall": "pnpm build",
     "test": "pnpm build && node --test tests/**/*.test.mjs"
   },
   "dependencies": {
@@ -55,5 +54,13 @@
     "@jridgewell/trace-mapping": "^0.3.31",
     "@types/node": "^24.10.1",
     "typescript": "~5.9.3"
+  },
+  "engines": {
+    "node": ">=22.14.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/timothyokooboh/vbox.git",
+    "directory": "packages/unplugin"
   }
 }
