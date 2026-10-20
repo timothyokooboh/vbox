@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 const width = ref(20);
 const mounted = ref(true);
+const contributing = ref(true);
 </script>
 <template>
   <section aria-label="Style resource exercise">
@@ -9,15 +10,27 @@ const mounted = ref(true);
     <button type="button" @click="mounted = !mounted">
       Toggle resource target
     </button>
-    <p
+    <button type="button" @click="contributing = !contributing">
+      Toggle resource contribution
+    </button>
+    <v-box
+      is="p"
+      color="black"
+      width="10px"
       v-if="mounted"
       data-testid="resource-target"
-      :vb="{ width: `${width}px`, color: 'red' }"
+      :vb="contributing ? { width: `${width}px`, color: 'red' } : null"
     >
       Resource target
-    </p>
-    <p data-testid="resource-shared" vb-width="20px" vb-color="red">
+    </v-box>
+    <v-box
+      is="p"
+      color="black"
+      width="10px"
+      data-testid="resource-shared"
+      :vb="{ width: '20px', color: 'red' }"
+    >
       Shared survivor
-    </p>
+    </v-box>
   </section>
 </template>
