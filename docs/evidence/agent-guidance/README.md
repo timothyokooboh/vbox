@@ -1,4 +1,4 @@
-# Agent guidance — ticket #18
+# Agent guidance - ticket #18
 
 `skills/vbox-native/SKILL.md` routes consumer tasks to canonical docs. The
 builder creates a portable artifact with generated references and the exact Vue
@@ -66,3 +66,18 @@ archive and project-scoped discovery instructions. Distribution requires a clean
 source commit, verified beta package range and same-release artifact validation.
 Full workspace validation and independent review results are recorded below once
 complete. No beta, registry entry, release tag or manual deployment was created.
+
+## Review refinements
+
+The first complete workspace gate passed 14/14 tasks, including 935 browser
+cases and four intentional CDP-only skips. Independent review then caught a gap
+outside the four task examples: the artifact renderer discarded canonical
+VitePress source inclusions, removing essential installation/SSR code. A new
+artifact regression failed for those missing sources. The builder now expands
+them into fenced code, records their hashes, and confines source reads to the
+repository. Original code fences remain unchanged.
+
+A browser regression also reproduced a malformed docs warning container. Its
+standalone delimiters now survive formatting, and the three-engine check passes.
+The refined artifact regression passes. Final full-gate and re-review results
+will follow; no previous green run is being used to hide these discovered gaps.

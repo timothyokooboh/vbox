@@ -44,6 +44,7 @@ await fs.cp(
 );
 await fs.mkdir(path.join(destination, 'references'));
 const sources = {};
+const includedSources = {};
 for (const [source, name] of references) {
   const text = await fs.readFile(source, 'utf8');
   sources[path.relative(repository, source)] = createHash('sha256')
@@ -51,38 +52,76 @@ for (const [source, name] of references) {
     .digest('hex');
   let fenced = false;
   let liveScript = false;
-  const portable = text
-    .split('\n')
-    .flatMap((line) => {
-      if (/^```/.test(line)) {
-        fenced = !fenced;
-        return [line];
-      }
-      if (fenced) return [line];
-      if (/^<script\s/.test(line)) liveScript = true;
-      if (liveScript) {
-        if (/^<\/script>/.test(line)) liveScript = false;
-        return [];
-      }
-      if (/^<<<\s|^<[A-Z][\w]*\s*\/>/.test(line)) return [];
-      return [
-        line.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, label, target) => {
-          if (/^(?:https?:|#)/.test(target)) return match;
-          const [file, fragment] = target.split('#');
-          const resolved = path.resolve(path.dirname(source), file);
-          const local = references.get(resolved);
-          const relative = path
-            .relative(repository, resolved)
-            .split(path.sep)
-            .join('/');
-          const url =
-            local ??
-            `https://github.com/timothyokooboh/vbox/blob/${sourceRevision}/${relative}`;
-          return `[${label}](${url}${fragment ? `#${fragment}` : ''})`;
-        }),
-      ];
-    })
-    .join('\n');
+  const lines = [];
+  for (const line of text.split('\n')) {
+    if (/^```/.test(line)) {
+      fenced = !fenced;
+      lines.push(line);
+      continue;
+    }
+    if (fenced) {
+      lines.push(line);
+      continue;
+    }
+    if (/^<script\s/.test(line)) liveScript = true;
+    if (liveScript) {
+      if (/^<\/script>/.test(line)) liveScript = false;
+      continue;
+    }
+    if (/^<<<\s/.test(line)) {
+      const inclusion = line.match(/^<<<\s+@\/(.+)$/);
+      if (!inclusion)
+        throw new Error(`Unsupported source inclusion in ${source}: ${line}`);
+      const included = await fs.realpath(path.resolve(docsRoot, inclusion[1]));
+      const relative = path.relative(repository, included);
+      if (
+        relative === '..' ||
+        relative.startsWith(`..${path.sep}`) ||
+        path.isAbsolute(relative)
+      )
+        throw new Error(
+          `Skill source inclusion must stay inside the repository: ${line}`,
+        );
+      const content = await fs.readFile(included, 'utf8');
+      includedSources[relative] = createHash('sha256')
+        .update(content)
+        .digest('hex');
+      const extension = path.extname(included).slice(1);
+      const language = ['mjs', 'cjs'].includes(extension) ? 'js' : extension;
+      const fence = '`'.repeat(
+        Math.max(
+          3,
+          ...[...content.matchAll(/^`+/gm)].map((match) => match[0].length + 1),
+        ),
+      );
+      lines.push(
+        `Source: \`${relative}\``,
+        '',
+        `${fence}${language}`,
+        content.trimEnd(),
+        fence,
+      );
+      continue;
+    }
+    if (/^<[A-Z][\w]*\s*\/>/.test(line)) continue;
+    lines.push(
+      line.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, label, target) => {
+        if (/^(?:https?:|#)/.test(target)) return match;
+        const [file, fragment] = target.split('#');
+        const resolved = path.resolve(path.dirname(source), file);
+        const local = references.get(resolved);
+        const relative = path
+          .relative(repository, resolved)
+          .split(path.sep)
+          .join('/');
+        const url =
+          local ??
+          `https://github.com/timothyokooboh/vbox/blob/${sourceRevision}/${relative}`;
+        return `[${label}](${url}${fragment ? `#${fragment}` : ''})`;
+      }),
+    );
+  }
+  const portable = lines.join('\n');
   await fs.writeFile(
     path.join(destination, 'references', name),
     `<!-- Generated from ${path.relative(repository, source)}; edit the canonical document. -->\n\n${portable}`,
@@ -114,6 +153,7 @@ await fs.writeFile(
       sourceRevision,
       sourceVersions,
       canonicalSources: sources,
+      includedSources,
       workingTreeDirty: Boolean(
         execFileSync(
           'git',
@@ -127,6 +167,10 @@ await fs.writeFile(
             'apps/acceptance/src/skill-examples',
             'apps/docs/docs',
             'packages',
+            'apps/vboxssr',
+            'pnpm-lock.yaml',
+            'package.json',
+            'pnpm-workspace.yaml',
           ],
           { cwd: repository, encoding: 'utf8' },
         ).trim(),

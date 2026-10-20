@@ -37,11 +37,23 @@ test('prepared skill is self-contained, source-aligned, and ships compilable nat
       [...text.matchAll(/^```[^\n]*\n([\s\S]*?)^```/gm)].map(
         (match) => match[1],
       );
-    assert.deepEqual(
-      fences(bundled),
-      fences(canonical),
-      `fenced examples changed in ${relative}`,
-    );
+    for (const block of fences(canonical))
+      assert.ok(
+        fences(bundled).includes(block),
+        `fenced example changed in ${relative}`,
+      );
+    for (const inclusion of canonical.matchAll(/^<<<\s+@\/(.+)$/gm)) {
+      const source = path.resolve(repository, 'apps/docs/docs', inclusion[1]);
+      const imported = fs.readFileSync(source, 'utf8');
+      assert.ok(
+        bundled.includes(imported.trimEnd()),
+        `missing imported example ${inclusion[1]}`,
+      );
+      assert.equal(
+        manifest.includedSources[path.relative(repository, source)],
+        createHash('sha256').update(imported).digest('hex'),
+      );
+    }
   }
   const skill = fs.readFileSync(path.join(output, 'SKILL.md'), 'utf8');
   assert.match(skill, /^---\nname: vbox-native\n/);
@@ -72,6 +84,7 @@ test('prepared skill is self-contained, source-aligned, and ships compilable nat
     0,
     'building must not overwrite an existing installation',
   );
+  assert.match(retry.stderr, /EEXIST/);
   assert.equal(fs.readFileSync(path.join(output, 'SKILL.md'), 'utf8'), skill);
   for (const name of examples) {
     const file = path.join(output, 'examples', name);
