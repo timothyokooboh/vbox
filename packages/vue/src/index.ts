@@ -1,5 +1,5 @@
 import type VBox from './components/VBox.vue';
-import type { VBoxNativeTemplateProps, VBoxStyleInput } from '@veebox/core';
+import type { VBoxStyleInput } from '@veebox/core';
 
 export { default as VBox } from './components/VBox.vue';
 export { default as VBoxPlugin } from './plugins';
@@ -11,16 +11,12 @@ declare module 'vue' {
     VBox: typeof VBox;
   }
 
-  export interface HTMLAttributes extends VBoxNativeTemplateProps {
+  export interface HTMLAttributes {
     vb?: VBoxStyleInput;
-    vbox?: boolean | '';
-    'vbox-ignore'?: boolean | '';
   }
 
-  export interface SVGAttributes extends VBoxNativeTemplateProps {
+  export interface SVGAttributes {
     vb?: VBoxStyleInput;
-    vbox?: boolean | '';
-    'vbox-ignore'?: boolean | '';
   }
 }
 

@@ -91,3 +91,5 @@ export type {
   VBoxDefaultThemeEnabled,
   VBoxTokenPreview,
 } from './helpers/themePreviewTypes';
+
+export { createStyleVocabulary } from './helpers/styleVocabulary';

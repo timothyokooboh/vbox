@@ -1,3 +1,7 @@
+const {
+  collectNameAdvisories,
+  buildNameAdvisories,
+} = require('./nameAdvisories.cjs');
 const { collectTokenHints, buildHoverCode } = require('./tokenPreviews.cjs');
 const { templateElements } = require('./templateElements.cjs');
 const path = require('node:path');
@@ -13,243 +17,6 @@ const knownCssPropertiesModule = require('known-css-properties');
 const importWithJiti = createJiti(__filename, { interopDefault: true });
 const core = require('@veebox/core');
 const TOKEN_PREFIX_TO_CATEGORY = core.TokenCategories;
-
-const GLOBAL_SEMANTIC_ATTRIBUTES = new Set([
-  'id',
-  'class',
-  'style',
-  'title',
-  'lang',
-  'dir',
-  'hidden',
-  'tabindex',
-  'contenteditable',
-  'draggable',
-  'spellcheck',
-  'translate',
-  'role',
-  'slot',
-  'is',
-  'part',
-  'inert',
-  'popover',
-  'inputmode',
-  'nonce',
-  'accesskey',
-  'autocapitalize',
-  'autocorrect',
-  'enterkeyhint',
-  'exportparts',
-  'itemid',
-  'itemprop',
-  'itemref',
-  'itemscope',
-  'itemtype',
-  'virtualkeyboardpolicy',
-]);
-
-const SEMANTIC_ATTRIBUTES_BY_TAG = {
-  a: [
-    'download',
-    'href',
-    'hreflang',
-    'ping',
-    'referrerpolicy',
-    'rel',
-    'target',
-    'type',
-  ],
-  area: [
-    'alt',
-    'coords',
-    'download',
-    'href',
-    'ping',
-    'referrerpolicy',
-    'rel',
-    'shape',
-    'target',
-  ],
-  audio: [
-    'autoplay',
-    'controls',
-    'crossorigin',
-    'loop',
-    'muted',
-    'preload',
-    'src',
-  ],
-  base: ['href', 'target'],
-  blockquote: ['cite'],
-  button: [
-    'disabled',
-    'form',
-    'formaction',
-    'formenctype',
-    'formmethod',
-    'formnovalidate',
-    'formtarget',
-    'name',
-    'popovertarget',
-    'popovertargetaction',
-    'type',
-    'value',
-  ],
-  canvas: [],
-  col: ['span'],
-  colgroup: ['span'],
-  data: ['value'],
-  del: ['cite', 'datetime'],
-  details: ['name', 'open'],
-  embed: ['src', 'type'],
-  fieldset: ['disabled', 'form', 'name'],
-  form: [
-    'accept-charset',
-    'action',
-    'autocomplete',
-    'enctype',
-    'method',
-    'name',
-    'novalidate',
-    'rel',
-    'target',
-  ],
-  iframe: [
-    'allow',
-    'allowfullscreen',
-    'loading',
-    'name',
-    'referrerpolicy',
-    'sandbox',
-    'src',
-    'srcdoc',
-  ],
-  img: [
-    'alt',
-    'crossorigin',
-    'decoding',
-    'fetchpriority',
-    'ismap',
-    'loading',
-    'referrerpolicy',
-    'sizes',
-    'src',
-    'srcset',
-    'usemap',
-  ],
-  input: [
-    'accept',
-    'alt',
-    'autocomplete',
-    'autofocus',
-    'capture',
-    'checked',
-    'dirname',
-    'disabled',
-    'form',
-    'formaction',
-    'formenctype',
-    'formmethod',
-    'formnovalidate',
-    'formtarget',
-    'list',
-    'max',
-    'maxlength',
-    'min',
-    'minlength',
-    'multiple',
-    'name',
-    'pattern',
-    'placeholder',
-    'readonly',
-    'required',
-    'src',
-    'step',
-    'type',
-    'value',
-  ],
-  ins: ['cite', 'datetime'],
-  label: ['for', 'form'],
-  li: ['value'],
-  link: [
-    'as',
-    'crossorigin',
-    'disabled',
-    'fetchpriority',
-    'href',
-    'hreflang',
-    'imagesizes',
-    'imagesrcset',
-    'integrity',
-    'media',
-    'referrerpolicy',
-    'rel',
-    'sizes',
-    'type',
-  ],
-  map: ['name'],
-  meter: ['form', 'high', 'low', 'max', 'min', 'optimum', 'value'],
-  object: ['data', 'form', 'name', 'type', 'usemap'],
-  ol: ['reversed', 'start', 'type'],
-  optgroup: ['disabled', 'label'],
-  option: ['disabled', 'label', 'selected', 'value'],
-  output: ['for', 'form', 'name'],
-  progress: ['max', 'value'],
-  q: ['cite'],
-  script: [
-    'async',
-    'blocking',
-    'crossorigin',
-    'defer',
-    'fetchpriority',
-    'integrity',
-    'nomodule',
-    'nonce',
-    'referrerpolicy',
-    'src',
-    'type',
-  ],
-  select: ['autocomplete', 'disabled', 'form', 'multiple', 'name', 'required'],
-  slot: ['name'],
-  source: ['media', 'src', 'srcset', 'type'],
-  style: ['blocking', 'media', 'nonce', 'title'],
-  td: ['colspan', 'headers', 'rowspan'],
-  textarea: [
-    'autocomplete',
-    'autocorrect',
-    'autofocus',
-    'cols',
-    'dirname',
-    'disabled',
-    'form',
-    'maxlength',
-    'minlength',
-    'name',
-    'placeholder',
-    'readonly',
-    'required',
-    'rows',
-    'wrap',
-  ],
-  th: ['abbr', 'colspan', 'headers', 'rowspan', 'scope'],
-  time: ['datetime'],
-  track: ['default', 'kind', 'label', 'src', 'srclang'],
-  video: [
-    'autoplay',
-    'controls',
-    'crossorigin',
-    'loop',
-    'muted',
-    'playsinline',
-    'poster',
-    'preload',
-    'src',
-  ],
-  svg: ['viewBox', 'preserveAspectRatio', 'xmlns'],
-  path: ['d', 'pathLength'],
-  use: ['href', 'xlink:href'],
-  image: ['href', 'x', 'y', 'preserveAspectRatio', 'xlink:href'],
-};
 
 const COMPLETION_FEATURES = {
   verification: true,
@@ -286,41 +53,6 @@ const getKeyVariants = (name) => {
   const camel = kebabToCamelCase(name);
   const lower = name.toLowerCase();
   return new Set([name, normalized, camel, lower]);
-};
-
-const setHasAnyVariant = (set, name) => {
-  for (const variant of getKeyVariants(name)) {
-    if (set.has(variant)) return true;
-  }
-  return false;
-};
-
-const toVariantSet = (list) => {
-  const set = new Set();
-  for (const item of list) {
-    for (const variant of getKeyVariants(item)) {
-      set.add(variant);
-    }
-  }
-  return set;
-};
-
-const GLOBAL_SEMANTIC_SET = toVariantSet(
-  Array.from(GLOBAL_SEMANTIC_ATTRIBUTES),
-);
-const TAG_SEMANTIC_SET_MAP = new Map(
-  Object.entries(SEMANTIC_ATTRIBUTES_BY_TAG).map(([tag, attrs]) => [
-    String(tag).toLowerCase(),
-    toVariantSet(attrs),
-  ]),
-);
-
-const isSemanticAttributeForTag = (tag, key) => {
-  if (!tag || !key) return false;
-  if (key.startsWith('aria-') || key.startsWith('data-')) return true;
-  if (setHasAnyVariant(GLOBAL_SEMANTIC_SET, key)) return true;
-  const perTag = TAG_SEMANTIC_SET_MAP.get(String(tag).toLowerCase());
-  return perTag ? setHasAnyVariant(perTag, key) : false;
 };
 
 const getAttrValueContentAndOffset = (attrValueNode) => {
@@ -383,29 +115,13 @@ const resolveAliasKeys = (vboxConfig = {}, pluginConfig = {}) =>
     : Object.keys(vboxConfig?.aliases?.values ?? {});
 
 const createStyleKeyMatcher = (vboxConfig = {}, pluginConfig = {}) => {
-  const userAliases = new Set(resolveAliasKeys(vboxConfig, pluginConfig));
-  const forceStyleAttrs = new Set([
-    ...(vboxConfig?.compiler?.forceStyleAttrs ?? []),
-    ...(pluginConfig?.forceStyleAttrs ?? []),
+  const known = core.createStyleVocabulary(knownCssPropertiesModule.all, [
+    ...(vboxConfig.aliases?.strategy === 'replace'
+      ? []
+      : VBOX_DEFAULT_ALIAS_KEYS),
+    ...resolveAliasKeys(vboxConfig, pluginConfig),
   ]);
-  const forceSemanticAttrs = new Set([
-    ...(vboxConfig?.compiler?.forceSemanticAttrs ?? []),
-    ...(pluginConfig?.forceSemanticAttrs ?? []),
-  ]);
-
-  return (tag, key) => {
-    if (!key) return false;
-    if (setHasAnyVariant(forceSemanticAttrs, key)) return false;
-    if (setHasAnyVariant(forceStyleAttrs, key)) return true;
-    if (isSemanticAttributeForTag(tag, key)) return false;
-    if (key.startsWith('aria-') || key.startsWith('data-')) return false;
-    if (key.includes(':')) return false;
-    if (setHasAnyVariant(VBOX_DEFAULT_ALIAS_KEYS, key)) return true;
-    if (setHasAnyVariant(userAliases, key)) return true;
-
-    // Keep this permissive for plain CSS keys.
-    return /^[A-Za-z_][A-Za-z0-9_-]*$/.test(key) || key.startsWith('--');
-  };
+  return (_tag, key) => known(key);
 };
 
 const buildTokenPrefixByProperty = (vboxConfig = {}, pluginConfig = {}) => {
@@ -630,7 +346,6 @@ const collectCompletionHints = (
     if (shouldProcessElement) {
       for (const prop of node.props) {
         if (prop.type === 6 /* ATTRIBUTE */) {
-          if (prop.name === 'vbox' || prop.name === 'vbox-ignore') continue;
           if (!acceptsStyleName(prop.name)) continue;
 
           pushAttrHint(prop.name, prop.loc.start.offset, prop.name.length);
@@ -880,6 +595,16 @@ const buildCompletionCode = (
 
 const createPlugin = (ctx) => {
   const userConfig = ctx?.config ?? {};
+  for (const key of [
+    'parseAllComponents',
+    'forceStyleAttrs',
+    'forceSemanticAttrs',
+  ]) {
+    if (Object.prototype.hasOwnProperty.call(userConfig, key))
+      throw new Error(
+        `[VBox] ${key} was removed. Use explicit vb-* or :vb styling; semantic bindings retain ordinary Vue behavior.`,
+      );
+  }
   const rootDir = resolveRootDir(ctx, userConfig);
   const { ObjectStyleKeys } = core;
   let tokenMap = new Map();
@@ -940,18 +665,21 @@ const createPlugin = (ctx) => {
       if (!sfc.template?.ast) return;
       refreshVocabulary();
 
+      const nameHints = collectNameAdvisories(sfc.template.ast, (key) =>
+        isStyleKey(null, key),
+      );
       const hints = collectTokenHints(sfc.template.ast, resolveTokenValue);
       const completionHints = collectCompletionHints(
         sfc.template.ast,
         isStyleKey,
         getTokenCandidates,
         {
-          parseAllComponents: userConfig.parseAllComponents !== false,
           typescript,
         },
       );
 
       if (
+        nameHints.length === 0 &&
         hints.length === 0 &&
         completionHints.attrHints.length === 0 &&
         completionHints.valueHints.length === 0
@@ -1021,6 +749,20 @@ const createPlugin = (ctx) => {
                 },
               },
             ),
+            sfc.content,
+          ),
+        );
+      }
+      if (nameHints.length) {
+        embeddedFile.content = prioritizeEditorMappings(
+          embeddedFile.content,
+          nameHints,
+          'semantic',
+        );
+        embeddedFile.content.push(
+          ...scopeCompletionCode(
+            typescript,
+            buildNameAdvisories(nameHints),
             sfc.content,
           ),
         );

@@ -18,17 +18,27 @@ function project(t) {
 
 test('discovered alias metadata refreshes after config edits in the same process', (t) => {
   const p = project(t);
-  const source = '<template><p first="red" second="blue" /></template>';
+  const source = '<template><p vb-first="red" vb-second="blue" /></template>';
   fs.writeFileSync(
     p.config,
     'export default { aliases: { values: { first: "color" } } }',
   );
-  assert.match(transformVueSfc(source, p.file).code, /'first': 'red'/);
+  assert.deepEqual(
+    transformVueSfc(source, p.file).warnings.map(
+      (item) => item.message.match(/property \"([^\"]+)/)[1],
+    ),
+    ['second'],
+  );
   fs.writeFileSync(
     p.config,
     'export default { aliases: { values: { second: "color" } } }',
   );
-  assert.match(transformVueSfc(source, p.file).code, /'second': 'blue'/);
+  assert.deepEqual(
+    transformVueSfc(source, p.file).warnings.map(
+      (item) => item.message.match(/property \"([^\"]+)/)[1],
+    ),
+    ['first'],
+  );
 });
 
 test('explicit metadata replaces discovery including an empty list; explicit styling needs neither', (t) => {
@@ -63,13 +73,13 @@ test('configPath and rootDir select non-standard locations without process-wide 
     b.config,
     'export default { aliases: { values: { second: "color" } } }',
   );
-  const source = '<template><p first="red" second="blue" /></template>';
+  const source = '<template><p vb-first="red" vb-second="blue" /></template>';
   const out = transformVueSfc(source, a.file, {
     rootDir: b.root,
     configPath: './vbox.config.ts',
   });
-  assert.match(out.code, /'second': 'blue'/);
-  assert.ok(out.code.includes('first="red"'));
+  assert.equal(out.warnings.length, 1);
+  assert.match(out.warnings[0].message, /Unrecognized.*first/);
   assert.deepEqual(out.dependencies, [b.config]);
 });
 
@@ -92,4 +102,18 @@ test('bad configuration is diagnosed with its path and can recover without resta
   );
   fs.writeFileSync(p.config, 'export default {}');
   assert.ok(transformVueSfc(source, p.file));
+});
+
+test('advisories honor replacement of runtime default aliases', (t) => {
+  const p = project(t);
+  fs.writeFileSync(
+    p.config,
+    'export default { aliases: { strategy: "replace", values: { paint: "color" } } }',
+  );
+  const out = transformVueSfc(
+    '<template><p vb-bg="red" vb-paint="blue" /></template>',
+    p.file,
+  );
+  assert.equal(out.warnings.length, 1);
+  assert.match(out.warnings[0].message, /Unrecognized.*bg/);
 });

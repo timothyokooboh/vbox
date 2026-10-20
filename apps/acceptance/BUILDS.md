@@ -43,9 +43,9 @@ and merge compatibility keys normally.
 - No-op HTML SFCs retain authored bytes. Changed explicit files preserve script,
   style and custom-block content except for required runtime binding setup.
 
-The unpublished inference bridge still exists for old demos until the separate
-namespace-cutover ticket. Already transformed files cannot enter that bridge a
-second time. This is internal transition handling, not a second public mode.
+The unpublished inference bridge was removed in ticket #14. Every authored file
+uses the explicit namespace contract, and there is no legacy-inference mode. The
+published VBox component API remains supported independently.
 
 ## Executable evidence
 

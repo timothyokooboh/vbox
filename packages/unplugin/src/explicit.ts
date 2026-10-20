@@ -87,6 +87,7 @@ const escapeAttribute = (value: string) =>
 export const transformExplicitStyles = (
   code: string,
   id: string,
+  isKnownStyleKey: (key: string) => boolean,
 ): VBoxSfcTransformPayload | null => {
   const { descriptor, errors } = parse(code, { filename: id });
   if (descriptor.template?.lang && descriptor.template.lang !== 'html') {
@@ -157,6 +158,12 @@ export const transformExplicitStyles = (
           : prop.name === 'bind' && prop.arg?.type === 4 && prop.arg.isStatic
             ? prop.arg.content
             : null;
+      if (name && ['vbox', 'vbox-ignore', 'vboxignore'].includes(name)) {
+        warnings.push({
+          message: `[VBox] ${id}:${prop.loc.start.line} ${name} is a retired marker with no styling effect. Remove it and use vb-* or :vb for styling.`,
+          loc: prop.loc.start,
+        });
+      }
       const key =
         name === 'vb' ? 'vb' : name === null ? null : getStyleBindingKey(name);
       if (key === null) continue;
@@ -188,6 +195,12 @@ export const transformExplicitStyles = (
           prop.loc.start,
           `Invalid style property name ${JSON.stringify(name)}.`,
         );
+      }
+      if (name !== 'vb' && !isKnownStyleKey(key)) {
+        warnings.push({
+          message: `[VBox] ${id}:${prop.loc.start.line} Unrecognized style property "${key}". It remains styling; check the spelling or configure its alias. Future CSS properties are allowed.`,
+          loc: prop.loc.start,
+        });
       }
       const identity = name === 'vb' ? ':vb' : (getConditionKey(key) ?? key);
       if (seen.has(identity))
