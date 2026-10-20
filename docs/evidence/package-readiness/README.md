@@ -39,3 +39,26 @@ CI's packed-consumer matrix complements the full multi-engine workspace suite.
 It is not a claim of older Node, Yarn Plug'n'Play, all editor versions or
 complete accessibility certification. Final CI/full-suite/review results are
 pending.
+
+## Review refinements
+
+The initial full workspace gate at `fc580db` passed **14/14 tasks, 938 browser
+cases and four intentional CDP-only skips** in 10m27s. Independent reviews then
+identified two gaps: test-canary cleanup could delete an existing file after
+exclusive creation failed, and the packed webpack client hydrated Vite-rendered
+markup rather than proving webpack's own server build. Cleanup now tracks only
+successfully created, uniquely named paths. The installed consumer builds both
+server outputs independently and checks critical computed styles with client
+JavaScript disabled before testing hydration and interactive updates.
+
+CI passed npm on Node 22/24 and Yarn Classic. Its pnpm setup exposed a
+shell-shim assumption in the runner; package managers now execute as programs,
+not as Node source. Self-review also found that a simple `typeof process` guard
+suppressed browser development diagnostics after bundler replacement. A public
+Vite-built probe reproduced `__DEV__ === false` in development. Safe fallback
+evaluation now preserves development/production replacement while standalone UMD
+remains free of a required process shim.
+
+The stronger pnpm consumer passes these refinements. Final CI/full-gate and
+review rechecks follow before this PR becomes ready. Earlier successful runs are
+not presented as evidence for subsequently added checks.
