@@ -5,17 +5,20 @@ Issue #28, slice 23/27. Builds on Atelier PR #51 and its
 
 ## Acceptance status
 
-**Retirement is pending explicit maintainer acceptance. SpaceHub is retained.**
-The ticket requires acceptance of the working replacement, not merely approval
-of its plan. An automatic safety review rejected removal before that acceptance.
-The maintainer has been asked to accept Atelier and approve the separate
-retirement PR; no response is recorded here yet. Do not treat the implementation
-brief, passing tests, or this document as that response.
+**The maintainer accepted Atelier and approved SpaceHub retirement on
+2026-10-20.** When explicitly asked whether Atelier was accepted as the
+replacement and `apps/spacehub` could be removed in the separate retirement PR,
+the maintainer replied **"yes i accept"**. The approval is recorded in
+[issue #28](https://github.com/timothyokooboh/vbox/issues/28#issuecomment-6291292092).
+This supersedes the earlier pending-acceptance state and safety rejection; it is
+acceptance of the working replacement, not an inference from the plan.
 
-The original checkout and main branch are untouched. This slice neither deploys
-Atelier nor publishes packages. After acceptance, remove the old app in the
-separate review branch, regenerate the lockfile, verify a frozen workspace
-install and run the remaining consumer gate before proposing merge.
+The old app's 32 tracked files and its lockfile importer are removed in this
+isolated review branch. The workspace uses `apps/*`, so no root script or
+workspace glob needs replacement. Remaining reference checks found only
+historical evidence/brief discussion, not executable SpaceHub consumers. The
+original checkout and main branch are untouched. This slice neither deploys
+Atelier nor publishes packages. Merge remains a separate maintainer action.
 
 ## Replacement evidence
 
@@ -65,5 +68,13 @@ name includes its permalink label, which the assertion accounts for.
 
 Verification on 2026-10-19: `pnpm --filter @vbox/acceptance test:docs` passed
 (type checks, production VitePress build, 26 executable snippet checks, and 27
-browser checks across Chromium/Firefox/WebKit). No post-retirement install or
-consumer result is claimed: removal is still awaiting acceptance.
+browser checks across Chromium/Firefox/WebKit). These documentation checks
+preceded retirement; post-retirement checks are recorded below.
+
+## Post-retirement verification
+
+`pnpm install --ignore-scripts --no-frozen-lockfile` regenerated the workspace
+lockfile; `pnpm install --frozen-lockfile --ignore-scripts --offline` then
+passed. The change removes the SpaceHub importer without changing shared
+dependency versions. Full consumer verification is running and will be recorded
+before this PR is marked ready.
