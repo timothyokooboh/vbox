@@ -40,3 +40,35 @@ await fs.writeFile(
   path.join(destination, 'artifacts.json'),
   JSON.stringify(artifacts, null, 2),
 );
+
+await fs.writeFile(
+  path.join(destination, 'provenance.json'),
+  JSON.stringify(
+    {
+      sourceRevision: execFileSync('git', ['rev-parse', 'HEAD'], {
+        cwd: repository,
+        encoding: 'utf8',
+      }).trim(),
+      workingTreeDirty: Boolean(
+        execFileSync(
+          'git',
+          [
+            'status',
+            '--porcelain',
+            '--untracked-files=normal',
+            '--',
+            'packages',
+            'scripts',
+            'release',
+            'pnpm-lock.yaml',
+            'package.json',
+          ],
+          { cwd: repository, encoding: 'utf8' },
+        ).trim(),
+      ),
+      node: process.version,
+    },
+    null,
+    2,
+  ),
+);

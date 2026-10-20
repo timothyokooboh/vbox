@@ -118,24 +118,32 @@ test('prepared skill is self-contained, source-aligned, and ships compilable nat
 
 test('prepared skill excludes incidental local files and linked examples', (t) => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'vbox-skill-safety-'));
+  const suffix = path.basename(root);
+  const created = [];
   const files = [
-    path.join(repository, 'skills/vbox-native/.artifact-secret-canary'),
     path.join(
       repository,
-      'apps/acceptance/src/skill-examples/.artifact-secret-canary',
+      `skills/vbox-native/.artifact-secret-canary-${suffix}`,
+    ),
+    path.join(
+      repository,
+      `apps/acceptance/src/skill-examples/.artifact-secret-canary-${suffix}`,
     ),
   ];
   const linked = path.join(
     repository,
-    'apps/acceptance/src/skill-examples/ExternalCanary.vue',
+    `apps/acceptance/src/skill-examples/ExternalCanary-${suffix}.vue`,
   );
   t.after(() => {
-    for (const file of [...files, linked]) fs.rmSync(file, { force: true });
+    for (const file of created) fs.rmSync(file, { force: true });
     fs.rmSync(root, { recursive: true, force: true });
   });
-  for (const file of files)
+  for (const file of files) {
     fs.writeFileSync(file, 'DO NOT DISTRIBUTE', { flag: 'wx' });
+    created.push(file);
+  }
   fs.symlinkSync(files[0], linked);
+  created.push(linked);
   const output = path.join(root, 'vbox-native');
   const result = spawnSync(
     process.execPath,
@@ -144,15 +152,15 @@ test('prepared skill excludes incidental local files and linked examples', (t) =
   );
   assert.equal(result.status, 0, result.stdout + result.stderr);
   assert.equal(
-    fs.existsSync(path.join(output, '.artifact-secret-canary')),
+    fs.existsSync(path.join(output, path.basename(files[0]))),
     false,
   );
   assert.equal(
-    fs.existsSync(path.join(output, 'examples/.artifact-secret-canary')),
+    fs.existsSync(path.join(output, 'examples', path.basename(files[1]))),
     false,
   );
   assert.equal(
-    fs.existsSync(path.join(output, 'examples/ExternalCanary.vue')),
+    fs.existsSync(path.join(output, 'examples', path.basename(linked))),
     false,
   );
 });

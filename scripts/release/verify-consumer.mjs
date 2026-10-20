@@ -127,8 +127,12 @@ console.log(
   ),
 );
 try {
-  run(managerPath, ['--version']);
-  run(
+  execFileSync(managerPath, ['--version'], {
+    cwd: root,
+    env,
+    stdio: 'inherit',
+  });
+  execFileSync(
     managerPath,
     manager === 'yarn'
       ? ['install', '--non-interactive', '--prefer-offline']
@@ -139,6 +143,7 @@ try {
             '--config.manage-package-manager-versions=false',
           ]
         : ['install', '--prefer-offline'],
+    { cwd: root, env, stdio: 'inherit' },
   );
   runBinary('vbox-type-gen');
   run('modules.mjs');
@@ -157,8 +162,10 @@ try {
     'types.cts',
   ]);
   run('editor.cjs');
+  run('environment.mjs');
   runBinary('vite', ['build']);
   runBinary('webpack', ['--config', 'webpack.config.cjs']);
+  runBinary('webpack', ['--config', 'webpack.server.cjs']);
   runBinary('vite', [
     'build',
     '--ssr',

@@ -3,6 +3,23 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import http from 'node:http';
 import { chromium } from '@playwright/test';
+const readStyles = (button) =>
+  button.evaluate((el) => {
+    const s = getComputedStyle(el);
+    return {
+      color: s.color,
+      width: s.width,
+      translate: s.translate,
+      padding: s.padding,
+    };
+  });
+
+const initialStyle = {
+  color: 'rgb(18, 52, 86)',
+  width: '100px',
+  translate: '8px',
+  padding: '16px',
+};
 const browser = await chromium.launch();
 try {
   for (const bundler of ['vite', 'webpack']) {
@@ -33,28 +50,24 @@ try {
         errors.push(message.text());
     });
     try {
+      const cold = await browser.newPage({ javaScriptEnabled: false });
+      try {
+        await cold.goto(`http://127.0.0.1:${server.address().port}`);
+        assert.deepEqual(
+          await readStyles(cold.locator('#probe')),
+          initialStyle,
+          `${bundler}: critical CSS without client JavaScript`,
+        );
+      } finally {
+        await cold.close();
+      }
       await page.goto(`http://127.0.0.1:${server.address().port}`);
       const button = page.locator('#probe');
       assert.equal(await button.getAttribute('translate'), 'no');
-      const style = () =>
-        button.evaluate((el) => {
-          const s = getComputedStyle(el);
-          return {
-            color: s.color,
-            width: s.width,
-            translate: s.translate,
-            padding: s.padding,
-          };
-        });
-      assert.deepEqual(await style(), {
-        color: 'rgb(18, 52, 86)',
-        width: '100px',
-        translate: '8px',
-        padding: '16px',
-      });
+      assert.deepEqual(await readStyles(button), initialStyle);
       await button.click();
-      assert.equal((await style()).width, '120px');
-      assert.equal((await style()).color, 'rgb(255, 0, 0)');
+      assert.equal((await readStyles(button)).width, '120px');
+      assert.equal((await readStyles(button)).color, 'rgb(255, 0, 0)');
       assert.deepEqual(errors, []);
       console.log(
         `${bundler}: packed SSR/hydration, semantic collision, tokens, alias, PVA, hover and update passed`,

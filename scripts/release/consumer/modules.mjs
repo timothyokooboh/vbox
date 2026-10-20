@@ -27,10 +27,9 @@ for (const name of [
       fs.readFileSync(path.join(path.dirname(entry), 'index.umd.js'), 'utf8'),
       context,
     );
-    assert.ok(
-      Object.keys(context).some((key) => !['Vue', 'console'].includes(key)),
-      'UMD exposes a browser global',
-    );
+    if (name === 'core')
+      assert.equal(typeof context.VBoxCore.defineConfig, 'function');
+    else assert.equal(typeof context.VBoxVue.VBoxPlugin.install, 'function');
   }
 }
 for (const entry of ['vite', 'webpack', 'transform']) {
