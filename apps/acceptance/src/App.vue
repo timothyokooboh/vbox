@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SkillExamples from './SkillExamples.vue';
 import ResourceStyles from './ResourceStyles.vue';
 import { ref } from 'vue';
 import PrimitiveTargets from './targets/PrimitiveTargets.vue';
@@ -37,6 +38,7 @@ const badge = pva({
   <main>
     <NativeScalar />
     <ResourceStyles />
+    <SkillExamples />
     <Vocabulary />
     <GroupedObject />
     <SourceComposition />
