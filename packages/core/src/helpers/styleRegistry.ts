@@ -1,10 +1,6 @@
 import { serializeStyleBundles } from '../styles/bundles';
 import type { StyleBundle } from '../styles/types';
-import {
-  CSS_REGISTRY_KEY,
-  CSS_REGISTRY_LISTENERS_KEY,
-  VENDOR_PREFIX_KEY,
-} from '../constants';
+import { CSS_REGISTRY_KEY, VENDOR_PREFIX_KEY } from '../constants';
 import { createVendorPrefix } from './vendorPrefix';
 
 export type CssPriority = 'prelude' | 'base' | 'override';
@@ -26,7 +22,6 @@ const createRegistry = (): CssRegistry => ({
 const typedGlobal = globalThis as typeof globalThis & {
   [VENDOR_PREFIX_KEY]?: Map<string, string>;
   [CSS_REGISTRY_KEY]?: CssRegistry | Set<string>;
-  [CSS_REGISTRY_LISTENERS_KEY]?: Set<() => void>;
 };
 
 export const vendorPrefixes: Map<string, string> =
@@ -83,7 +78,9 @@ export const getCss = (registry: CssRegistry = cssRegistry) => {
   const overrideCss = Array.from(registry.override).join('\n\n');
 
   const explicitCss = serializeStyleBundles(registry.styles?.values() ?? []);
-  return [preludeCss, baseCss, overrideCss, explicitCss].filter(Boolean).join('\n\n');
+  return [preludeCss, baseCss, overrideCss, explicitCss]
+    .filter(Boolean)
+    .join('\n\n');
 };
 
 export const registerStyleBundle = (

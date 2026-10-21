@@ -148,9 +148,7 @@ describe('pva', () => {
         },
       },
       defaultVariants: defaults,
-      compoundVariants: [
-        { variant: 'solid', styles: { bg: 'brand' } },
-      ],
+      compoundVariants: [{ variant: 'solid', styles: { bg: 'brand' } }],
     });
 
     const result = resolver();
@@ -187,4 +185,56 @@ describe('pva', () => {
 
     expect(resolver({ intent: 'ghost' })).toEqual({ color: 'ink', py: '6px' });
   });
+});
+
+it('empty-string variants apply both explicit/default styles and matching compounds', () => {
+  const resolve = pva({
+    variants: {
+      density: { '': { padding: '4px' }, roomy: { padding: '12px' } },
+    },
+    defaultVariants: { density: '' },
+    compoundVariants: [{ density: '', styles: { color: 'blue' } }],
+  });
+  expect(resolve()).toEqual({ padding: '4px', color: 'blue' });
+  expect(resolve({ density: '' })).toEqual({ padding: '4px', color: 'blue' });
+  expect(resolve({ density: 'roomy' })).toEqual({ padding: '12px' });
+});
+
+it('shallowly replaces nested properties without mutating frozen inputs or sharing result objects', () => {
+  const firstHover = Object.freeze({ color: 'red', padding: '4px' });
+  const secondHover = Object.freeze({ color: 'blue' });
+  const compoundHover = Object.freeze({ opacity: 0.5 });
+  const resolve = pva(
+    Object.freeze({
+      variants: Object.freeze({
+        appearance: Object.freeze({
+          solid: Object.freeze({ hover: firstHover, color: 'white' }),
+        }),
+        size: Object.freeze({
+          large: Object.freeze({ hover: secondHover, padding: '16px' }),
+        }),
+      }),
+      compoundVariants: Object.freeze([
+        {
+          appearance: 'solid' as const,
+          size: 'large' as const,
+          styles: Object.freeze({ hover: compoundHover }),
+        },
+      ]),
+    }),
+  );
+  const one = resolve({ appearance: 'solid' });
+  expect(one.hover).toBe(firstHover);
+  const both = resolve({ appearance: 'solid', size: 'large' });
+  expect(both).toEqual({
+    color: 'white',
+    padding: '16px',
+    hover: { opacity: 0.5 },
+  });
+  expect(both.hover).toBe(compoundHover);
+  both.color = 'green';
+  const next = resolve({ appearance: 'solid', size: 'large' });
+  expect(next).not.toBe(both);
+  expect(next.color).toBe('white');
+  expect(firstHover).toEqual({ color: 'red', padding: '4px' });
 });

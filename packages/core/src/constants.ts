@@ -422,4 +422,15 @@ export const DefaultTheme: VBoxPluginOptions['theme'] = {
 
 export const CSS_REGISTRY_KEY = '__VBOX__CSS__REGISTRY__';
 export const VENDOR_PREFIX_KEY = '__VBOX__VENDOR__PREFIXES__';
-export const CSS_REGISTRY_LISTENERS_KEY = '_VBOX__CSS__REGISTRY__LISTENERS';
+
+/** Template structure/head tags are not style targets; component names stay case-sensitive. */
+export const NonStylingTargetTags = [
+  'template',
+  'slot',
+  'script',
+  'style',
+  'meta',
+  'link',
+  'base',
+  'title',
+] as const;

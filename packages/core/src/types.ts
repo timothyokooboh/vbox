@@ -157,10 +157,7 @@ export type Breakpoints = Required<{
  * All CSS properties accept the native StandardCssProperties value
  * OR any design token var (CSSTokenAndVars)
  */
-/*
-export type CSSStyleProps = AugmentedCSSProperties & {
-  [K in keyof AliasProps]?: AliasProps[K] | DesignTokens;
-}*/
+
 export type CSSStyleProps = AugmentedCSSProperties & AliasProps;
 
 export type VBoxProps = PseudoProps &
