@@ -81,9 +81,9 @@ design, not a hidden cleanup change.
 
 ## Final verification status
 
-Focused package/editor checks have passed; final browser, full workspace,
-independent review and packed-install gates are in progress. This section must
-be completed with exact tested revisions/results before declaring readiness. No
+All implementation gates passed for source revision `2638d93c812a23c1e06bef0f8a8233ab55fa0afa`.
+Independent Standards and Spec reviews cleared the final fixes. The results below
+are tied to that exact revision; this subsequent evidence-only update changes no code. No
 beta, skill, release tag or manual deployment has been published.
 
 ### Review follow-ups
@@ -105,3 +105,26 @@ packed-install matrices will run on clean CI runners, with their exact source
 revision recorded here. Focused package checks passed locally: core 108 before
 the added wrapper regression, compiler 61, Volar public-contract 3, PVA 10 plus
 type fixtures, and the previously recorded real editor suite 83.
+
+
+## Completed gates
+
+- [Full acceptance](https://github.com/timothyokooboh/vbox/actions/runs/39553172328/job/119066745454): **14/14 tasks**, **962 browser cases**, **83 real editor cases**, core/Vue/consumer type checks. Four intentional CDP-only skips remain. Core's final suite includes **109** tests, Vue **18**, compiler **61**, PVA **10** plus type fixtures.
+- [Packed installations](https://github.com/timothyokooboh/vbox/actions/runs/39553172296): all four jobs passed, npm/pnpm/Yarn Classic on Node 22.14 and npm on Node 24. Actual five-package tarballs were installed outside the workspace with lifecycle scripts enabled, then tested for exports, types, CLI, editor, Vite/webpack SSR/hydration and interactive styles.
+- Final CI completion timings: cold **817 ms**, warm p95 **6.67 ms**, incremental max **759 ms**. Hover: cold **650 ms**, warm p95 **0.58 ms**, incremental **677 ms**. Executable budgets passed.
+- Browser finite-state measurements plateaued at **one stylesheet, 13,901 bytes, 220 rules, 258 live nodes**. Unique states increased to **14,861 bytes/240 rules**; unmount reduced nodes to 257 while intentionally retaining CSS. This is not a bounded-memory guarantee.
+- The unpublished skill built and validated from clean revision `2638d93`; candidate versions match the package plan. Archive SHA-256: `0b808af005b5bbaaa23638efc979707c9fe4a1a2a00fd4d77beb01a8b4bb5e29`. Local artifact: `/private/tmp/vbox-native-skill-2638d93.tgz`. Rebuild from the approved release revision before publication.
+
+## Handoff
+
+All 27 tickets have corresponding PRs. At verification, slices 1-23 were already
+merged in GitHub; slices 24-27 remained open as PRs #54, #55, #56 and #57.
+Review the remaining stack in that order. No merges were performed during this
+round-up. The original maintainer checkout remains untouched.
+
+The separate Vercel preview check is failing; it is not included in the passing
+acceptance claim, and hosting/deployment settings were not modified. Automated
+checks are not exhaustive WCAG certification, universal editor compatibility or
+proof against every external CSS interaction. The documented Node/runtime and
+retained-rule limitations still apply. Beta publication, skill distribution and
+manual deployment remain maintainer-controlled, separately authorized actions.
