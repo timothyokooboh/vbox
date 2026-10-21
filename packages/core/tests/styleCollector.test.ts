@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { createStyleCollector } from '../src/helpers/styleRegistry';
+import { createStyleCollector } from '../src/index';
 
 describe('style collector', () => {
   test('collects and returns css', () => {
@@ -54,4 +54,27 @@ describe('style collector', () => {
     collector.reset();
     expect(collector.getCss()).toBe('');
   });
+});
+
+test('request-local collectors retain independent snapshots when another request resets', () => {
+  const first = createStyleCollector();
+  const second = createStyleCollector();
+  const bundle = {
+    key: 'request-snapshot',
+    ownerDepth: 0,
+    rules: [{ context: [], css: '.request-snapshot{color:red;}' }],
+  };
+  first.collectStyleBundle(bundle);
+  second.collectStyleBundle(bundle);
+  bundle.rules[0]!.css = '.request-snapshot{color:blue;}';
+  const snapshot = second.getCss();
+  expect(snapshot).toContain('color:red');
+  expect(snapshot).not.toContain('blue');
+  first.reset();
+  first.collectStyleBundle(bundle);
+  expect(first.getCss()).toContain('color:blue');
+  expect(second.getCss()).toBe(snapshot);
+  first.reset();
+  expect(first.getCss()).toBe('');
+  expect(second.getCss()).toBe(snapshot);
 });

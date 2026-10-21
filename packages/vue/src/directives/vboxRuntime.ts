@@ -4,7 +4,6 @@ import {
   createDjb2Hash,
   type CssPriority,
   injectCSS,
-  stableStringify,
 } from '@veebox/core';
 import type { AliasMap, Breakpoints } from '@veebox/core';
 import type { Directive, DirectiveBinding } from 'vue';
@@ -35,16 +34,16 @@ const ensureClass = (
     el.__vboxRuntimeClassMap = new Map();
   }
 
-  const previousClassName = el.__vboxRuntimeClassMap.get(ownerKey);
-  if (previousClassName && previousClassName !== className) {
+  const map = el.__vboxRuntimeClassMap;
+  const previousClassName = map.get(ownerKey);
+  map.set(ownerKey, className);
+  if (previousClassName && ![...map.values()].includes(previousClassName)) {
     el.classList.remove(previousClassName);
   }
 
   if (!el.classList.contains(className)) {
     el.classList.add(className);
   }
-
-  el.__vboxRuntimeClassMap.set(ownerKey, className);
 };
 
 const clearClass = (el: RuntimeElement, ownerKey: string) => {
@@ -52,9 +51,10 @@ const clearClass = (el: RuntimeElement, ownerKey: string) => {
   if (!map) return;
 
   const previousClassName = map.get(ownerKey);
-  if (previousClassName) {
+  map.delete(ownerKey);
+  // A parent and child may still share the same generated class on this target.
+  if (previousClassName && ![...map.values()].includes(previousClassName)) {
     el.classList.remove(previousClassName);
-    map.delete(ownerKey);
   }
 
   if (map.size === 0) {
@@ -72,9 +72,12 @@ const resolveAppContextValues = (
   binding: DirectiveBinding<Record<string, unknown>>,
 ) => {
   const appContext = binding.instance?.$?.appContext;
-  const provides = appContext?.provides as Record<PropertyKey, unknown> | undefined;
+  const provides = appContext?.provides as
+    | Record<PropertyKey, unknown>
+    | undefined;
 
-  const aliases = (provides?.[aliasKey as symbol] as AliasMap) ?? DefaultAliases;
+  const aliases =
+    (provides?.[aliasKey as symbol] as AliasMap) ?? DefaultAliases;
   const breakpoints =
     (provides?.[breakpointsKey as symbol] as Breakpoints) ?? DefaultBreakpoints;
   const classNamePrefix =
@@ -96,8 +99,10 @@ const computeClassAndCss = (
   styles: Record<string, unknown>,
   binding: DirectiveBinding<Record<string, unknown>>,
 ) => {
-  const { aliases, breakpoints, classNamePrefix } = resolveAppContextValues(binding);
-  const hash = createDjb2Hash(stableStringify(styles));
+  const { aliases, breakpoints, classNamePrefix } =
+    resolveAppContextValues(binding);
+  // Nested values, authored declaration order and effective config define the rule.
+  const hash = createDjb2Hash(JSON.stringify([styles, aliases, breakpoints]));
   const baseClassName = `css-${hash}`;
   const className = classNamePrefix
     ? `${classNamePrefix}-${baseClassName}`
@@ -133,7 +138,15 @@ const applyRuntimeStyles = (
   injectCSS(css, priority);
 };
 
-export const vboxRuntimeDirective: Directive<RuntimeElement, Record<string, unknown>> = {
+export const vboxRuntimeDirective: Directive<
+  RuntimeElement,
+  Record<string, unknown>
+> = {
+  // Hydration must establish directive-owned DOM before mount-time checks/hooks.
+  // Keep mounted too: a fresh mount patches authored class props after created.
+  created(el, binding) {
+    applyRuntimeStyles(el, binding);
+  },
   mounted(el, binding) {
     applyRuntimeStyles(el, binding);
   },

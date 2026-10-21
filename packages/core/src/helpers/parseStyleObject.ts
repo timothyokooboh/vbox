@@ -2,22 +2,13 @@ import { isObjectLiteral } from './isObjectLiteral';
 import type { StandardPropertiesHyphen } from 'csstype';
 import type { AliasMap, Breakpoints, VBoxProps } from '../types';
 import { toKebabCase } from './toKebabCase';
-import { kebabToCamelCase } from './kebabToCamelCase';
+import { normalizeKey } from './normalizeKey';
 import { isValidCssSelector } from './isValidCssSelector';
 import { isValidCssDeclaration } from './isValidCssDeclaration';
 import { parseTokens } from './parseTokens';
 import { __DEV__ } from './isDevelopment';
 
-/** Resolve against the current consumer, never a process-global key-only cache. */
-export const normalizeKey = (key: string, aliases: AliasMap): string => {
-  if (key.startsWith('--')) return key;
-  const camelCaseKey = kebabToCamelCase(key);
-  for (const name of [key, camelCaseKey]) {
-    if (Object.hasOwn(aliases, name))
-      return aliases[name as keyof AliasMap] ?? camelCaseKey;
-  }
-  return camelCaseKey;
-};
+export { normalizeKey } from './normalizeKey';
 
 // Convert a style map into validated kebab-case CSS rules and nested selectors
 const extractStylesFromValue = (value: unknown, aliases: AliasMap) => {

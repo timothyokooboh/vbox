@@ -15,9 +15,10 @@ export type CompoundCondition<V extends VariantDefinitions> = {
   [K in keyof V]?: VariantValue<V, K> | VariantValue<V, K>[];
 };
 
-export type CompoundVariant<V extends VariantDefinitions> = CompoundCondition<V> & {
-  styles: StyleObject;
-};
+export type CompoundVariant<V extends VariantDefinitions> =
+  CompoundCondition<V> & {
+    styles: StyleObject;
+  };
 
 export type PvaConfig<V extends VariantDefinitions> = {
   variants: V;
@@ -69,11 +70,12 @@ export const pva = <const V extends VariantDefinitions>(
     const styles: StyleObject = {};
 
     for (const variantKey of variantKeys) {
-      const selected = (selection[variantKey] ??
-        defaults[variantKey]) as VariantValue<V, typeof variantKey> | undefined;
+      const selected = (selection[variantKey] ?? defaults[variantKey]) as
+        | VariantValue<V, typeof variantKey>
+        | undefined;
       resolved[variantKey] = selected;
 
-      if (!selected) continue;
+      if (selected == null) continue;
 
       const variantMap = variants[variantKey];
       mergeStyles(styles, variantMap[selected]);

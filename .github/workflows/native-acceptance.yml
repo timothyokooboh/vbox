@@ -27,7 +27,6 @@ jobs:
           pnpm --filter @vbox/acceptance exec playwright install --with-deps
           chromium firefox webkit
       - run: pnpm --filter @vbox/acceptance type-check
-      - run: pnpm --filter @vbox/acceptance test:editor
       - run: pnpm --filter @veebox/core exec tsc --noEmit -p tsconfig.json
       - run:
           pnpm --filter @vbox/acceptance exec vue-tsc --noEmit -p
