@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LegacyDirectiveQuality from './LegacyDirectiveQuality.vue';
 import SkillExamples from './SkillExamples.vue';
 import ResourceStyles from './ResourceStyles.vue';
 import { ref } from 'vue';
@@ -36,6 +37,7 @@ const badge = pva({
 </script>
 <template>
   <main>
+    <LegacyDirectiveQuality />
     <NativeScalar />
     <ResourceStyles />
     <SkillExamples />

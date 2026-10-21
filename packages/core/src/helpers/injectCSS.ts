@@ -20,7 +20,8 @@ const updateStyleElement = () => {
     styleEl.id = id;
     document.head.appendChild(styleEl);
   }
-  styleEl.textContent = getCss();
+  const css = getCss();
+  if (styleEl.textContent !== css) styleEl.textContent = css;
 };
 
 export const injectCSS = (css: string, priority: CssPriority = 'base') => {
