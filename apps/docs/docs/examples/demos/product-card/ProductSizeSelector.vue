@@ -1,72 +1,69 @@
 <template>
-  <v-box is="section" data-scope="product-size-selector">
-    <v-box
-      display="flex"
-      align-items="center"
-      justify-content="space-between"
-      mb="0.7rem"
+  <section data-scope="product-size-selector">
+    <div
+      vb-display="flex"
+      vb-align-items="center"
+      vb-justify-content="space-between"
+      vb-mb="0.7rem"
     >
-      <v-box
-        is="h2"
-        my="0"
-        fs="fs-sm"
-        fw="fw-bold"
-        color="cl-text-product"
+      <h2
+        vb-my="0"
+        vb-fs="fs-sm"
+        vb-fw="fw-bold"
+        vb-color="cl-text-product"
         class="vp-raw"
       >
         Select Size
-      </v-box>
-      <v-box
-        is="button"
-        cursor="pointer"
-        bg="transparent"
-        fs="fs-xs"
-        fw="fw-medium"
-        color="cl-gray-500"
-        text-decoration="underline"
-        border="none"
-        :dark="{
+      </h2>
+      <button
+        vb-cursor="pointer"
+        vb-bg="transparent"
+        vb-fs="fs-xs"
+        vb-fw="fw-medium"
+        vb-color="cl-gray-500"
+        vb-text-decoration="underline"
+        vb-border="none"
+        :vb-dark="{
           color: 'cl-gray-400',
         }"
-        v-bind="outlineStyles"
+        :vb="outlineStyles"
       >
         Size Guide
-      </v-box>
-    </v-box>
+      </button>
+    </div>
 
-    <v-box
-      display="flex"
-      gap="sp-3"
-      py="sp-1"
-      overflow-x="auto"
-      scrollbar-width="none"
-      :declarations="{
+    <div
+      vb-display="flex"
+      vb-gap="sp-3"
+      vb-py="sp-1"
+      vb-overflow-x="auto"
+      vb-scrollbar-width="none"
+      :vb-declarations="{
         '-ms-overflow-style': 'none',
         '&::-webkit-scrollbar': {
           display: 'none',
         },
       }"
     >
-      <v-box is="button" v-bind="baseSizeSelectionStyles">39</v-box>
-      <v-box is="button" v-bind="baseSizeSelectionStyles">40</v-box>
-      <v-box
-        is="button"
-        v-bind="baseSizeSelectionStyles"
-        bg="cl-primary"
-        border="none"
-        shadow="0 4px 12px rgba(249,245,6,0.3)"
-        :dark="{
+      <button :vb="baseSizeSelectionStyles">39</button>
+      <button :vb="baseSizeSelectionStyles">40</button>
+      <button
+        :vb="baseSizeSelectionStyles"
+        vb-bg="cl-primary"
+        vb-border="none"
+        vb-shadow="0 4px 12px rgba(249,245,6,0.3)"
+        :vb-dark="{
           color: '#1c1c0d',
         }"
       >
         41
-      </v-box>
-      <v-box is="button" v-bind="baseSizeSelectionStyles">42</v-box>
-      <v-box is="button" v-bind="baseSizeSelectionStyles">43</v-box>
-      <v-box is="button" v-bind="baseSizeSelectionStyles">44</v-box>
-      <v-box is="button" v-bind="baseSizeSelectionStyles">45</v-box>
-    </v-box>
-  </v-box>
+      </button>
+      <button :vb="baseSizeSelectionStyles">42</button>
+      <button :vb="baseSizeSelectionStyles">43</button>
+      <button :vb="baseSizeSelectionStyles">44</button>
+      <button :vb="baseSizeSelectionStyles">45</button>
+    </div>
+  </section>
 </template>
 
 <script setup lang="ts">

@@ -1,13 +1,9 @@
 <template>
-  <v-box
-    :declarations="{
+  <div
+    :vb-declarations="{
       '--border-input': 'blue',
     }"
   >
-    <v-box is="input" border="1px solid var(--border-input)" />
-  </v-box>
+    <input vb-border="1px solid var(--border-input)" />
+  </div>
 </template>
-
-<script setup lang="ts"></script>
-
-<style scoped></style>

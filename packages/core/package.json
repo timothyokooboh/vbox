@@ -1,7 +1,7 @@
 {
   "name": "@veebox/core",
-  "version": "1.1.1",
-  "description": "The core package of VBox - a polymorphic Vue.js component with a runtime styling engine.",
+  "version": "2.0.0-beta.0",
+  "description": "Framework-agnostic styling engine, design tokens and style composition for VBox.",
   "publishConfig": {
     "access": "public"
   },
@@ -12,10 +12,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/timothyokooboh/vbox.git"
+    "url": "git+https://github.com/timothyokooboh/vbox.git",
+    "directory": "packages/core"
   },
   "type": "module",
-  "main": "dist/index.umd.js",
+  "main": "dist/index.cjs",
   "module": "dist/index.es.js",
   "types": "dist/types/index.d.ts",
   "files": [
@@ -25,17 +26,22 @@
     ".": {
       "types": "./dist/types/index.d.ts",
       "import": "./dist/index.es.js",
-      "require": "./dist/index.umd.js"
+      "require": "./dist/index.cjs"
     },
-    "./styles/resets.css": "./dist/styles/resets.css"
+    "./styles/resets.css": "./dist/styles/resets.css",
+    "./config": {
+      "types": "./dist/types/config.d.ts",
+      "import": "./dist/cli/config.js",
+      "default": "./dist/cli/config.js"
+    }
   },
   "bin": {
     "vbox-type-gen": "dist/cli/cli/generate-types.js"
   },
   "scripts": {
-    "build": "vite build && pnpm copy:assets && tsc -p tsconfig.cli.json",
+    "build": "vite build && pnpm copy:assets && tsc -p tsconfig.cli.json && node ../../scripts/declaration-specifiers.mjs dist/types",
     "copy:assets": "cpx src/styles/resets.css dist/styles/",
-    "test": "vitest",
+    "test": "vitest run",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint ."
@@ -46,7 +52,6 @@
     "@types/node": "^24.10.1",
     "@types/stylis": "^4.2.7",
     "cpx": "^1.5.0",
-    "csstype": "^3.2.3",
     "eslint": "^9.39.2",
     "globals": "^16.5.0",
     "jsdom": "^27.2.0",
@@ -63,6 +68,11 @@
   "dependencies": {
     "fs-extra": "^11.3.2",
     "jiti": "^2.6.1",
-    "stylis": "^4.3.6"
+    "postcss-selector-parser": "7.1.1",
+    "stylis": "^4.3.6",
+    "csstype": "^3.2.3"
+  },
+  "engines": {
+    "node": ">=22.14.0"
   }
 }

@@ -8,6 +8,13 @@ const root = path.resolve(__dirname, '..');
 const srcDir = path.join(root, 'src');
 const distDir = path.join(root, 'dist');
 
+await fs.rm(distDir, { recursive: true, force: true });
 await fs.mkdir(distDir, { recursive: true });
-await fs.copyFile(path.join(srcDir, 'index.cjs'), path.join(distDir, 'index.cjs'));
-await fs.copyFile(path.join(srcDir, 'index.d.ts'), path.join(distDir, 'index.d.ts'));
+for (const name of await fs.readdir(srcDir)) {
+  if (name.endsWith('.cjs'))
+    await fs.copyFile(path.join(srcDir, name), path.join(distDir, name));
+}
+await fs.copyFile(
+  path.join(srcDir, 'index.d.ts'),
+  path.join(distDir, 'index.d.ts'),
+);

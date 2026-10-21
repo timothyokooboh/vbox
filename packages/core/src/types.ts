@@ -4,7 +4,7 @@ import type {
   VendorPropertiesHyphen,
   Pseudos,
 } from 'csstype';
-import { type DefaultAliases } from './constants';
+import type { DefaultAliases, ObjectStyleKeys } from './constants';
 
 export type CSSCustomProperties = { [index: `--${string}`]: unknown };
 export type CssProperties = StandardProperties &
@@ -92,7 +92,9 @@ export type Selectors = Record<string, AugmentedCSSProperties>;
  * Example: `d="flex"` → `display: flex`.
  */
 export type AliasProps = {
-  [K in keyof AliasMap]?: CssProperties[AliasMap[K]] | DesignTokens;
+  [K in AliasKeyVariants<Extract<keyof AliasMap, string>>]?:
+    | AliasValue<K>
+    | DesignTokens;
 };
 
 /**
@@ -155,10 +157,7 @@ export type Breakpoints = Required<{
  * All CSS properties accept the native StandardCssProperties value
  * OR any design token var (CSSTokenAndVars)
  */
-/*
-export type CSSStyleProps = AugmentedCSSProperties & {
-  [K in keyof AliasProps]?: AliasProps[K] | DesignTokens;
-}*/
+
 export type CSSStyleProps = AugmentedCSSProperties & AliasProps;
 
 export type VBoxProps = PseudoProps &
@@ -190,20 +189,73 @@ export type VBoxProps = PseudoProps &
     asChild?: boolean;
   };
 
-export type VBoxStyleProps = Omit<VBoxProps, 'is'>;
+export type VBoxStyleProps = Omit<VBoxProps, 'is' | 'asChild'>;
+
+type RecursiveConditionKey =
+  | Exclude<(typeof ObjectStyleKeys)[number], 'mq' | 'cq' | 'pseudos'>
+  | 'disabled'
+  | '2xl';
+
+type VBoxStyleGroup =
+  | VBoxStyles
+  | Record<string, VBoxStyles | null | undefined>;
+
+/** Style-only object boundary; template prefixes never belong in these keys. */
+export type VBoxStyles = {
+  [Key in keyof CSSStyleProps]?: CSSStyleProps[Key] | null;
+} & {
+  [Key in AliasKeyVariants<RecursiveConditionKey>]?: VBoxStyleGroup | null;
+} & {
+  mq?: Partial<Record<`@media ${string}`, VBoxStyleGroup | null>> | null;
+  cq?: Partial<Record<`@container ${string}`, VBoxStyleGroup | null>> | null;
+  pseudos?: { [Key in Pseudos | `:${string}`]?: VBoxStyleGroup | null } | null;
+} & Record<string, unknown>;
+export type VBoxStyleInput =
+  | VBoxStyles
+  | readonly (VBoxStyles | null | undefined | false)[]
+  | null
+  | undefined;
+
+export type VBoxNativeTemplateProps = CommonPseudoProps &
+  PseudoProps &
+  BreakpointProps &
+  AliasProps & {
+    mq?: Record<`@media ${string}`, PropertiesAndSelectors>;
+    cq?: Record<`@container ${string}`, PropertiesAndSelectors>;
+    declarations?: PropertiesAndSelectors;
+    dark?: PropertiesAndSelectors;
+    [key: string]: unknown;
+  };
 
 export type AliasStrategy = 'merge' | 'replace';
+
+type KebabCase<S extends string> = S extends `${infer H}${infer T}`
+  ? T extends Uncapitalize<T>
+    ? `${Lowercase<H>}${KebabCase<T>}`
+    : `${Lowercase<H>}-${KebabCase<T>}`
+  : S;
+
+type KebabToCamelCase<S extends string> = S extends `${infer H}-${infer T}`
+  ? `${H}${Capitalize<KebabToCamelCase<T>>}`
+  : S;
+
+type AliasKeyVariants<K extends string> = K | KebabCase<K>;
+
+type AliasProperty<K extends string> = K extends keyof AliasMap
+  ? AliasMap[K]
+  : KebabToCamelCase<K> extends keyof AliasMap
+    ? AliasMap[KebabToCamelCase<K>]
+    : never;
+
+type AliasValue<K extends string> =
+  AliasProperty<K> extends keyof CssProperties
+    ? CssProperties[AliasProperty<K>]
+    : never;
 export interface VBoxPluginOptions {
   classNamePrefix?: string;
   enableDefaultTheme?: boolean;
   cssResets?: boolean;
-  breakpoints?: {
-    sm: string;
-    md: string;
-    lg: string;
-    xl: string;
-    _2xl: string;
-  };
+  breakpoints?: Partial<Breakpoints>;
   aliases?: {
     strategy?: AliasStrategy;
     values: Record<string, keyof CSSStyleDeclaration>;

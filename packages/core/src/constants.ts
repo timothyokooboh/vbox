@@ -13,6 +13,20 @@ export const ThemeCategories: readonly ThemeKeys[] = [
   'zIndex',
 ];
 
+/** Token prefixes map to the same categories in runtime, editor and type generation. */
+export const TokenCategories = {
+  cl: 'color',
+  fs: 'fontSize',
+  fw: 'fontWeight',
+  ff: 'fontFamily',
+  lh: 'lineHeight',
+  ls: 'letterSpacing',
+  sp: 'spacing',
+  br: 'borderRadius',
+  bs: 'boxShadow',
+  z: 'zIndex',
+} as const;
+
 export const DefaultAliases = {
   w: 'width',
   maxW: 'maxWidth',
@@ -50,6 +64,7 @@ export const DefaultAliases = {
   bgOrigin: 'backgroundOrigin',
   radius: 'borderRadius',
   shadow: 'boxShadow',
+  pos: 'position',
 } as const;
 
 export const DefaultBreakpoints: Breakpoints = {
@@ -59,6 +74,33 @@ export const DefaultBreakpoints: Breakpoints = {
   xl: '80rem', // ~1280px
   _2xl: '96rem', // ~1536px
 };
+
+export const InteractionStyleKeys = [
+  'hover',
+  'focusWithin',
+  'focus',
+  'focusVisible',
+  'active',
+  '_disabled',
+] as const;
+
+/**
+ * Style props that require bound object expressions in template usage.
+ * Shared source-of-truth for compiler/tooling packages.
+ */
+export const ObjectStyleKeys = [
+  'mq',
+  'cq',
+  'dark',
+  'declarations',
+  'pseudos',
+  ...InteractionStyleKeys,
+  'sm',
+  'md',
+  'lg',
+  'xl',
+  '_2xl',
+] as const;
 
 export const DefaultTheme: VBoxPluginOptions['theme'] = {
   color: {
@@ -380,4 +422,15 @@ export const DefaultTheme: VBoxPluginOptions['theme'] = {
 
 export const CSS_REGISTRY_KEY = '__VBOX__CSS__REGISTRY__';
 export const VENDOR_PREFIX_KEY = '__VBOX__VENDOR__PREFIXES__';
-export const CSS_REGISTRY_LISTENERS_KEY = '_VBOX__CSS__REGISTRY__LISTENERS';
+
+/** Template structure/head tags are not style targets; component names stay case-sensitive. */
+export const NonStylingTargetTags = [
+  'template',
+  'slot',
+  'script',
+  'style',
+  'meta',
+  'link',
+  'base',
+  'title',
+] as const;

@@ -16,7 +16,11 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),
       name: 'VBoxCore',
-      fileName: (format) => `index.${format}.js`,
+      formats: ['es', 'cjs', 'umd'],
+      fileName: (format) => {
+        if (format === 'cjs') return 'index.cjs';
+        return `index.${format}.js`;
+      },
     },
     rollupOptions: {
       external: [],

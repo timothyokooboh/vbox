@@ -1,8 +1,7 @@
 <template>
-  <v-box
-    is="label"
-    position="relative"
-    :pseudos="{
+  <label
+    vb-position="relative"
+    :vb-pseudos="{
       '::after': {
         position: 'absolute',
         content: '*',
@@ -14,5 +13,5 @@
     }"
   >
     Enter your username
-  </v-box>
+  </label>
 </template>

@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": true
+  },
+  "include": ["src/**/*.cjs", "tests/**/*.cjs"]
+}

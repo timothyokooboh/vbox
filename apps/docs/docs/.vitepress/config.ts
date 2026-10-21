@@ -1,11 +1,12 @@
+import { vboxSsgHooks } from './vbox-ssg';
 import { defineConfig } from 'vitepress';
+import { vboxVitePlugin } from '@veebox/unplugin/vite';
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  ...vboxSsgHooks,
   vite: {
-    ssr: {
-      noExternal: ['@veebox/core', '@veebox/vue'],
-    },
+    plugins: [vboxVitePlugin()],
   },
   title: 'VBox',
   head: [
@@ -18,8 +19,7 @@ export default defineConfig({
       },
     ],
   ],
-  description:
-    'A polymorphic Vue component with a lightweight runtime styling engine.',
+  description: 'The most intuitive styling framework for Vue.js Apps',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     logo: '/logo.png',
@@ -34,13 +34,23 @@ export default defineConfig({
         items: [
           { text: 'Introduction', link: '/guide/introduction' },
           { text: 'Installation', link: '/guide/installation' },
+          { text: 'Migration', link: '/guide/migration' },
         ],
       },
       {
         text: 'Essentials',
         items: [
-          { text: 'Polymorphism', link: '/guide/essentials/polymorphism' },
-          { text: 'Style props', link: '/guide/essentials/style-props' },
+          {
+            text: 'Supported legacy VBox',
+            link: '/guide/essentials/polymorphism',
+          },
+          { text: 'Native syntax', link: '/guide/essentials/native-syntax' },
+          { text: 'Style bindings', link: '/guide/essentials/style-props' },
+          { text: 'Style priority', link: '/guide/essentials/style-priority' },
+          {
+            text: 'Component targets',
+            link: '/guide/essentials/component-targets',
+          },
           {
             text: 'CSS property aliases',
             link: '/guide/essentials/css-properties-alias',
@@ -92,6 +102,7 @@ export default defineConfig({
       {
         text: 'Demos',
         items: [
+          { text: 'Application showcases', link: '/demos/applications' },
           {
             text: 'Product Card',
             link: '/demos/product-card',
@@ -103,16 +114,17 @@ export default defineConfig({
         ],
       },
       {
-        text: 'Up Next',
+        text: 'Integrations',
         items: [
           {
-            text: 'Full SSR Support',
+            text: 'SSR and hydration',
             link: '/up-next/ssr-support',
           },
           {
-            text: 'Enhanced DX',
+            text: 'Editor and types',
             link: '/up-next/enhanced-dx',
           },
+          { text: 'Agent Skills', link: '/up-next/agent-skills' },
         ],
       },
     ],

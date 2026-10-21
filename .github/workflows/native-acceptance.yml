@@ -1,0 +1,39 @@
+name: Native styling acceptance
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      NUXT_TELEMETRY_DISABLED: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.14.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm --filter '@veebox/*' build
+      # Local workspace bins cannot be linked until their built entry points exist.
+      - run: pnpm install --frozen-lockfile --ignore-scripts --offline
+      - run:
+          pnpm --filter @vbox/acceptance exec playwright install --with-deps
+          chromium firefox webkit
+      - run: pnpm --filter @vbox/acceptance type-check
+      - run: pnpm --filter @veebox/core exec tsc --noEmit -p tsconfig.json
+      - run:
+          pnpm --filter @vbox/acceptance exec vue-tsc --noEmit -p
+          ../../packages/vue/tsconfig.json
+      - run: pnpm run test --concurrency=1
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-failure-traces
+          path: apps/acceptance/test-results

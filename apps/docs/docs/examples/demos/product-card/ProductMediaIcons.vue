@@ -1,25 +1,24 @@
 <template>
-  <v-box
+  <button
     data-scope="product-media-icons"
-    is="button"
-    display="flex"
-    justify-content="center"
-    align-items="center"
-    w="2.75rem"
-    h="2.75rem"
-    radius="br-full"
-    border="1px solid rgba(255,255,255,0.1)"
-    bg="rgba(255,255,255,0.1)"
-    color="#fff"
-    cursor="pointer"
-    transition="scale 0.2s ease-in-out"
-    :active="{
+    vb-display="flex"
+    vb-justify-content="center"
+    vb-align-items="center"
+    vb-w="2.75rem"
+    vb-h="2.75rem"
+    vb-radius="br-full"
+    vb-border="1px solid rgba(255,255,255,0.1)"
+    vb-bg="rgba(255,255,255,0.1)"
+    vb-color="#fff"
+    vb-cursor="pointer"
+    vb-transition="scale 0.2s ease-in-out"
+    :vb-active="{
       scale: 0.95,
     }"
-    v-bind="outlineStyles"
+    :vb="outlineStyles"
   >
     <slot />
-  </v-box>
+  </button>
 </template>
 
 <script setup lang="ts">

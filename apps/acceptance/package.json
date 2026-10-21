@@ -1,0 +1,48 @@
+{
+  "name": "@vbox/acceptance",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build && webpack --config webpack.config.mjs && vite build --ssr src/entry-server.ts --outDir dist/server",
+    "test": "pnpm build && pnpm test:editor && node --test tests/*.test.mjs && playwright test && pnpm test:nuxt && pnpm test:consumers && pnpm test:docs && pnpm test:movies && pnpm test:atelier",
+    "type-check": "vue-tsc --noEmit -p tsconfig.json",
+    "test:editor": "node --test --test-concurrency=1 tests/editor*.test.cjs",
+    "test:browser": "playwright test",
+    "benchmark": "node benchmark.mjs",
+    "test:nuxt": "pnpm --filter vboxssr build && playwright test --config playwright.nuxt.config.ts",
+    "test:consumers": "pnpm --filter @vbox/playground type-check && pnpm --filter vboxssr type-check && playwright test --config playwright.playground.config.ts && pnpm --filter @vbox/playground build-only && PLAYGROUND_PRODUCTION=true playwright test --config playwright.playground.config.ts && NUXT_DEVELOPMENT=true playwright test --config playwright.nuxt.config.ts",
+    "test:docs": "pnpm --filter docs type-check && pnpm --filter docs build && node --test tests/docs-snippets.test.mjs && playwright test --config playwright.docs.config.ts",
+    "test:movies": "pnpm --filter @vbox/movies type-check && playwright test --config playwright.movies.config.ts && VITE_TMDB_API_KEY=acceptance-placeholder pnpm --filter @vbox/movies build-only && MOVIES_PRODUCTION=true playwright test --config playwright.movies.config.ts",
+    "test:atelier": "pnpm --filter @vbox/atelier type-check && playwright test --config playwright.atelier.config.ts && pnpm --filter @vbox/atelier build-only && ATELIER_PRODUCTION=true playwright test --config playwright.atelier.config.ts"
+  },
+  "dependencies": {
+    "@veebox/core": "workspace:*",
+    "@veebox/property-variance-authority": "workspace:*",
+    "@veebox/vue": "workspace:*",
+    "radix-vue": "1.9.17",
+    "vue": "^3.5.24",
+    "vue-router": "4.6.4"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@jridgewell/trace-mapping": "^0.3.31",
+    "@playwright/test": "^1.51.1",
+    "@types/node": "^24.10.1",
+    "@veebox/unplugin": "workspace:*",
+    "@veebox/volar": "workspace:*",
+    "@vitejs/plugin-vue": "^6.0.3",
+    "@volar/typescript": "2.4.28",
+    "@vue/compiler-sfc": "^3.5.24",
+    "@vue/language-core": "3.2.5",
+    "@vue/server-renderer": "^3.5.24",
+    "html-webpack-plugin": "^5.6.4",
+    "ts-loader": "^9.5.4",
+    "typescript": "~5.9.3",
+    "vite": "^7.2.4",
+    "vue-loader": "^17.4.2",
+    "vue-tsc": "3.2.5",
+    "webpack": "^5.102.1",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.2"
+  }
+}

@@ -2,34 +2,13 @@ import { isObjectLiteral } from './isObjectLiteral';
 import type { StandardPropertiesHyphen } from 'csstype';
 import type { AliasMap, Breakpoints, VBoxProps } from '../types';
 import { toKebabCase } from './toKebabCase';
-import { kebabToCamelCase } from './kebabToCamelCase';
+import { normalizeKey } from './normalizeKey';
 import { isValidCssSelector } from './isValidCssSelector';
 import { isValidCssDeclaration } from './isValidCssDeclaration';
 import { parseTokens } from './parseTokens';
 import { __DEV__ } from './isDevelopment';
 
-const normalizeCache = new Map<string, string>();
-
-/**
- * Normalizes a style key by resolving alias names to their corresponding
- * CSS property. The key is converted to camelCase before lookup.
- *
- * If the key is a known alias, the associated CSS property is returned.
- * Otherwise, the camelCased key is returned unchanged.
- *
- * Results are cached to avoid repeated normalization work.
- */
-export const normalizeKey = (key: string, aliases: AliasMap): string => {
-  const cached = normalizeCache.get(key);
-  if (cached) return cached;
-
-  const camelCaseKey = kebabToCamelCase(key);
-  const resolvedKey = aliases[camelCaseKey as keyof typeof aliases];
-  const finalKey = resolvedKey ?? camelCaseKey;
-  normalizeCache.set(key, finalKey);
-
-  return finalKey;
-};
+export { normalizeKey } from './normalizeKey';
 
 // Convert a style map into validated kebab-case CSS rules and nested selectors
 const extractStylesFromValue = (value: unknown, aliases: AliasMap) => {
@@ -188,7 +167,10 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
     const parsedKey = normalizeKey(cssProp, aliases);
     const parsedKebabKey = toKebabCase(parsedKey);
 
-    if (isValidCssDeclaration(parsedKebabKey, parsedValue)) {
+    if (
+      typeof rawValue !== 'object' &&
+      isValidCssDeclaration(parsedKebabKey, parsedValue)
+    ) {
       rootStyles[parsedKebabKey] = parsedValue;
     }
 
@@ -300,7 +282,7 @@ export const parseStyleObject = <T extends Record<string, unknown>>({
       continue;
     }
 
-    if (['sm', 'md', 'lg', 'xl'].includes(resolvedKey)) {
+    if (['sm', 'md', 'lg', 'xl', '_2xl'].includes(resolvedKey)) {
       const bpKey = resolvedKey as keyof typeof breakpoints;
       if (typeof rawValue === 'object') {
         const { rootStyleRecord, nestedStyleRecord } = extractStylesFromValue(

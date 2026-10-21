@@ -7,6 +7,10 @@ There are three ways to handle dark mode styling in VBox: `dark` prop,
 `prefers-color-scheme` media query via the `mq` prop, or applying colors via the
 `light-dark` css function when the :root has color-scheme set to `light dark`
 
+Native templates use `:vb-dark`, `:vb-mq` and `vb-background`; inside style
+objects these keys remain unprefixed. Theme tokens can eliminate most repeated
+color-mode declarations.
+
 ## dark prop
 
 The `dark` prop applies styles specifically for dark mode when the html element
@@ -37,8 +41,8 @@ In addition to CSS properties, the `dark` prop also accepts valid CSS selectors
 
 ```html
 <!-- Example -->
-<v-box
-  :dark="{
+<div
+  :vb-dark="{
       backgroundColor: 'black',
       color: 'white',
       '&:has([data-scope=child])': {
@@ -47,7 +51,7 @@ In addition to CSS properties, the `dark` prop also accepts valid CSS selectors
     }"
 >
   <div data-scope="child">I'm a child element</div>
-</v-box>
+</div>
 ```
 
 :::
@@ -60,8 +64,8 @@ scheme preference using the `prefers-color-scheme` media query.
 ```html
 <!-- Example -->
 <template>
-  <v-box
-    :mq="{
+  <div
+    :vb-mq="{
       '@media (prefers-color-scheme: dark)': {
         backgroundColor: 'black',
         color: 'white',
@@ -92,7 +96,7 @@ for more information on `color-scheme` property.
 
 ```html
 <template>
-  <v-box background="light-dark(white, black)" />
+  <div vb-background="light-dark(white, black)" />
 </template>
 ```
 

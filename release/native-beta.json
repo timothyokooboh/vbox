@@ -1,0 +1,12 @@
+{
+  "contract": "explicit-native-v1",
+  "status": "unreleased",
+  "node": ">=22.14.0",
+  "packages": {
+    "@veebox/core": "2.0.0-beta.0",
+    "@veebox/vue": "2.0.0-beta.0",
+    "@veebox/unplugin": "0.1.0-beta.0",
+    "@veebox/volar": "0.1.0-beta.0",
+    "@veebox/property-variance-authority": "0.1.0-beta.0"
+  }
+}

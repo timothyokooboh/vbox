@@ -4,10 +4,12 @@ import { kebabToCamelCase } from '../src/helpers/kebabToCamelCase';
 test('converts kebab case to camel case', () => {
   expect(kebabToCamelCase('font-size')).toBe('fontSize');
   expect(kebabToCamelCase('background-color')).toBe('backgroundColor');
+  expect(kebabToCamelCase('foo-2')).toBe('foo2');
+  expect(kebabToCamelCase('alias-2-value')).toBe('alias2Value');
 });
 
 test('preserves special characters during conversion', () => {
   expect(kebabToCamelCase(':focus-visible')).toBe(':focusVisible');
   expect(kebabToCamelCase(':focus-within')).toBe(':focusWithin');
-  expect(kebabToCamelCase('--border-input')).toBe('--borderInput');
+  expect(kebabToCamelCase('--border-input')).toBe('--border-input');
 });

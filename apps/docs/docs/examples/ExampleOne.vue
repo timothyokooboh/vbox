@@ -1,14 +1,14 @@
 <template>
-  <v-box
-    is="p"
-    text-align="center"
-    padding="1rem"
-    color="#fff"
-    background-color="#000"
-    :dark="{
+  <p
+    vb-text-align="center"
+    vb-padding="1rem"
+    vb-color="#fff"
+    vb-background-color="#000"
+    :vb-dark="{
       backgroundColor: '#fff',
       color: '#000',
     }"
-    >Hello world 🎉</v-box
   >
+    Hello world 🎉
+  </p>
 </template>

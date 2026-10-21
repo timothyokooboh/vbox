@@ -4,11 +4,9 @@ layout: home
 
 hero:
   name: 'VBox'
-  text: 'A polymorphic Vue.js component with a lightweight styling engine'
-  tagline: Style Vue SPAs with expressive attributes & props.
-  alt:
-    'VBox - A polymorphic Vue component with a lightweight runtime styling
-    engine'
+  text: 'The intuitive styling framework for Vue.js applications'
+  tagline: Style Vue apps with expressive attributes, props, and design tokens.
+  alt: 'VBox - The most intuitive styling framework for Vue.js applications'
   image: /logo.png
   actions:
     - theme: brand
@@ -21,13 +19,13 @@ hero:
 features:
   - title: Style Props
     details:
-      Supports every CSS property as an attribute with type-safety and
-      autocompletion.
+      Keep native HTML semantics and add explicit vb-* style bindings with
+      contextual completions.
 
   - title: Automatic vendor Prefixing
     details:
-      Automatically adds vendor prefixes to CSS properties to ensure
-      cross-browser compatibility.
+      Adds applicable vendor prefixes; browsers retain control over support for
+      modern CSS.
 
   - title: Light & Dark Mode
     details: Easily implement light and dark themes

@@ -1,22 +1,22 @@
 <template>
-  <v-box
+  <div
     data-scope="carousel-indicators"
-    position="absolute"
-    left="0"
-    right="0"
-    bottom="2.5rem"
-    display="flex"
-    justify-content="center"
-    gap="sp-2"
+    vb-position="absolute"
+    vb-left="0"
+    vb-right="0"
+    vb-bottom="2.5rem"
+    vb-display="flex"
+    vb-justify-content="center"
+    vb-gap="sp-2"
   >
-    <v-box h="0.25rem" w="1.5rem" radius="br-full" bg="cl-primary" />
-    <v-box
+    <div vb-h="0.25rem" vb-w="1.5rem" vb-radius="br-full" vb-bg="cl-primary" />
+    <div
       v-for="n in 3"
       :key="n"
-      h="0.25rem"
-      w="0.25rem"
-      radius="br-full"
-      bg="rgba(255,255,255,0.4)"
+      vb-h="0.25rem"
+      vb-w="0.25rem"
+      vb-radius="br-full"
+      vb-bg="rgba(255,255,255,0.4)"
     />
-  </v-box>
+  </div>
 </template>

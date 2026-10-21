@@ -1,74 +1,70 @@
 <template>
-  <v-box is="section" data-scope="product-header" flex-grow="1">
-    <v-box display="flex" flex-direction="column" gap="0.25rem">
-      <v-box
-        display="flex"
-        justify-content="space-between"
-        align-items="center"
-        gap="0.25rem"
+  <section data-scope="product-header" vb-flex-grow="1">
+    <div vb-display="flex" vb-flex-direction="column" vb-gap="0.25rem">
+      <div
+        vb-display="flex"
+        vb-justify-content="space-between"
+        vb-align-items="center"
+        vb-gap="0.25rem"
       >
-        <v-box
-          is="h2"
-          fs="fs-3xl"
-          fw="fw-bold"
-          lh="lh-snug"
-          my="0"
-          color="cl-text-product"
+        <h2
+          vb-fs="fs-3xl"
+          vb-fw="fw-bold"
+          vb-lh="lh-snug"
+          vb-my="0"
+          vb-color="cl-text-product"
           class="vp-raw"
         >
           Urban Runner
-        </v-box>
+        </h2>
 
-        <v-box is="span" fs="fs-2xl" fw="fw-bold" color="cl-text-product">
+        <span vb-fs="fs-2xl" vb-fw="fw-bold" vb-color="cl-text-product">
           $120.00
-        </v-box>
-      </v-box>
+        </span>
+      </div>
 
-      <v-box
-        display="flex"
-        justify-content="space-between"
-        align-items="center"
+      <div
+        vb-display="flex"
+        vb-justify-content="space-between"
+        vb-align-items="center"
       >
-        <v-box
-          is="p"
-          my="0"
-          fs="fs-sm"
-          fw="fw-medium"
-          color="cl-gray-500"
-          :dark="{
+        <p
+          vb-my="0"
+          vb-fs="fs-sm"
+          vb-fw="fw-medium"
+          vb-color="cl-gray-500"
+          :vb-dark="{
             color: 'cl-gray-400',
           }"
         >
           Men's Running Collection
-        </v-box>
+        </p>
 
-        <v-box display="flex" align-items="center" gap="0.25rem">
-          <v-box
-            is="span"
-            color="cl-primary"
-            fs="1rem"
+        <div vb-display="flex" vb-align-items="center" vb-gap="0.25rem">
+          <span
+            vb-color="cl-primary"
+            vb-fs="1rem"
             class="material-symbols-outlined"
             style="font-variation-settings: 'FILL' 1"
           >
             star
-          </v-box>
+          </span>
 
-          <v-box is="span" fs="fs-sm" fw="fw-bold" color="cl-text-product">
+          <span vb-fs="fs-sm" vb-fw="fw-bold" vb-color="cl-text-product">
             4.8
-          </v-box>
+          </span>
 
-          <v-box
-            is="span"
-            fs="fs-xs"
-            color="cl-gray-500"
-            :dark="{
+          <span
+            vb-fs="fs-xs"
+            vb-color="cl-gray-500"
+            :vb-dark="{
               color: 'cl-gray-400',
             }"
           >
             (120)
-          </v-box>
-        </v-box>
-      </v-box>
-    </v-box>
-  </v-box>
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
 </template>

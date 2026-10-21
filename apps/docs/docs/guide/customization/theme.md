@@ -49,30 +49,30 @@ In the above example, we defined four custom colors: `red-100`, `red-200`,
 `red-300`, and `danger`. `red-200` and `red-300` have different values for light
 and dark modes. We also created a `danger` color that references `red-300`.
 
-There are two ways to use these custom colors in your `v-box` components:
+There are two ways to use these custom colors in native elements:
 
 - Prefixing the color name with `cl-`:
 
 ```html
-<v-box background-color="cl-red-100" color="cl-danger">
+<div vb-background-color="cl-red-100" vb-color="cl-danger">
   This box has a red background and danger text color!
-</v-box>
+</div>
 ```
 
 - Using CSS custom properties:
 
 ```html
-<v-box background-color="var(--color-red-100)" color="var(--color-danger)">
+<div vb-background-color="var(--color-red-100)" vb-color="var(--color-danger)">
   This box has a red background and danger text color!
-</v-box>
+</div>
 ```
 
 ::: tip
 
 Providing color values as an object with `default` and `dark` keys allows VBox
 to automatically switch between light and dark mode colors based on the current
-theme. This can drastically limit your use of the `dark` prop for manual dark
-mode styling :sparkles:.
+theme. This can drastically limit your use of the `:vb-dark` binding for manual
+dark mode styling :sparkles:.
 
 The dark mode colors will be applied when the `html` element has a `dark` class.
 
@@ -102,16 +102,14 @@ export default defineConfig({
 });
 ```
 
-You can then use these custom font sizes in your `v-box` components like so:
+You can then use these custom font sizes in native elements like so:
 
 ```html
 <!-- prefixing the token with fs -->
-<v-box font-size="fs-heading">This box has a heading font size!</v-box>
+<div vb-font-size="fs-heading">This box has a heading font size!</div>
 
 <!-- or via CSS custom properties -->
-<v-box font-size="var(--font-size-md)">
-  This box has a medium font size!
-</v-box>
+<div vb-font-size="var(--font-size-md)">This box has a medium font size!</div>
 ```
 
 ## Font Weights
@@ -134,16 +132,16 @@ export default defineConfig({
 });
 ```
 
-You can then use these custom font weights in your `v-box` components like so:
+You can then use these custom font weights in native elements like so:
 
 ```html
 <!-- prefixing the token with fw -->
-<v-box font-weight="fw-thick"> This box has a thick font weight! </v-box>
+<div vb-font-weight="fw-thick">This box has a thick font weight!</div>
 
 <!-- or via CSS custom properties -->
-<v-box font-weight="var(--font-weight-thin)">
+<div vb-font-weight="var(--font-weight-thin)">
   This box has a normal font weight!
-</v-box>
+</div>
 ```
 
 ## Font Families
@@ -165,16 +163,16 @@ export default defineConfig({
 });
 ```
 
-You can then use these custom font families in your `v-box` components like so:
+You can then use these custom font families in native elements like so:
 
 ```html
 <!-- prefixing the token with ff -->
-<v-box font-family="ff-sans"> This box has a sans-serif font family! </v-box>
+<div vb-font-family="ff-sans">This box has a sans-serif font family!</div>
 
 <!-- or via CSS custom properties -->
-<v-box font-family="var(--font-family-serif)">
+<div vb-font-family="var(--font-family-serif)">
   This box has a serif font family!
-</v-box>
+</div>
 ```
 
 ## Line Height
@@ -199,16 +197,16 @@ export default defineConfig({
 });
 ```
 
-You can then use these custom line heights in your `v-box` components like so:
+You can then use these custom line heights in native elements like so:
 
 ```html
 <!-- prefixing the token with lh -->
-<v-box is="p" line-height="lh-relaxed"> This has a relaxed line height! </v-box>
+<p vb-line-height="lh-relaxed">This has a relaxed line height!</p>
 
 <!-- or via CSS custom properties -->
-<v-box line-height="var(--line-height-tight)">
+<div vb-line-height="var(--line-height-tight)">
   This box has a tight line height!
-</v-box>
+</div>
 ```
 
 ## Letter Spacing
@@ -234,17 +232,16 @@ export default defineConfig({
 });
 ```
 
-You can then use these custom letter spacings in your `v-box` components like
-so:
+You can then use these custom letter spacings in native elements like so:
 
 ```html
 <!-- prefixing the token with ls -->
-<v-box letter-spacing="ls-wide"> This box has wide letter spacing! </v-box>
+<div vb-letter-spacing="ls-wide">This box has wide letter spacing!</div>
 
 <!-- or via CSS custom properties -->
-<v-box letter-spacing="var(--letter-spacing-tight)">
+<div vb-letter-spacing="var(--letter-spacing-tight)">
   This box has tight letter spacing!
-</v-box>
+</div>
 ```
 
 ## Spacings
@@ -270,14 +267,14 @@ export default defineConfig({
 });
 ```
 
-You can then use these custom spacings in your `v-box` components like so:
+You can then use these custom spacings in native elements like so:
 
 ```html
 <!-- prefixing the token with sp -->
-<v-box padding="sp-lg"> This box has large padding! </v-box>
+<div vb-padding="sp-lg">This box has large padding!</div>
 
 <!-- or via CSS custom properties -->
-<v-box margin="var(--spacing-sm)"> This box has small margin! </v-box>
+<div vb-margin="var(--spacing-sm)">This box has small margin!</div>
 ```
 
 ## Border Radius
@@ -303,17 +300,16 @@ export default defineConfig({
 });
 ```
 
-You can then use these custom border radius values in your `v-box` components
-like so:
+You can then use these custom border radius values in native elements like so:
 
 ```html
 <!-- prefixing the token with br -->
-<v-box border-radius="br-lg"> This box has large border radius! </v-box>
+<div vb-border-radius="br-lg">This box has large border radius!</div>
 
 <!-- or via CSS custom properties -->
-<v-box border-radius="var(--border-radius-sm)">
+<div vb-border-radius="var(--border-radius-sm)">
   This box has small border radius!
-</v-box>
+</div>
 ```
 
 ## Box-shadow
@@ -334,17 +330,14 @@ export default defineConfig({
 });
 ```
 
-You can then use these custom box-shadows values in your `v-box` components like
-so:
+You can then use these custom box-shadows values in native elements like so:
 
 ```html
 <!-- prefixing the token with bs -->
-<v-box box-shadow="bs-md"> Working with custom box-shadows </v-box>
+<div vb-box-shadow="bs-md">Working with custom box-shadows</div>
 
 <!-- or via CSS custom properties -->
-<v-box box-shadow="var(--box-shadow-md)">
-  Working with custom box-shadows
-</v-box>
+<div vb-box-shadow="var(--box-shadow-md)">Working with custom box-shadows</div>
 ```
 
 ## Z-Index
@@ -370,14 +363,12 @@ export default defineConfig({
 });
 ```
 
-You can then use these custom z-index values in your `v-box` components like so:
+You can then use these custom z-index values in native elements like so:
 
 ```html
 <!-- prefixing the token with z -->
-<v-box z-index="z-modal"> This box has a modal z-index! </v-box>
+<div vb-z-index="z-modal">This box has a modal z-index!</div>
 
 <!-- or via CSS custom properties -->
-<v-box z-index="var(--z-index-dropdown)">
-  This box has a dropdown z-index!
-</v-box>
+<div vb-z-index="var(--z-index-dropdown)">This box has a dropdown z-index!</div>
 ```

@@ -1,17 +1,10 @@
-const TOKEN_PREFIX_MAP = {
-  cl: 'color',
-  fs: 'font-size',
-  fw: 'font-weight',
-  ff: 'font-family',
-  lh: 'line-height',
-  ls: 'letter-spacing',
-  sp: 'spacing',
-  br: 'border-radius',
-  bs: 'box-shadow',
-  z: 'z-index',
-} as const;
+import { TokenCategories } from '../constants.js';
+import { toKebabCase } from './toKebabCase.js';
 
-const TOKEN_REGEX = /\b(cl|fs|fw|ff|lh|ls|sp|br|bs|z)-([a-zA-Z0-9-_]+)\b/g;
+const TOKEN_REGEX = new RegExp(
+  `\\b(${Object.keys(TokenCategories).join('|')})-([a-zA-Z0-9-_]+)\\b`,
+  'g',
+);
 
 /**
  * Replaces prefixed tokens like `cl-red-300` with `var(--color-red-300)`.
@@ -23,8 +16,7 @@ export const parseTokens = (value: string): string => {
   return value.replace(
     TOKEN_REGEX,
     (_match, prefix, tokenKey, offset: number, fullStr: string) => {
-      const category =
-        TOKEN_PREFIX_MAP[prefix as keyof typeof TOKEN_PREFIX_MAP];
+      const category = TokenCategories[prefix as keyof typeof TokenCategories];
 
       /** if this specific match is inside a var(...) call, don't transform it.
        * Find the nearest "var(" before the match, and check if its closing ')' comes
@@ -40,7 +32,7 @@ export const parseTokens = (value: string): string => {
 
       if (!category) return _match;
 
-      return `var(--${category}-${tokenKey})`;
+      return `var(--${toKebabCase(category)}-${tokenKey})`;
     },
   );
 };
