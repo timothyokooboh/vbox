@@ -2,7 +2,7 @@ import type { AliasProps, AugmentedCSSProperties } from '../types';
 import { injectCSS } from './injectCSS';
 import { toKebabCase } from './toKebabCase';
 import { parseTokens } from './parseTokens';
-import { normalizeKey } from './parseStyleObject';
+import { normalizeKey } from './normalizeKey';
 import { DefaultAliases } from '../constants';
 import { createDjb2Hash } from './createDjb2Hash';
 import { __DEV__ } from './isDevelopment';

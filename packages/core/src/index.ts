@@ -25,6 +25,7 @@ export {
   DefaultBreakpoints,
   DefaultTheme,
   ObjectStyleKeys,
+  NonStylingTargetTags,
   TokenCategories,
 } from './constants';
 export type {
