@@ -124,6 +124,7 @@ export default defineConfig({
             text: 'Editor and types',
             link: '/up-next/enhanced-dx',
           },
+          { text: 'Agent Skills', link: '/up-next/agent-skills' },
         ],
       },
     ],

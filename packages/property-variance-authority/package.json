@@ -1,6 +1,6 @@
 {
   "name": "@veebox/property-variance-authority",
-  "version": "0.0.1",
+  "version": "0.1.0-beta.0",
   "description": "Framework-agnostic variant resolver for style property objects.",
   "type": "module",
   "license": "MIT",
@@ -30,5 +30,13 @@
   "devDependencies": {
     "typescript": "~5.9.3",
     "vitest": "^4.0.18"
+  },
+  "engines": {
+    "node": ">=22.14.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/timothyokooboh/vbox.git",
+    "directory": "packages/property-variance-authority"
   }
 }

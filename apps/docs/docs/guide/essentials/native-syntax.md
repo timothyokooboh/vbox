@@ -50,9 +50,10 @@ RouterLink and NuxtLink. Component classes must reach a real
   `--accent`; `vb---Accent` is a different property. Grouped objects are often
   clearer: `:vb="{ '--accent': 'red', color: 'var(--accent)' }"`.
 - An unfamiliar `vb-*` name remains an explicit style declaration, even when not
-  recognized. The current compiler does not warn for every unknown property. A
-  CSS dataset cannot silently turn it into a semantic prop. Browsers decide
-  whether future CSS declarations are supported.
+  recognized. The compiler emits a source-located advisory, and the editor
+  offers property-name hover guidance. Neither rejects future CSS or silently
+  turns it into a semantic prop. Configured aliases and CSS custom properties
+  are recognized; browsers decide whether a declaration is supported.
 - Duplicate equivalent individual names, style-binding modifiers, invalid object
   values and non-rendering targets receive diagnostics. Do not style `template`,
   `slot`, script/style blocks or rely on a fragment receiving classes.
@@ -86,3 +87,31 @@ API is needed to compile or server-render.
 
 See [migration](../migration.md) for the removed experimental inference
 controls.
+
+## Frequently changing values
+
+VBox reuses identical generated styles. Its browser stylesheet retains distinct
+style values for the page lifetime; unmounting an element does not evict its
+CSS. This preserves shared and cached consumers, but continuously varying values
+can grow the stylesheet. For drag positions, progress, or per-frame animation,
+keep the styling declaration stable and update an ordinary inline CSS variable:
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue';
+const position = ref(0);
+</script>
+<template>
+  <div
+    vb-transform="translateX(var(--offset))"
+    :style="{ '--offset': `${position}px` }"
+  >
+    Moving content
+  </div>
+</template>
+```
+
+Request-local SSR collectors are separate from the browser registry. Their
+`reset()` clears their collected rules and prefix cache. A stable stylesheet
+size under repeated finite styles is not proof of bounded heap under arbitrary
+unique values; measure the workload your application actually uses.

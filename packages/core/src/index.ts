@@ -25,6 +25,7 @@ export {
   DefaultBreakpoints,
   DefaultTheme,
   ObjectStyleKeys,
+  NonStylingTargetTags,
   TokenCategories,
 } from './constants';
 export type {
@@ -91,3 +92,5 @@ export type {
   VBoxDefaultThemeEnabled,
   VBoxTokenPreview,
 } from './helpers/themePreviewTypes';
+
+export { createStyleVocabulary } from './helpers/styleVocabulary';

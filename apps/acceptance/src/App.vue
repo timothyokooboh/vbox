@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import LegacyDirectiveQuality from './LegacyDirectiveQuality.vue';
+import SkillExamples from './SkillExamples.vue';
+import ResourceStyles from './ResourceStyles.vue';
 import { ref } from 'vue';
 import PrimitiveTargets from './targets/PrimitiveTargets.vue';
 import AdoptedTargets from './targets/AdoptedTargets.vue';
@@ -34,7 +37,10 @@ const badge = pva({
 </script>
 <template>
   <main>
+    <LegacyDirectiveQuality />
     <NativeScalar />
+    <ResourceStyles />
+    <SkillExamples />
     <Vocabulary />
     <GroupedObject />
     <SourceComposition />
@@ -63,6 +69,8 @@ const badge = pva({
     >
     <VBox is="span" data-testid="pva" v-bind="badge()">Available</VBox>
     <VBox is="button" type="button" @click="count++">Count {{ count }}</VBox>
-    <p data-testid="inference" color="red">Unpublished inference baseline</p>
+    <p data-testid="semantic-unprefixed" color="red">
+      Ordinary bindings stay semantic
+    </p>
   </main>
 </template>

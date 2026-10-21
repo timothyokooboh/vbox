@@ -5,7 +5,7 @@ import { DefaultBreakpoints } from '../constants.js';
 import type { AliasMap } from '../types.js';
 import { readStyleObject } from '../helpers/readStyleObject.js';
 import { getConditionKey } from '../helpers/resolveConfig.js';
-import { normalizeKey } from '../helpers/parseStyleObject.js';
+import { normalizeKey } from '../helpers/normalizeKey.js';
 import { serializeStyleValue } from './values.js';
 import { toKebabCase } from '../helpers/toKebabCase.js';
 import type { StyleContext, StyleDeclaration } from './types.js';

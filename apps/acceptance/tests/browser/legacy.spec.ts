@@ -38,15 +38,13 @@ test('a framework-independent PVA result styles the published component', async 
   await expect(badge).toHaveCSS('color', 'rgb(255, 255, 255)');
 });
 
-test('the actual bundler runs the existing native transform', async ({
+test('ordinary native attributes stay semantic even without explicit styling nearby', async ({
   page,
 }) => {
   await page.goto('/');
-  await expect(page.getByTestId('inference')).toHaveCSS(
-    'color',
-    'rgb(255, 0, 0)',
-  );
-  await expect(page.getByTestId('inference')).not.toHaveAttribute('color');
+  const target = page.getByTestId('semantic-unprefixed');
+  await expect(target).toHaveAttribute('color', 'red');
+  await expect(target).not.toHaveCSS('color', 'rgb(255, 0, 0)');
 });
 
 test('server HTML hydrates and remains interactive without mismatches', async ({

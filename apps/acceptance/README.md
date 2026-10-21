@@ -50,24 +50,20 @@ and diagnostic assertions are added alongside the corresponding feature slices.
 See [Vue editing and builds](./BUILDS.md) for the supported template forms,
 source-map handoff, actual HMR coverage and installed-artifact checks.
 
-## Expansion plan
+## Namespace cutover
 
-1. Keep the published VBox API green. Add explicit `vb-*` recognition in a small
-   Vue-AST transform seam, separate from Vite/webpack lifecycle effects.
-2. Migrate behavior incrementally behind internal module boundaries. Unpublished
-   inference and explicit syntax may coexist only where unambiguous, without a
-   public compatibility mode. A file using the new namespace must never have its
-   ordinary semantic bindings consumed by the old inference path.
-3. When semantic isolation requires replacing the default transform, use the
-   stacked integration branches: keep legacy/new acceptance tests green and
-   explicitly record old inferred examples/tests awaiting migration.
-4. Migrate consumers and docs, then remove the inference path and obsolete
-   options. Ticket #14 is the full-green integration cutover gate. No
-   intermediate stack branch is a beta-release candidate; #19 and #20 gate
-   publication readiness.
+The temporary inference bridge has been removed. Only explicit `vb-*` and `:vb`
+enter native styling; ordinary bindings stay semantic, including in files
+without any explicit styling. The published VBox API remains independently
+supported. Old inference options fail with migration guidance, and retired
+markers cannot opt into or suppress styling. Source-located compiler advisories
+and editor name hovers flag unfamiliar explicit names without rejecting future
+CSS.
 
-Only introduce shared normalization metadata when the next tested behavior needs
-it; do not split every file or redesign the engine in this baseline ticket.
+Consumer migrations, documentation, Movies, and the webpack Atelier replacement
+are integrated. Artifact readiness and the final quality review remain separate
+release gates; this branch is not authorization to publish.
 
 [Editor coverage and limitations](./EDITOR.md) describes contextual completions,
-project invalidation, generated declarations and the real-service latency checks.
+project invalidation, generated declarations and the real-service latency
+checks.

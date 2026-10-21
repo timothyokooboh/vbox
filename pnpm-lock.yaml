@@ -473,6 +473,9 @@ importers:
 
   packages/core:
     dependencies:
+      csstype:
+        specifier: ^3.2.3
+        version: 3.2.3
       fs-extra:
         specifier: ^11.3.2
         version: 11.3.4
@@ -501,9 +504,6 @@ importers:
       cpx:
         specifier: ^1.5.0
         version: 1.5.0
-      csstype:
-        specifier: ^3.2.3
-        version: 3.2.3
       eslint:
         specifier: ^9.39.2
         version: 9.39.4(jiti@2.6.1)
@@ -621,6 +621,9 @@ importers:
       '@types/node':
         specifier: ^24.10.0
         version: 24.12.0
+      '@veebox/unplugin':
+        specifier: workspace:*
+        version: link:../unplugin
       '@vitejs/plugin-vue':
         specifier: ^6.0.3
         version: 6.0.4(vite@7.3.1(@types/node@24.12.0)(jiti@2.6.1)(terser@5.46.0)(yaml@2.8.2))(vue@3.5.29(typescript@5.9.3))

@@ -17,9 +17,8 @@ Remove old `vbox`, `vbox-ignore`/`vboxignore` markers and the
 `parseAllComponents`, `forceStyleAttrs`, `forceSemanticAttrs` options. They
 belonged to the unreleased inference experiment, not the new public grammar.
 Leaving an attribute unprefixed is now how you keep its semantic meaning. No
-parallel inference mode is part of the planned beta. A temporary workspace
-migration bridge remains during the PR sequence and is removed before the beta
-readiness gate.
+parallel inference mode or temporary migration bridge remains. All authored
+templates now use the explicit namespace contract.
 
 Do not mechanically prefix every binding. Keep `src`, `href`, `alt`, `class`,
 `style`, `type`, `disabled`, ARIA/data attributes, listeners, and legitimate

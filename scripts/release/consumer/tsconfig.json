@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noEmit": true,
+    "lib": ["ES2022", "DOM"],
+    "types": ["@veebox/vue", "node"],
+    "skipLibCheck": false
+  },
+  "include": ["src/**/*.ts", "src/**/*.vue", "vbox.config.ts", "vbox.d.ts"],
+  "vueCompilerOptions": { "plugins": ["@veebox/volar"] }
+}
